@@ -4,6 +4,6 @@
 
 struct RigidBodyComponent : fr::Component
 {
-    float mass;
+    float     mass;
     glm::vec3 velocity;
 };

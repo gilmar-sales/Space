@@ -5,6 +5,6 @@
 
 struct SphereColliderComponent : fr::Component
 {
-    float radius;
+    float     radius;
     glm::vec3 offset;
 };

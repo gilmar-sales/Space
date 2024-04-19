@@ -4,7 +4,7 @@
 
 struct CollisionEvent : fr::Event
 {
-  fr::Entity target;
-  fr::Entity collisor;
-  float deltaTime;
+    fr::Entity target;
+    fr::Entity collisor;
+    float      deltaTime;
 };

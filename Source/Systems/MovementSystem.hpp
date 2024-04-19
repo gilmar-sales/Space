@@ -4,5 +4,6 @@
 
 class MovementSystem : public fr::System
 {
-    void Update(float deltaTime);
+  public:
+    void Update(float deltaTime) override;
 };

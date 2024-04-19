@@ -17,12 +17,6 @@ void RenderSystem::Update(float dt)
 {
 }
 
-struct InstanceElement {
-    fr::Entity entity;
-    glm::mat4 matrix;
-    std::vector<std::uint32_t>* meshes;
-};
-
 void RenderSystem::PostUpdate(float dt)
 {
     mInstanceBuffers.clear();
@@ -31,21 +25,20 @@ void RenderSystem::PostUpdate(float dt)
 
     std::vector<std::uint32_t>* currentMeshes = nullptr;
 
-    mManager->ForEach<TransformComponent, ModelComponent>([&](fr::Entity entity, TransformComponent& transform, ModelComponent& model)
-    {
+    mManager->ForEach<TransformComponent, ModelComponent>([&](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
         if (currentMeshes && currentMeshes != model.meshes)
-            {
+        {
             const auto instanceBuffer = mRenderer->GetBufferBuilder()
-                .SetData(instanceData.data())
-                .SetSize(sizeof(glm::mat4) * instanceData.size())
-                .SetUsage(fra::BufferUsage::Instance)
-                .Build();
+                                            .SetData(instanceData.data())
+                                            .SetSize(sizeof(glm::mat4) * instanceData.size())
+                                            .SetUsage(fra::BufferUsage::Instance)
+                                            .Build();
 
             mInstanceBuffers.push_back(instanceBuffer);
 
             mRenderer->BindBuffer(instanceBuffer);
 
-            for(const auto& meshId : *currentMeshes)
+            for (const auto& meshId : *currentMeshes)
             {
                 gMeshPool->DrawInstanced(meshId, instanceData.size());
             }
@@ -68,16 +61,16 @@ void RenderSystem::PostUpdate(float dt)
     if (!instanceData.empty())
     {
         const auto instanceBuffer = mRenderer->GetBufferBuilder()
-            .SetData(instanceData.data())
-            .SetSize(sizeof(glm::mat4) * instanceData.size())
-            .SetUsage(fra::BufferUsage::Instance)
-            .Build();
+                                        .SetData(instanceData.data())
+                                        .SetSize(sizeof(glm::mat4) * instanceData.size())
+                                        .SetUsage(fra::BufferUsage::Instance)
+                                        .Build();
 
         mInstanceBuffers.push_back(instanceBuffer);
 
         mRenderer->BindBuffer(instanceBuffer);
 
-        for(const auto& meshId : *currentMeshes)
+        for (const auto& meshId : *currentMeshes)
         {
             gMeshPool->DrawInstanced(meshId, instanceData.size());
         }

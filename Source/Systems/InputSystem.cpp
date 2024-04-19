@@ -1,8 +1,8 @@
 #include "InputSystem.hpp"
 
-#include <glm/glm.hpp>
-#include <glm/ext/matrix_transform.hpp>
 #include <Core/UniformBuffer.hpp>
+#include <glm/ext/matrix_transform.hpp>
+#include <glm/glm.hpp>
 
 void InputSystem::PreUpdate(float deltaTime)
 {
@@ -127,12 +127,12 @@ void InputSystem::PreUpdate(float deltaTime)
     cameraPosition += cameraRight * cameraVelocity.x * 100.0f * deltaTime;
 
     auto projection = fra::ProjectionUniformBuffer {
-            .view =
-                glm::lookAt(cameraPosition, cameraPosition + cameraForward, cameraUp),
-            .projection = glm::perspective(glm::radians(45.0f),
-                                            mWindow->GetWidth() / (float) mWindow->GetHeight(),
-                                            0.001f,
-                                            1000.0f)
+        .view =
+            glm::lookAt(cameraPosition, cameraPosition + cameraForward, cameraUp),
+        .projection = glm::perspective(glm::radians(45.0f),
+                                       mWindow->GetWidth() / (float) mWindow->GetHeight(),
+                                       0.001f,
+                                       1000.0f)
     };
 
     mRenderer->UpdateProjection(projection);

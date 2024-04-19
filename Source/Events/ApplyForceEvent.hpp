@@ -7,7 +7,7 @@
 struct ApplyForceEvent : fr::Event
 {
     fr::Entity target;
-    glm::vec3 direction;
-    float magnetiude;
-    float deltaTime;
+    glm::vec3  direction;
+    float      magnetiude;
+    float      deltaTime;
 };
