@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Freyr.hpp>
+#include <Freyr/Freyr.hpp>
 
 class SpawnSystem : public fr::System
 {

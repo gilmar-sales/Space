@@ -8,6 +8,7 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
+#include <Events/OctreeFinishedEvent.hpp>
 
 extern std::shared_ptr<fra::MeshPool> gMeshPool;
 
@@ -15,20 +16,16 @@ void CollisionSystem::Start()
 {
     mSphereModel = gMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
     mCubeModel   = gMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
+
+    mManager->AddEventListener<OctreeFinishedEvent>([](OctreeFinishedEvent octreeFinishedEvent) {
+
+    });
 }
 
 void CollisionSystem::Update(float deltaTime)
 {
-    mOctree = std::make_shared<Octree>(glm::vec3(0), 1000.0f, 4);
-
-    mManager->ForEach<TransformComponent, SphereColliderComponent>([octree = mOctree](fr::Entity entity, TransformComponent& transform, SphereColliderComponent& sphereCollider) {
-        octree->Insert(Particle {
-            .entity         = entity,
-            .transform      = transform,
-            .sphereCollider = sphereCollider });
-    });
-
-    mManager->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>([octree = mOctree, manager = mManager, deltaTime = deltaTime](fr::Entity entity, TransformComponent& transform, SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
+    auto octree = mOctreeSystem->GetOctree();
+    mManager->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>([octree = octree, manager = mManager, deltaTime = deltaTime](fr::Entity entity, TransformComponent& transform, SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
         auto collisions = std::vector<Particle*>(0);
 
         auto particle = Particle {

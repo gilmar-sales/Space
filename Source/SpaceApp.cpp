@@ -6,23 +6,23 @@ void SpaceApp::Startup()
 
     mManager = std::make_shared<fr::ECSManager>(30'000);
 
+    auto diContainer = mManager->GetDIContainer();
+
+    diContainer->AddSingleton<fra::Window>(mWindow);
+    diContainer->AddSingleton<fra::Renderer>(mRenderer);
+
     mManager->RegisterComponent<ModelComponent>();
     mManager->RegisterComponent<TransformComponent>();
     mManager->RegisterComponent<SphereColliderComponent>();
     mManager->RegisterComponent<RigidBodyComponent>();
 
-    auto inputSystem       = mManager->RegisterSystem<InputSystem>();
-    inputSystem->mRenderer = mRenderer;
-    inputSystem->mWindow   = mWindow;
-
+    mManager->RegisterSystem<InputSystem>();
     mManager->RegisterSystem<SpawnSystem>();
+    mManager->RegisterSystem<OctreeSystem>();
+    mManager->RegisterSystem<CollisionSystem>();
     mManager->RegisterSystem<MovementSystem>();
     mManager->RegisterSystem<PhysicsSystem>();
-    mManager->RegisterSystem<CollisionSystem>()->mRenderer = mRenderer;
-
-    auto renderSystem       = mManager->RegisterSystem<RenderSystem>();
-    renderSystem->mRenderer = mRenderer;
-    mRenderer->SetDrawDistance(1000000.0f);
+    mManager->RegisterSystem<RenderSystem>();
 }
 
 void SpaceApp::Update()

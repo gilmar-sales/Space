@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Freyr.hpp>
+#include <Freyr/Freyr.hpp>
 #include <glm/glm.hpp>
 
 struct TransformComponent : fr::Component

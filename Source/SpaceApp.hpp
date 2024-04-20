@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Core/AbstractApplication.hpp>
-#include <Freyr.hpp>
+#include <Freyr/Freyr.hpp>
 
 #include "Components/ModelComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"

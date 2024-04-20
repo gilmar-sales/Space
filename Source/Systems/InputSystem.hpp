@@ -2,12 +2,14 @@
 
 #include <Core/Renderer.hpp>
 #include <Core/Window.hpp>
-#include <Freyr.hpp>
-
+#include <Freyr/Freyr.hpp>
 
 class InputSystem : public fr::System
 {
   public:
+    InputSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::Window> window) :
+        mRenderer(renderer), mWindow(window) {}
+
     void PreUpdate(float deltaTime) override;
 
   private:

@@ -122,6 +122,54 @@ bool Octree::Intersect(const Particle& particle)
         particle.transform.position.z <= mPosition.z + (mHalfRange + particle.sphereCollider.radius));
 }
 
+void Octree::Query(Frustum& frustum, std::vector<Particle*>& found)
+{
+    if (!Intersect(frustum))
+    {
+        return;
+    }
+
+    for (auto& other : mElements)
+    {
+        if (other.isOnFrustum(frustum))
+        {
+            found.push_back(&other);
+        }
+    }
+
+    if (mNearTopLeft)
+    {
+        mNearTopLeft->Query(frustum, found);
+        mNearTopRight->Query(frustum, found);
+        mNearBotLeft->Query(frustum, found);
+        mNearBotRight->Query(frustum, found);
+        mFarTopLeft->Query(frustum, found);
+        mFarTopRight->Query(frustum, found);
+        mFarBotLeft->Query(frustum, found);
+        mFarBotRight->Query(frustum, found);
+    }
+}
+
+// see https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
+bool Octree::isOnOrForwardPlane(const Plane& plane) const
+{
+    // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
+    const float r = mHalfRange * std::abs(plane.normal.x) + mHalfRange * std::abs(plane.normal.y) +
+                    mHalfRange * std::abs(plane.normal.z);
+
+    return -r <= plane.getSignedDistanceToPlane(mPosition);
+}
+
+bool Octree::Intersect(const Frustum& camFrustum)
+{
+    return (isOnOrForwardPlane(camFrustum.leftFace) &&
+            isOnOrForwardPlane(camFrustum.rightFace) &&
+            isOnOrForwardPlane(camFrustum.topFace) &&
+            isOnOrForwardPlane(camFrustum.bottomFace) &&
+            isOnOrForwardPlane(camFrustum.nearFace) &&
+            isOnOrForwardPlane(camFrustum.farFace));
+}
+
 void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData)
 {
     auto modelMatrix = glm::mat4(1);
