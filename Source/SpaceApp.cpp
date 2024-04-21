@@ -2,14 +2,13 @@
 
 void SpaceApp::Startup()
 {
-    gMeshPool = mRenderer->GetMeshPoolFactory()->CreateMeshPool();
-
     mManager = std::make_shared<fr::ECSManager>(30'000);
 
     auto diContainer = mManager->GetDIContainer();
 
     diContainer->AddSingleton<fra::Window>(mWindow);
     diContainer->AddSingleton<fra::Renderer>(mRenderer);
+    diContainer->AddSingleton<fra::MeshPool>(mRenderer->GetMeshPoolFactory()->CreateMeshPool());
 
     mManager->RegisterComponent<ModelComponent>();
     mManager->RegisterComponent<TransformComponent>();

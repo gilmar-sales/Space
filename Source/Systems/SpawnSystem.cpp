@@ -9,8 +9,6 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Events/CollisionEvent.hpp"
 
-extern std::shared_ptr<fra::MeshPool> gMeshPool;
-
 glm::vec3 randomPosition(int min, int max)
 {
     std::random_device              r;
@@ -22,9 +20,9 @@ glm::vec3 randomPosition(int min, int max)
 
 void SpawnSystem::Start()
 {
-    mRedShipModel  = gMeshPool->CreateMeshFromFile("C:/Models/cartoon_spaceship_red.obj");
-    mBlueShipModel = gMeshPool->CreateMeshFromFile("C:/Models/cartoon_spaceship_blue.obj");
-    mMoonModel     = gMeshPool->CreateMeshFromFile("C:/Models/moon.obj");
+    mRedShipModel  = mMeshPool->CreateMeshFromFile("C:/Models/cartoon_spaceship_red.obj");
+    mBlueShipModel = mMeshPool->CreateMeshFromFile("C:/Models/cartoon_spaceship_blue.obj");
+    mMoonModel     = mMeshPool->CreateMeshFromFile("C:/Models/moon.obj");
 
     for (auto i = 1; i <= 10; i++)
     {
@@ -35,17 +33,13 @@ void SpawnSystem::Start()
                 auto redShip = mManager->CreateEntity();
                 mManager->AddComponent(redShip, ModelComponent { .meshes = &mRedShipModel });
 
-                auto defaultRedTransform = TransformComponent {
-                    .position = glm::vec3(i, j, k) * 5.0f,
-                    .rotation = glm::vec3(0),
-                    .scale    = glm::vec3(1)
-                };
+                auto defaultRedTransform =
+                    TransformComponent { .position = glm::vec3(i, j, k) * 5.0f,
+                                         .rotation = glm::vec3(0),
+                                         .scale    = glm::vec3(1) };
                 mManager->AddComponent(redShip, defaultRedTransform);
-                mManager->AddComponent(redShip, SphereColliderComponent {
-                                                    .radius = 1.0f,
-                                                    .offset = glm::vec3(0) });
-                mManager->AddComponent(redShip, RigidBodyComponent {
-                                                    .mass = 100.0f });
+                mManager->AddComponent(redShip, SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) });
+                mManager->AddComponent(redShip, RigidBodyComponent { .mass = 100.0f });
             }
         }
     }
@@ -59,17 +53,13 @@ void SpawnSystem::Start()
                 auto blueShip = mManager->CreateEntity();
                 mManager->AddComponent(blueShip, ModelComponent { .meshes = &mBlueShipModel });
 
-                auto defaultBlueTransform = TransformComponent {
-                    .position = glm::vec3(-i, j, k) * 5.0f,
-                    .rotation = glm::vec3(0.0),
-                    .scale    = glm::vec3(1.0, 1.0, 1.0)
-                };
+                auto defaultBlueTransform =
+                    TransformComponent { .position = glm::vec3(-i, j, k) * 5.0f,
+                                         .rotation = glm::vec3(0.0),
+                                         .scale    = glm::vec3(1.0, 1.0, 1.0) };
                 mManager->AddComponent(blueShip, defaultBlueTransform);
-                mManager->AddComponent(blueShip, SphereColliderComponent {
-                                                     .radius = 1.0f,
-                                                     .offset = glm::vec3(0) });
-                mManager->AddComponent(blueShip, RigidBodyComponent {
-                                                     .mass = 100.0f });
+                mManager->AddComponent(blueShip, SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) });
+                mManager->AddComponent(blueShip, RigidBodyComponent { .mass = 100.0f });
             }
         }
     }
@@ -79,15 +69,12 @@ void SpawnSystem::Start()
         auto moon = mManager->CreateEntity();
         mManager->AddComponent(moon, ModelComponent { .meshes = &mMoonModel });
 
-        auto defaultBlueTransform = TransformComponent {
-            .position = randomPosition(-100, 100),
-            .rotation = glm::vec3(0.0),
-            .scale    = glm::vec3(1.0, 1.0, 1.0)
-        };
+        auto defaultBlueTransform =
+            TransformComponent { .position = randomPosition(-100, 100),
+                                 .rotation = glm::vec3(0.0),
+                                 .scale    = glm::vec3(1.0, 1.0, 1.0) };
         mManager->AddComponent(moon, defaultBlueTransform);
-        mManager->AddComponent(moon, SphereColliderComponent {
-                                         .radius = 1.0f,
-                                         .offset = glm::vec3(0) });
+        mManager->AddComponent(moon, SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) });
     }
 }
 

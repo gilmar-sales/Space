@@ -15,8 +15,6 @@
 #include "Systems/RenderSystem.hpp"
 #include "Systems/SpawnSystem.hpp"
 
-extern std::shared_ptr<fra::MeshPool> gMeshPool;
-
 class SpaceApp : public fra::AbstractApplication
 {
   public:

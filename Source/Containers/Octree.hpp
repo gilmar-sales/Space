@@ -16,7 +16,8 @@ struct Particle
 
     bool Intersect(const Particle& other)
     {
-        return glm::distance(transform.position, other.transform.position) <= sphereCollider.radius + other.sphereCollider.radius;
+        return glm::distance(transform.position, other.transform.position) <=
+               sphereCollider.radius + other.sphereCollider.radius;
     }
 
     bool isOnOrForwardPlane(const Plane& plane) const
@@ -26,12 +27,9 @@ struct Particle
 
     bool isOnFrustum(const Frustum& camFrustum) const
     {
-        return (isOnOrForwardPlane(camFrustum.leftFace) &&
-                isOnOrForwardPlane(camFrustum.rightFace) &&
-                isOnOrForwardPlane(camFrustum.farFace) &&
-                isOnOrForwardPlane(camFrustum.nearFace) &&
-                isOnOrForwardPlane(camFrustum.topFace) &&
-                isOnOrForwardPlane(camFrustum.bottomFace));
+        return (isOnOrForwardPlane(camFrustum.leftFace) && isOnOrForwardPlane(camFrustum.rightFace) &&
+                isOnOrForwardPlane(camFrustum.farFace) && isOnOrForwardPlane(camFrustum.nearFace) &&
+                isOnOrForwardPlane(camFrustum.topFace) && isOnOrForwardPlane(camFrustum.bottomFace));
     }
 };
 
@@ -53,7 +51,10 @@ class Octree
     bool isOnOrForwardPlane(const Plane& plane) const;
     bool Intersect(const Frustum& particle);
 
-    void Draw(std::shared_ptr<fra::Renderer> renderer, std::vector<std::uint32_t>& meshIds);
+    void Draw(std::shared_ptr<fra::Renderer> renderer,
+              std::shared_ptr<fra::MeshPool>
+                                          meshPool,
+              std::vector<std::uint32_t>& meshIds);
     void PushInstanceData(std::vector<glm::mat4>& instanceData);
 
   private:

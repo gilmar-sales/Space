@@ -12,7 +12,6 @@ AllowShortIfStatementsOnASingleLine: Never
 AlwaysBreakTemplateDeclarations: Yes
 BreakBeforeTernaryOperators: true
 BreakConstructorInitializers: AfterColon
-ColumnLimit: 0
 ConstructorInitializerIndentWidth: 4
 Cpp11BracedListStyle: false
 ExperimentalAutoDetectBinPacking: true

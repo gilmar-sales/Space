@@ -9,8 +9,12 @@
 class CollisionSystem : public fr::System
 {
   public:
-    CollisionSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<OctreeSystem> octreeSystem) :
-        mRenderer(renderer), mOctreeSystem(octreeSystem) {}
+    CollisionSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::MeshPool> meshPool,
+                    std::shared_ptr<OctreeSystem> octreeSystem) :
+        mRenderer(renderer),
+        mMeshPool(meshPool), mOctreeSystem(octreeSystem)
+    {
+    }
 
     void Start() override;
     void Update(float deltaTime) override;
@@ -18,8 +22,10 @@ class CollisionSystem : public fr::System
   private:
     friend class SpaceApp;
 
-    std::vector<std::uint32_t>     mSphereModel;
-    std::vector<std::uint32_t>     mCubeModel;
+    std::vector<std::uint32_t> mSphereModel;
+    std::vector<std::uint32_t> mCubeModel;
+
     std::shared_ptr<OctreeSystem>  mOctreeSystem;
+    std::shared_ptr<fra::MeshPool> mMeshPool;
     std::shared_ptr<fra::Renderer> mRenderer;
 };

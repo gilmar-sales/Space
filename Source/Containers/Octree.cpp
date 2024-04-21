@@ -2,8 +2,6 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-extern std::shared_ptr<fra::MeshPool> gMeshPool;
-
 Octree::Octree(glm::vec3 position, float halfRange, size_t capacity)
 {
     mPosition  = position;
@@ -18,13 +16,12 @@ Octree::Octree(const Octree&)
 
 bool Octree::Contains(const Particle& particle)
 {
-    return (
-        particle.transform.position.x >= mPosition.x - mHalfRange &&
-        particle.transform.position.x <= mPosition.x + mHalfRange &&
-        particle.transform.position.y >= mPosition.y - mHalfRange &&
-        particle.transform.position.y <= mPosition.y + mHalfRange &&
-        particle.transform.position.z >= mPosition.z - mHalfRange &&
-        particle.transform.position.z <= mPosition.z + mHalfRange);
+    return (particle.transform.position.x >= mPosition.x - mHalfRange &&
+            particle.transform.position.x <= mPosition.x + mHalfRange &&
+            particle.transform.position.y >= mPosition.y - mHalfRange &&
+            particle.transform.position.y <= mPosition.y + mHalfRange &&
+            particle.transform.position.z >= mPosition.z - mHalfRange &&
+            particle.transform.position.z <= mPosition.z + mHalfRange);
 }
 
 bool Octree::Insert(Particle particle)
@@ -44,15 +41,9 @@ bool Octree::Insert(Particle particle)
         Subdivide();
     }
 
-    return (
-        mNearTopLeft->Insert(particle) ||
-        mNearTopRight->Insert(particle) ||
-        mNearBotLeft->Insert(particle) ||
-        mNearBotRight->Insert(particle) ||
-        mFarTopLeft->Insert(particle) ||
-        mFarTopRight->Insert(particle) ||
-        mFarBotLeft->Insert(particle) ||
-        mFarBotRight->Insert(particle));
+    return (mNearTopLeft->Insert(particle) || mNearTopRight->Insert(particle) || mNearBotLeft->Insert(particle) ||
+            mNearBotRight->Insert(particle) || mFarTopLeft->Insert(particle) || mFarTopRight->Insert(particle) ||
+            mFarBotLeft->Insert(particle) || mFarBotRight->Insert(particle));
 }
 
 void Octree::Subdivide()
@@ -113,13 +104,12 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
 bool Octree::Intersect(const Particle& particle)
 {
-    return (
-        particle.transform.position.x >= mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
-        particle.transform.position.x <= mPosition.x + (mHalfRange + particle.sphereCollider.radius) &&
-        particle.transform.position.y >= mPosition.y - (mHalfRange + particle.sphereCollider.radius) &&
-        particle.transform.position.y <= mPosition.y + (mHalfRange + particle.sphereCollider.radius) &&
-        particle.transform.position.z >= mPosition.z - (mHalfRange + particle.sphereCollider.radius) &&
-        particle.transform.position.z <= mPosition.z + (mHalfRange + particle.sphereCollider.radius));
+    return (particle.transform.position.x >= mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.x <= mPosition.x + (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.y >= mPosition.y - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.y <= mPosition.y + (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.z >= mPosition.z - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.z <= mPosition.z + (mHalfRange + particle.sphereCollider.radius));
 }
 
 void Octree::Query(Frustum& frustum, std::vector<Particle*>& found)
@@ -162,12 +152,9 @@ bool Octree::isOnOrForwardPlane(const Plane& plane) const
 
 bool Octree::Intersect(const Frustum& camFrustum)
 {
-    return (isOnOrForwardPlane(camFrustum.leftFace) &&
-            isOnOrForwardPlane(camFrustum.rightFace) &&
-            isOnOrForwardPlane(camFrustum.topFace) &&
-            isOnOrForwardPlane(camFrustum.bottomFace) &&
-            isOnOrForwardPlane(camFrustum.nearFace) &&
-            isOnOrForwardPlane(camFrustum.farFace));
+    return (isOnOrForwardPlane(camFrustum.leftFace) && isOnOrForwardPlane(camFrustum.rightFace) &&
+            isOnOrForwardPlane(camFrustum.topFace) && isOnOrForwardPlane(camFrustum.bottomFace) &&
+            isOnOrForwardPlane(camFrustum.nearFace) && isOnOrForwardPlane(camFrustum.farFace));
 }
 
 void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData)
@@ -192,23 +179,27 @@ void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData)
     }
 }
 
-void Octree::Draw(std::shared_ptr<fra::Renderer> renderer, std::vector<std::uint32_t>& meshIds)
+void Octree::Draw(std::shared_ptr<fra::Renderer> renderer,
+                  std::shared_ptr<fra::MeshPool>
+                                              meshPool,
+                  std::vector<std::uint32_t>& meshIds)
 {
     static std::shared_ptr<fra::Buffer> instanceBuffer = nullptr;
     auto                                instanceData   = std::vector<glm::mat4>();
 
     PushInstanceData(instanceData);
 
-    instanceBuffer = renderer->GetBufferBuilder()
-                         .SetData(instanceData.data())
-                         .SetSize(sizeof(glm::mat4) * instanceData.size())
-                         .SetUsage(fra::BufferUsage::Instance)
-                         .Build();
+    instanceBuffer =
+        renderer->GetBufferBuilder()
+            .SetData(instanceData.data())
+            .SetSize(sizeof(glm::mat4) * instanceData.size())
+            .SetUsage(fra::BufferUsage::Instance)
+            .Build();
 
     renderer->BindBuffer(instanceBuffer);
 
     for (auto meshId : meshIds)
     {
-        gMeshPool->DrawInstanced(meshId, instanceData.size());
+        meshPool->DrawInstanced(meshId, instanceData.size());
     }
 }

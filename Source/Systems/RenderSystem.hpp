@@ -8,8 +8,12 @@
 class RenderSystem : public fr::System
 {
   public:
-    RenderSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<OctreeSystem> octreeSystem) :
-        mRenderer(renderer), mOctreeSystem(octreeSystem) {}
+    RenderSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::MeshPool> meshPool,
+                 std::shared_ptr<OctreeSystem> octreeSystem) :
+        mRenderer(renderer),
+        mMeshPool(meshPool), mOctreeSystem(octreeSystem)
+    {
+    }
 
     void Start() override;
     void Update(float dt) override;
@@ -19,6 +23,7 @@ class RenderSystem : public fr::System
     friend class SpaceApp;
 
     std::shared_ptr<fra::Renderer> mRenderer;
+    std::shared_ptr<fra::MeshPool> mMeshPool;
     std::shared_ptr<OctreeSystem>  mOctreeSystem;
 
     std::vector<std::shared_ptr<fra::Buffer>> mInstanceBuffers;
