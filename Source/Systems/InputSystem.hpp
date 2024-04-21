@@ -8,12 +8,15 @@ class InputSystem : public fr::System
 {
   public:
     InputSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::Window> window) :
-        mRenderer(renderer), mWindow(window) {}
+        mRenderer(renderer), mWindow(window)
+    {
+    }
 
     void PreUpdate(float deltaTime) override;
 
   private:
     friend class SpaceApp;
+
     std::shared_ptr<fra::Renderer> mRenderer;
     std::shared_ptr<fra::Window>   mWindow;
 };

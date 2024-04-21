@@ -10,15 +10,11 @@ struct Plane
     Plane() = default;
 
     Plane(const glm::vec3& position, const glm::vec3& normal) :
-        normal(glm::normalize(normal)),
-        distance(glm::dot(normal, position))
+        normal(glm::normalize(normal)), distance(glm::dot(normal, position))
     {
     }
 
-    float getSignedDistanceToPlane(const glm::vec3& point) const
-    {
-        return glm::dot(normal, point) - distance;
-    }
+    float getSignedDistanceToPlane(const glm::vec3& point) const { return glm::dot(normal, point) - distance; }
 };
 
 struct Frustum
@@ -30,5 +26,6 @@ struct Frustum
     Plane farFace;
     Plane nearFace;
 
-    Frustum(glm::vec3 position, glm::vec3 forward, glm::vec3 right, glm::vec3 up, float aspect, float fovY, float zNear, float zFar);
+    Frustum(glm::vec3 position, glm::vec3 forward, glm::vec3 right, glm::vec3 up, float aspect, float fovY, float zNear,
+            float zFar);
 };
