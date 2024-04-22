@@ -5,6 +5,13 @@
 
 #include <Systems/OctreeSystem.hpp>
 
+struct InstanceDraw
+{
+    size_t                      index;
+    int                         instanceCount;
+    std::vector<std::uint32_t>* meshes;
+};
+
 class RenderSystem : public fr::System
 {
   public:
@@ -15,8 +22,6 @@ class RenderSystem : public fr::System
     {
     }
 
-    void Start() override;
-    void Update(float dt) override;
     void PostUpdate(float dt) override;
 
   private:

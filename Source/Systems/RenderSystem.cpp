@@ -7,28 +7,15 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-void RenderSystem::Start()
-{
-}
-
-void RenderSystem::Update(float dt)
-{
-}
-
-struct InstanceDraw
-{
-    size_t                      index;
-    int                         instanceCount;
-    std::vector<std::uint32_t>* meshes;
-};
-
 void RenderSystem::PostUpdate(float dt)
 {
+    mRenderer->BeginFrame();
+
     mInstanceBuffers.clear();
+
     auto instanceData = std::vector<glm::mat4>();
     instanceData.resize(mManager->Count<TransformComponent, ModelComponent>());
 
-    mManager->StartTraceProfiling("Calculate Instances");
     mManager->ForEachParallel<TransformComponent, ModelComponent>(
         [&](fr::Entity entity, int index, TransformComponent& transform, ModelComponent& model) {
             auto& matrix = instanceData[index];
@@ -37,10 +24,9 @@ void RenderSystem::PostUpdate(float dt)
             matrix = glm::rotate(matrix, transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
             matrix = glm::rotate(matrix, transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
             matrix = glm::rotate(matrix, transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::scale(matrix, transform.scale);
             matrix = glm::translate(matrix, transform.position);
+            matrix = glm::scale(matrix, transform.scale);
         });
-    mManager->EndTraceProfiling();
 
     auto                        dataIndex     = instanceData.size();
     auto                        instanceCount = 0;
@@ -71,7 +57,6 @@ void RenderSystem::PostUpdate(float dt)
             }
         });
 
-    mManager->StartTraceProfiling("Draw Instances");
     for (auto& draw : instanceDraws)
     {
         const auto instanceBuffer =
@@ -90,26 +75,6 @@ void RenderSystem::PostUpdate(float dt)
             mMeshPool->DrawInstanced(meshId, draw.instanceCount);
         }
     }
-    mManager->EndTraceProfiling();
 
-    // if (!instanceData.empty())
-    // {
-    //     const auto instanceBuffer =
-    //         mRenderer->GetBufferBuilder()
-    //             .SetData(instanceData.data())
-    //             .SetSize(sizeof(glm::mat4) * instanceData.size())
-    //             .SetUsage(fra::BufferUsage::Instance)
-    //             .Build();
-
-    //     mInstanceBuffers.push_back(instanceBuffer);
-
-    //     mRenderer->BindBuffer(instanceBuffer);
-
-    //     for (const auto& meshId : *currentMeshes)
-    //     {
-    //         mMeshPool->DrawInstanced(meshId, instanceData.size());
-    //     }
-
-    //     instanceData.clear();
-    // }
+    mRenderer->EndFrame();
 }

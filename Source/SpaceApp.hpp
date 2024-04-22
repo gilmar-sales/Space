@@ -18,9 +18,9 @@
 class SpaceApp : public fra::AbstractApplication
 {
   public:
-    void Startup() override;
+    void Startup();
 
-    void Update() override;
+    void Run() override;
 
   private:
     std::shared_ptr<fr::ECSManager> mManager;

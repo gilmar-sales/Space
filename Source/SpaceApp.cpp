@@ -24,7 +24,13 @@ void SpaceApp::Startup()
     mManager->RegisterSystem<RenderSystem>();
 }
 
-void SpaceApp::Update()
+void SpaceApp::Run()
 {
-    mManager->Update(mWindow->GetDeltaTime());
+    Startup();
+
+    while (mWindow->IsRunning())
+    {
+        mWindow->Update();
+        mManager->Update(mWindow->GetDeltaTime());
+    }
 }
