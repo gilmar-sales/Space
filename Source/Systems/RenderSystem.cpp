@@ -13,19 +13,15 @@ void RenderSystem::PostUpdate(float dt)
 
     mInstanceBuffers.clear();
 
-    auto instanceData = std::vector<glm::mat4>();
-    instanceData.resize(mManager->Count<TransformComponent, ModelComponent>());
+    auto instanceData = mManager->Map<TransformComponent, ModelComponent>(
+        [](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
+            auto matrix = glm::rotate(glm::mat4(1), transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix      = glm::rotate(matrix, transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix      = glm::rotate(matrix, transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+            matrix      = glm::translate(matrix, transform.position);
+            matrix      = glm::scale(matrix, transform.scale);
 
-    mManager->ForEachParallel<TransformComponent, ModelComponent>(
-        [&](fr::Entity entity, int index, TransformComponent& transform, ModelComponent& model) {
-            auto& matrix = instanceData[index];
-
-            matrix = glm::mat4(1);
-            matrix = glm::rotate(matrix, transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix = glm::rotate(matrix, transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix = glm::rotate(matrix, transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
-            matrix = glm::translate(matrix, transform.position);
-            matrix = glm::scale(matrix, transform.scale);
+            return matrix;
         });
 
     auto                        dataIndex     = instanceData.size();
