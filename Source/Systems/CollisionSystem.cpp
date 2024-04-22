@@ -12,8 +12,8 @@
 
 void CollisionSystem::Start()
 {
-    mSphereModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
-    mCubeModel   = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
+    // mSphereModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
+    // mCubeModel   = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 
     mManager->AddEventListener<OctreeFinishedEvent>([](OctreeFinishedEvent octreeFinishedEvent) {
 

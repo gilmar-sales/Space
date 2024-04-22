@@ -19,8 +19,9 @@ void RenderSystem::PostUpdate(float dt)
 {
     mInstanceBuffers.clear();
     auto instanceData = std::vector<glm::mat4>();
-    instanceData.reserve(mManager->Count<TransformComponent, ModelComponent>());
+    instanceData.resize(mManager->Count<TransformComponent, ModelComponent>());
 
+    mManager->StartTraceProfiling("Calculate Instances");
     mManager->ForEachParallel<TransformComponent, ModelComponent>(
         [&](fr::Entity entity, int index, TransformComponent& transform, ModelComponent& model) {
             auto& matrix = instanceData[index];
@@ -34,18 +35,18 @@ void RenderSystem::PostUpdate(float dt)
         });
     mManager->EndTraceProfiling();
 
-    auto                        dataIndex     = 0;
+    auto                        dataIndex     = instanceData.size() - 1;
     auto                        instanceCount = 0;
     std::vector<std::uint32_t>* currentMeshes = nullptr;
 
     mManager->ForEach<TransformComponent, ModelComponent>(
         [&](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
-            if (currentMeshes && currentMeshes != model.meshes)
+            if (currentMeshes && currentMeshes != model.meshes || dataIndex == instanceCount)
             {
                 mManager->StartTraceProfiling("Draw Instances");
                 const auto instanceBuffer =
                     mRenderer->GetBufferBuilder()
-                        .SetData(&instanceData[dataIndex])
+                        .SetData(&instanceData[dataIndex - instanceCount])
                         .SetSize(sizeof(glm::mat4) * instanceCount)
                         .SetUsage(fra::BufferUsage::Instance)
                         .Build();
@@ -54,12 +55,15 @@ void RenderSystem::PostUpdate(float dt)
 
                 mRenderer->BindBuffer(instanceBuffer);
 
+                // if (!currentMeshes)
+                //     currentMeshes = model.meshes;
+
                 for (const auto& meshId : *currentMeshes)
                 {
                     mMeshPool->DrawInstanced(meshId, instanceCount);
                 }
 
-                dataIndex += instanceCount;
+                dataIndex -= instanceCount;
                 instanceCount = 0;
                 mManager->EndTraceProfiling();
             }
