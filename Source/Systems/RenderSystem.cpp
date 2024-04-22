@@ -15,6 +15,13 @@ void RenderSystem::Update(float dt)
 {
 }
 
+struct InstanceDraw
+{
+    size_t                      index;
+    int                         instanceCount;
+    std::vector<std::uint32_t>* meshes;
+};
+
 void RenderSystem::PostUpdate(float dt)
 {
     mInstanceBuffers.clear();
@@ -35,42 +42,55 @@ void RenderSystem::PostUpdate(float dt)
         });
     mManager->EndTraceProfiling();
 
-    auto                        dataIndex     = instanceData.size() - 1;
+    auto                        dataIndex     = instanceData.size();
     auto                        instanceCount = 0;
     std::vector<std::uint32_t>* currentMeshes = nullptr;
 
+    auto instanceDraws = std::vector<InstanceDraw>();
+
     mManager->ForEach<TransformComponent, ModelComponent>(
         [&](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
-            if (currentMeshes && currentMeshes != model.meshes || dataIndex == instanceCount)
+            if (currentMeshes && currentMeshes != model.meshes)
             {
-                mManager->StartTraceProfiling("Draw Instances");
-                const auto instanceBuffer =
-                    mRenderer->GetBufferBuilder()
-                        .SetData(&instanceData[dataIndex - instanceCount])
-                        .SetSize(sizeof(glm::mat4) * instanceCount)
-                        .SetUsage(fra::BufferUsage::Instance)
-                        .Build();
-
-                mInstanceBuffers.push_back(instanceBuffer);
-
-                mRenderer->BindBuffer(instanceBuffer);
-
-                // if (!currentMeshes)
-                //     currentMeshes = model.meshes;
-
-                for (const auto& meshId : *currentMeshes)
-                {
-                    mMeshPool->DrawInstanced(meshId, instanceCount);
-                }
-
                 dataIndex -= instanceCount;
+
+                instanceDraws.push_back(
+                    InstanceDraw { .index = dataIndex, .instanceCount = instanceCount, .meshes = currentMeshes });
                 instanceCount = 0;
-                mManager->EndTraceProfiling();
             }
 
-            currentMeshes = model.meshes;
-            instanceCount += 1;
+            if (dataIndex == instanceCount + 1)
+            {
+                instanceDraws.push_back(
+                    InstanceDraw { .index = 0, .instanceCount = instanceCount + 1, .meshes = currentMeshes });
+            }
+            else
+            {
+                currentMeshes = model.meshes;
+                instanceCount += 1;
+            }
         });
+
+    mManager->StartTraceProfiling("Draw Instances");
+    for (auto& draw : instanceDraws)
+    {
+        const auto instanceBuffer =
+            mRenderer->GetBufferBuilder()
+                .SetData(&instanceData[draw.index])
+                .SetSize(sizeof(glm::mat4) * draw.instanceCount)
+                .SetUsage(fra::BufferUsage::Instance)
+                .Build();
+
+        mInstanceBuffers.push_back(instanceBuffer);
+
+        mRenderer->BindBuffer(instanceBuffer);
+
+        for (const auto& meshId : *draw.meshes)
+        {
+            mMeshPool->DrawInstanced(meshId, draw.instanceCount);
+        }
+    }
+    mManager->EndTraceProfiling();
 
     // if (!instanceData.empty())
     // {
