@@ -21,8 +21,6 @@ void InputSystem::PreUpdate(float deltaTime)
     static auto     cameraVelocity = glm::vec2(0.0f, 0.0f);
     static SDL_bool grab           = SDL_FALSE;
 
-    static auto samples = false;
-
     SDL_Event event;
     while (SDL_PollEvent(&event))
     {
@@ -52,8 +50,7 @@ void InputSystem::PreUpdate(float deltaTime)
                         mRenderer->SetVSync(!mRenderer->GetVSync());
                         break;
                     case SDL_SCANCODE_P:
-                        samples = !samples;
-                        if (samples)
+                        if (mRenderer->GetSamples() == vk::SampleCountFlagBits::e1)
                         {
                             mRenderer->SetSamples(vk::SampleCountFlagBits::e8);
                         }
@@ -119,9 +116,9 @@ void InputSystem::PreUpdate(float deltaTime)
     cameraPosition += cameraRight * cameraVelocity.x * 100.0f * deltaTime;
 
     auto projection = fra::ProjectionUniformBuffer {
-        .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward, cameraUp),
-        .projection =
-            glm::perspective(glm::radians(45.0f), mWindow->GetWidth() / (float) mWindow->GetHeight(), 0.001f, 1000.0f)
+        .view       = glm::lookAt(cameraPosition, cameraPosition + cameraForward, cameraUp),
+        .projection = glm::perspective(glm::radians(45.0f), mWindow->GetWidth() / (float) mWindow->GetHeight(), 0.001f,
+                                       mRenderer->GetDrawDistance())
     };
 
     mRenderer->UpdateProjection(projection);

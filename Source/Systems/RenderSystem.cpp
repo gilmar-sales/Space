@@ -11,8 +11,7 @@ void RenderSystem::PostUpdate(float dt)
 {
     mRenderer->BeginFrame();
 
-    mInstanceBuffers.clear();
-
+    mManager->StartTraceProfiling("Calculate matrices");
     auto instanceData = mManager->Map<TransformComponent, ModelComponent>(
         [](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
             auto matrix = glm::rotate(glm::mat4(1), transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -23,6 +22,7 @@ void RenderSystem::PostUpdate(float dt)
 
             return matrix;
         });
+    mManager->EndTraceProfiling();
 
     auto                        dataIndex     = instanceData.size();
     auto                        instanceCount = 0;
@@ -30,6 +30,7 @@ void RenderSystem::PostUpdate(float dt)
 
     auto instanceDraws = std::vector<InstanceDraw>();
 
+    mManager->StartTraceProfiling("Calculate instance sequence");
     mManager->ForEach<TransformComponent, ModelComponent>(
         [&](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
             if (currentMeshes && currentMeshes != model.meshes)
@@ -52,25 +53,28 @@ void RenderSystem::PostUpdate(float dt)
                 instanceCount += 1;
             }
         });
+    mManager->EndTraceProfiling();
 
+    mInstanceMatrixBuffers =
+        mRenderer->GetBufferBuilder()
+            .SetData(instanceData.data())
+            .SetSize(sizeof(glm::mat4) * instanceData.size())
+            .SetUsage(fra::BufferUsage::Instance)
+            .Build();
+
+    mRenderer->BindBuffer(mInstanceMatrixBuffers);
+
+    mManager->StartTraceProfiling("Draw instance sequences");
     for (auto& draw : instanceDraws)
     {
-        const auto instanceBuffer =
-            mRenderer->GetBufferBuilder()
-                .SetData(&instanceData[draw.index])
-                .SetSize(sizeof(glm::mat4) * draw.instanceCount)
-                .SetUsage(fra::BufferUsage::Instance)
-                .Build();
-
-        mInstanceBuffers.push_back(instanceBuffer);
-
-        mRenderer->BindBuffer(instanceBuffer);
-
         for (const auto& meshId : *draw.meshes)
         {
-            mMeshPool->DrawInstanced(meshId, draw.instanceCount);
+            mMeshPool->DrawInstanced(meshId, draw.instanceCount, draw.index);
         }
     }
+    mManager->EndTraceProfiling();
 
+    mManager->StartTraceProfiling("Render");
     mRenderer->EndFrame();
+    mManager->EndTraceProfiling();
 }

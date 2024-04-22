@@ -31,7 +31,7 @@ class RenderSystem : public fr::System
     std::shared_ptr<fra::MeshPool> mMeshPool;
     std::shared_ptr<OctreeSystem>  mOctreeSystem;
 
-    std::vector<std::shared_ptr<fra::Buffer>> mInstanceBuffers;
-    std::vector<std::uint32_t>                mRedShipModel;
-    std::vector<std::uint32_t>                mBlueShipModel;
+    std::shared_ptr<fra::Buffer> mInstanceMatrixBuffers;
+    std::vector<std::uint32_t>   mRedShipModel;
+    std::vector<std::uint32_t>   mBlueShipModel;
 };
