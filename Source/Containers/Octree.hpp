@@ -58,6 +58,8 @@ class Octree
     void PushInstanceData(std::vector<glm::mat4>& instanceData);
 
   private:
+    std::mutex mMutex;
+
     glm::vec3             mPosition;
     size_t                mCapacity;
     float                 mHalfRange;

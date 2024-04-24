@@ -31,14 +31,17 @@ bool Octree::Insert(Particle particle)
         return false;
     }
 
-    if (mElements.size() < mCapacity)
     {
-        mElements.push_back(particle);
-        return true;
-    }
-    else if (mFarTopLeft == nullptr)
-    {
-        Subdivide();
+        auto lock = std::lock_guard(mMutex);
+        if (mElements.size() < mCapacity)
+        {
+            mElements.push_back(particle);
+            return true;
+        }
+        else if (mFarTopLeft == nullptr)
+        {
+            Subdivide();
+        }
     }
 
     return (mNearTopLeft->Insert(particle) || mNearTopRight->Insert(particle) || mNearBotLeft->Insert(particle) ||
@@ -91,14 +94,29 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
     if (mNearTopLeft)
     {
-        mNearTopLeft->Query(particle, found);
-        mNearTopRight->Query(particle, found);
-        mNearBotLeft->Query(particle, found);
-        mNearBotRight->Query(particle, found);
-        mFarTopLeft->Query(particle, found);
-        mFarTopRight->Query(particle, found);
-        mFarBotLeft->Query(particle, found);
-        mFarBotRight->Query(particle, found);
+        if (mNearTopLeft->mElements.size())
+            mNearTopLeft->Query(particle, found);
+
+        if (mNearTopRight->mElements.size())
+            mNearTopRight->Query(particle, found);
+
+        if (mNearBotLeft->mElements.size())
+            mNearBotLeft->Query(particle, found);
+
+        if (mNearBotRight->mElements.size())
+            mNearBotRight->Query(particle, found);
+
+        if (mFarTopLeft->mElements.size())
+            mFarTopLeft->Query(particle, found);
+
+        if (mFarTopRight->mElements.size())
+            mFarTopRight->Query(particle, found);
+
+        if (mFarBotLeft->mElements.size())
+            mFarBotLeft->Query(particle, found);
+
+        if (mFarBotRight->mElements.size())
+            mFarBotRight->Query(particle, found);
     }
 }
 
