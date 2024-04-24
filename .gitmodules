@@ -1,6 +1,6 @@
 [submodule "ThirdParty/Freyr"]
 	path = ThirdParty/Freyr
-	url = https://github.com/gilmar-sales/Freyr.git
+	url = git@github.com:gilmar-sales/Freyr.git
 [submodule "ThirdParty/Freya"]
 	path = ThirdParty/Freya
-	url = https://github.com/gilmar-sales/Freya.git
+	url = git@github.com:gilmar-sales/Freya.git
