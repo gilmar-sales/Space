@@ -21,7 +21,7 @@ class RenderSystem : public fr::System
         mMeshPool(meshPool), mOctreeSystem(octreeSystem)
     {
     }
-
+    void Start() override;
     void PostUpdate(float dt) override;
 
   private:
@@ -32,6 +32,8 @@ class RenderSystem : public fr::System
     std::shared_ptr<OctreeSystem>  mOctreeSystem;
 
     std::shared_ptr<fra::Buffer> mInstanceMatrixBuffers;
-    std::vector<std::uint32_t>   mRedShipModel;
-    std::vector<std::uint32_t>   mBlueShipModel;
+
+    std::vector<std::uint32_t> mRedShipModel;
+    std::vector<std::uint32_t> mBlueShipModel;
+    std::vector<std::uint32_t> mCubeModel;
 };

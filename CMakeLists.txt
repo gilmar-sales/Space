@@ -26,3 +26,5 @@ if(MSVC)
   target_compile_options(SpaceAiWar PUBLIC "/ZI" "/MP")
   target_link_options(SpaceAiWar PUBLIC "/INCREMENTAL")
 endif()
+
+file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})

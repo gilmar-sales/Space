@@ -7,6 +7,11 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+void RenderSystem::Start()
+{
+    // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
+}
+
 void RenderSystem::PostUpdate(float dt)
 {
     mRenderer->BeginFrame();
@@ -73,6 +78,8 @@ void RenderSystem::PostUpdate(float dt)
         }
     }
     mManager->EndTraceProfiling();
+
+    // mOctreeSystem->GetOctree()->Draw(mRenderer, mMeshPool, mCubeModel);
 
     mManager->StartTraceProfiling("Render");
     mRenderer->EndFrame();

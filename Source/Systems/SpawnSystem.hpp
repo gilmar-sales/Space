@@ -15,6 +15,7 @@ class SpawnSystem : public fr::System
   private:
     std::shared_ptr<fra::MeshPool> mMeshPool;
 
+    std::vector<std::uint32_t> mBlackHoleModel;
     std::vector<std::uint32_t> mMoonModel;
     std::vector<std::uint32_t> mCheckpointModel;
     std::vector<std::uint32_t> mRedShipModel;
