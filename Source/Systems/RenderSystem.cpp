@@ -18,10 +18,14 @@ void RenderSystem::PostUpdate(float dt)
 
     mManager->StartTraceProfiling("Calculate matrices");
     auto instanceData = mManager->Map<TransformComponent, ModelComponent>(
-        [](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
-            auto matrix = glm::rotate(glm::mat4(1), transform.rotation.z, glm::vec3(0.0f, 0.0f, 1.0f));
-            matrix      = glm::rotate(matrix, transform.rotation.y, glm::vec3(0.0f, 1.0f, 0.0f));
-            matrix      = glm::rotate(matrix, transform.rotation.x, glm::vec3(1.0f, 0.0f, 0.0f));
+        [](fr::Entity entity, TransformComponent& transform,
+           ModelComponent& model) {
+            auto matrix = glm::rotate(glm::mat4(1), transform.rotation.z,
+                                      glm::vec3(0.0f, 0.0f, 1.0f));
+            matrix      = glm::rotate(matrix, transform.rotation.y,
+                                      glm::vec3(0.0f, 1.0f, 0.0f));
+            matrix      = glm::rotate(matrix, transform.rotation.x,
+                                      glm::vec3(1.0f, 0.0f, 0.0f));
             matrix      = glm::translate(matrix, transform.position);
             matrix      = glm::scale(matrix, transform.scale);
 
@@ -37,20 +41,25 @@ void RenderSystem::PostUpdate(float dt)
 
     mManager->StartTraceProfiling("Calculate instance sequence");
     mManager->ForEach<TransformComponent, ModelComponent>(
-        [&](fr::Entity entity, TransformComponent& transform, ModelComponent& model) {
+        [&](fr::Entity entity, TransformComponent& transform,
+            ModelComponent& model) {
             if (currentMeshes && currentMeshes != model.meshes)
             {
                 dataIndex -= instanceCount;
 
-                instanceDraws.push_back(
-                    InstanceDraw { .index = dataIndex, .instanceCount = instanceCount, .meshes = currentMeshes });
+                instanceDraws.push_back(InstanceDraw {
+                    .index         = dataIndex,
+                    .instanceCount = instanceCount,
+                    .meshes        = currentMeshes });
                 instanceCount = 0;
             }
 
             if (dataIndex == instanceCount + 1)
             {
-                instanceDraws.push_back(
-                    InstanceDraw { .index = 0, .instanceCount = instanceCount + 1, .meshes = currentMeshes });
+                instanceDraws.push_back(InstanceDraw {
+                    .index         = 0,
+                    .instanceCount = instanceCount + 1,
+                    .meshes        = currentMeshes });
             }
             else
             {

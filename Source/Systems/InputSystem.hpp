@@ -7,10 +7,15 @@
 class InputSystem : public fr::System
 {
   public:
-    InputSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::Window> window) :
-        mRenderer(renderer), mWindow(window)
+    InputSystem(std::shared_ptr<fra::Renderer> renderer,
+                std::shared_ptr<fra::Window>
+                    window) :
+        mRenderer(renderer),
+        mWindow(window)
     {
     }
+
+    virtual ~InputSystem() = default;
 
     void PreUpdate(float deltaTime) override;
 

@@ -8,7 +8,8 @@ void SpaceApp::Startup()
 
     diContainer->AddSingleton<fra::Window>(mWindow);
     diContainer->AddSingleton<fra::Renderer>(mRenderer);
-    diContainer->AddSingleton<fra::MeshPool>(mRenderer->GetMeshPoolFactory()->CreateMeshPool());
+    diContainer->AddSingleton<fra::MeshPool>(
+        mRenderer->GetMeshPoolFactory()->CreateMeshPool());
 
     mManager->RegisterComponent<ModelComponent>();
     mManager->RegisterComponent<TransformComponent>();

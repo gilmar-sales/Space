@@ -9,14 +9,19 @@ void InputSystem::PreUpdate(float deltaTime)
     static auto cameraRotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
     auto cameraMatrix = glm::mat4(1.0f);
-    cameraMatrix      = glm::rotate(cameraMatrix, glm::radians(cameraRotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraMatrix      = glm::rotate(cameraMatrix, glm::radians(cameraRotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraMatrix      = glm::rotate(cameraMatrix, glm::radians(cameraRotation.z), glm::vec3(0.0f, 0.0f, 1.0f));
+    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.x),
+                               glm::vec3(1.0f, 0.0f, 0.0f));
+    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.y),
+                               glm::vec3(0.0f, 1.0f, 0.0f));
+    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.z),
+                               glm::vec3(0.0f, 0.0f, 1.0f));
 
     static auto cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
-    auto        cameraForward  = glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 0.0) * cameraMatrix);
-    auto        cameraRight    = glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), cameraForward));
-    auto        cameraUp       = glm::normalize(glm::cross(cameraForward, cameraRight));
+    auto        cameraForward =
+        glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 0.0) * cameraMatrix);
+    auto cameraRight =
+        glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), cameraForward));
+    auto cameraUp = glm::normalize(glm::cross(cameraForward, cameraRight));
 
     static auto     cameraVelocity = glm::vec2(0.0f, 0.0f);
     static SDL_bool grab           = SDL_FALSE;
@@ -50,7 +55,8 @@ void InputSystem::PreUpdate(float deltaTime)
                         mRenderer->SetVSync(!mRenderer->GetVSync());
                         break;
                     case SDL_SCANCODE_P:
-                        if (mRenderer->GetSamples() == vk::SampleCountFlagBits::e1)
+                        if (mRenderer->GetSamples() ==
+                            vk::SampleCountFlagBits::e1)
                         {
                             mRenderer->SetSamples(vk::SampleCountFlagBits::e8);
                         }
@@ -116,9 +122,12 @@ void InputSystem::PreUpdate(float deltaTime)
     cameraPosition += cameraRight * cameraVelocity.x * 100.0f * deltaTime;
 
     auto projection = fra::ProjectionUniformBuffer {
-        .view       = glm::lookAt(cameraPosition, cameraPosition + cameraForward, cameraUp),
-        .projection = glm::perspective(
-            glm::radians(45.0f), mWindow->GetWidth() / (float) mWindow->GetHeight(), 0.1f, mRenderer->GetDrawDistance())
+        .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,
+                            cameraUp),
+        .projection =
+            glm::perspective(glm::radians(45.0f),
+                             mWindow->GetWidth() / (float) mWindow->GetHeight(),
+                             0.1f, mRenderer->GetDrawDistance())
     };
 
     mRenderer->UpdateProjection(projection);

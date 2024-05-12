@@ -7,12 +7,11 @@
 class OctreeSystem : public fr::System
 {
   public:
+    virtual ~OctreeSystem() = default;
+
     void PreUpdate(float deltaTime) override;
 
-    std::shared_ptr<Octree> GetOctree()
-    {
-        return mOctree;
-    }
+    std::shared_ptr<Octree> GetOctree() const { return mOctree; }
 
   private:
     std::shared_ptr<Octree> mOctree;

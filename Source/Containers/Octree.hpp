@@ -22,14 +22,18 @@ struct Particle
 
     bool isOnOrForwardPlane(const Plane& plane) const
     {
-        return plane.getSignedDistanceToPlane(transform.position) > -sphereCollider.radius;
+        return plane.getSignedDistanceToPlane(transform.position) >
+               -sphereCollider.radius;
     }
 
     bool isOnFrustum(const Frustum& camFrustum) const
     {
-        return (isOnOrForwardPlane(camFrustum.leftFace) && isOnOrForwardPlane(camFrustum.rightFace) &&
-                isOnOrForwardPlane(camFrustum.farFace) && isOnOrForwardPlane(camFrustum.nearFace) &&
-                isOnOrForwardPlane(camFrustum.topFace) && isOnOrForwardPlane(camFrustum.bottomFace));
+        return (isOnOrForwardPlane(camFrustum.leftFace) &&
+                isOnOrForwardPlane(camFrustum.rightFace) &&
+                isOnOrForwardPlane(camFrustum.farFace) &&
+                isOnOrForwardPlane(camFrustum.nearFace) &&
+                isOnOrForwardPlane(camFrustum.topFace) &&
+                isOnOrForwardPlane(camFrustum.bottomFace));
     }
 };
 

@@ -7,7 +7,9 @@
 class SpawnSystem : public fr::System
 {
   public:
-    SpawnSystem(std::shared_ptr<fra::MeshPool> meshPool) : mMeshPool(meshPool) {}
+    SpawnSystem(std::shared_ptr<fra::MeshPool> meshPool) : mMeshPool(meshPool)
+    {
+    }
 
     void Start() override;
     void Update(float dt) override;

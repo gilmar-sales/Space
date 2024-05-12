@@ -5,5 +5,7 @@
 class MovementSystem : public fr::System
 {
   public:
+    virtual ~MovementSystem() = default;
+
     void Update(float deltaTime) override;
 };

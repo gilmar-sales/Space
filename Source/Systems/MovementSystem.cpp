@@ -10,11 +10,14 @@
 
 void MovementSystem::Update(float deltaTime)
 {
-    mManager->ForEachAsync<TransformComponent, RigidBodyComponent>([manager = mManager, deltaTime = deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody) {
-        manager->SendEvent(ApplyForceEvent {
-            .target     = entity,
-            .direction  = glm::vec3(0.0, 0.0, 1.0),
-            .magnetiude = float(200),
-            .deltaTime  = deltaTime });
-    });
+    mManager->ForEachAsync<TransformComponent, RigidBodyComponent>(
+        [manager = mManager, deltaTime = deltaTime](
+            fr::Entity entity, TransformComponent& transform,
+            RigidBodyComponent& rigidBody) {
+            manager->SendEvent(ApplyForceEvent {
+                .target     = entity,
+                .direction  = glm::vec3(0.0, 0.0, 1.0),
+                .magnetiude = float(200),
+                .deltaTime  = deltaTime });
+        });
 }

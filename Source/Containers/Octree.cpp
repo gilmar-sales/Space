@@ -44,8 +44,9 @@ bool Octree::Insert(Particle particle)
         }
     }
 
-    return (mNearTopLeft->Insert(particle) || mNearTopRight->Insert(particle) || mNearBotLeft->Insert(particle) ||
-            mNearBotRight->Insert(particle) || mFarTopLeft->Insert(particle) || mFarTopRight->Insert(particle) ||
+    return (mNearTopLeft->Insert(particle) || mNearTopRight->Insert(particle) ||
+            mNearBotLeft->Insert(particle) || mNearBotRight->Insert(particle) ||
+            mFarTopLeft->Insert(particle) || mFarTopRight->Insert(particle) ||
             mFarBotLeft->Insert(particle) || mFarBotRight->Insert(particle));
 }
 
@@ -53,25 +54,47 @@ void Octree::Subdivide()
 {
     float halfRange = mHalfRange / 2;
 
-    glm::vec3 nearTopLeftPos  = { mPosition.x - halfRange, mPosition.y - halfRange, mPosition.z - halfRange };
-    glm::vec3 nearTopRightPos = { mPosition.x + halfRange, mPosition.y - halfRange, mPosition.z - halfRange };
-    glm::vec3 nearBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
-    glm::vec3 nearBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
+    glm::vec3 nearTopLeftPos  = { mPosition.x - halfRange,
+                                  mPosition.y - halfRange,
+                                  mPosition.z - halfRange };
+    glm::vec3 nearTopRightPos = { mPosition.x + halfRange,
+                                  mPosition.y - halfRange,
+                                  mPosition.z - halfRange };
+    glm::vec3 nearBotLeftPos  = { mPosition.x - halfRange,
+                                  mPosition.y + halfRange,
+                                  mPosition.z - halfRange };
+    glm::vec3 nearBotRightPos = { mPosition.x + halfRange,
+                                  mPosition.y + halfRange,
+                                  mPosition.z - halfRange };
 
-    mNearTopLeft  = std::make_unique<Octree>(nearTopLeftPos, halfRange, mCapacity);
-    mNearTopRight = std::make_unique<Octree>(nearTopRightPos, halfRange, mCapacity);
-    mNearBotLeft  = std::make_unique<Octree>(nearBotLeftPos, halfRange, mCapacity);
-    mNearBotRight = std::make_unique<Octree>(nearBotRightPos, halfRange, mCapacity);
+    mNearTopLeft =
+        std::make_unique<Octree>(nearTopLeftPos, halfRange, mCapacity);
+    mNearTopRight =
+        std::make_unique<Octree>(nearTopRightPos, halfRange, mCapacity);
+    mNearBotLeft =
+        std::make_unique<Octree>(nearBotLeftPos, halfRange, mCapacity);
+    mNearBotRight =
+        std::make_unique<Octree>(nearBotRightPos, halfRange, mCapacity);
 
-    glm::vec3 farTopLeftPos  = { mPosition.x - halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
-    glm::vec3 farTopRightPos = { mPosition.x + halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
-    glm::vec3 farBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
-    glm::vec3 farBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
+    glm::vec3 farTopLeftPos  = { mPosition.x - halfRange,
+                                 mPosition.y - halfRange,
+                                 mPosition.z + halfRange };
+    glm::vec3 farTopRightPos = { mPosition.x + halfRange,
+                                 mPosition.y - halfRange,
+                                 mPosition.z + halfRange };
+    glm::vec3 farBotLeftPos  = { mPosition.x - halfRange,
+                                 mPosition.y + halfRange,
+                                 mPosition.z + halfRange };
+    glm::vec3 farBotRightPos = { mPosition.x + halfRange,
+                                 mPosition.y + halfRange,
+                                 mPosition.z + halfRange };
 
-    mFarTopLeft  = std::make_unique<Octree>(farTopLeftPos, halfRange, mCapacity);
-    mFarTopRight = std::make_unique<Octree>(farTopRightPos, halfRange, mCapacity);
-    mFarBotLeft  = std::make_unique<Octree>(farBotLeftPos, halfRange, mCapacity);
-    mFarBotRight = std::make_unique<Octree>(farBotRightPos, halfRange, mCapacity);
+    mFarTopLeft = std::make_unique<Octree>(farTopLeftPos, halfRange, mCapacity);
+    mFarTopRight =
+        std::make_unique<Octree>(farTopRightPos, halfRange, mCapacity);
+    mFarBotLeft = std::make_unique<Octree>(farBotLeftPos, halfRange, mCapacity);
+    mFarBotRight =
+        std::make_unique<Octree>(farBotRightPos, halfRange, mCapacity);
 }
 
 void Octree::Query(Particle& particle, std::vector<Particle*>& found)
@@ -122,12 +145,18 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
 bool Octree::Intersect(const Particle& particle)
 {
-    return (particle.transform.position.x >= mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.x <= mPosition.x + (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.y >= mPosition.y - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.y <= mPosition.y + (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.z >= mPosition.z - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.z <= mPosition.z + (mHalfRange + particle.sphereCollider.radius));
+    return (particle.transform.position.x >=
+                mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.x <=
+                mPosition.x + (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.y >=
+                mPosition.y - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.y <=
+                mPosition.y + (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.z >=
+                mPosition.z - (mHalfRange + particle.sphereCollider.radius) &&
+            particle.transform.position.z <=
+                mPosition.z + (mHalfRange + particle.sphereCollider.radius));
 }
 
 void Octree::Query(Frustum& frustum, std::vector<Particle*>& found)
@@ -158,11 +187,13 @@ void Octree::Query(Frustum& frustum, std::vector<Particle*>& found)
     }
 }
 
-// see https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
+// see
+// https://gdbooks.gitbooks.io/3dcollisions/content/Chapter2/static_aabb_plane.html
 bool Octree::isOnOrForwardPlane(const Plane& plane) const
 {
     // Compute the projection interval radius of b onto L(t) = b.c + t * p.n
-    const float r = mHalfRange * std::abs(plane.normal.x) + mHalfRange * std::abs(plane.normal.y) +
+    const float r = mHalfRange * std::abs(plane.normal.x) +
+                    mHalfRange * std::abs(plane.normal.y) +
                     mHalfRange * std::abs(plane.normal.z);
 
     return -r <= plane.getSignedDistanceToPlane(mPosition);
@@ -170,9 +201,12 @@ bool Octree::isOnOrForwardPlane(const Plane& plane) const
 
 bool Octree::Intersect(const Frustum& camFrustum)
 {
-    return (isOnOrForwardPlane(camFrustum.leftFace) && isOnOrForwardPlane(camFrustum.rightFace) &&
-            isOnOrForwardPlane(camFrustum.topFace) && isOnOrForwardPlane(camFrustum.bottomFace) &&
-            isOnOrForwardPlane(camFrustum.nearFace) && isOnOrForwardPlane(camFrustum.farFace));
+    return (isOnOrForwardPlane(camFrustum.leftFace) &&
+            isOnOrForwardPlane(camFrustum.rightFace) &&
+            isOnOrForwardPlane(camFrustum.topFace) &&
+            isOnOrForwardPlane(camFrustum.bottomFace) &&
+            isOnOrForwardPlane(camFrustum.nearFace) &&
+            isOnOrForwardPlane(camFrustum.farFace));
 }
 
 void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData)
@@ -203,7 +237,7 @@ void Octree::Draw(std::shared_ptr<fra::Renderer> renderer,
                   std::vector<std::uint32_t>& meshIds)
 {
     static std::shared_ptr<fra::Buffer> instanceBuffer = nullptr;
-    auto                                instanceData   = std::vector<glm::mat4>();
+    auto                                instanceData = std::vector<glm::mat4>();
 
     PushInstanceData(instanceData);
 

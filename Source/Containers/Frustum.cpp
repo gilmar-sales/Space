@@ -1,7 +1,8 @@
 #include "Frustum.hpp"
 
-Frustum::Frustum(glm::vec3 position, glm::vec3 forward, glm::vec3 right, glm::vec3 up, float aspect, float fovY,
-                 float zNear, float zFar)
+Frustum::Frustum(glm::vec3 position, glm::vec3 forward, glm::vec3 right,
+                 glm::vec3 up, float aspect, float fovY, float zNear,
+                 float zFar)
 {
     const float     halfVSide    = zFar * tanf(fovY * .5f);
     const float     halfHSide    = halfVSide * aspect;

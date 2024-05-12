@@ -12,31 +12,34 @@
 
 void CollisionSystem::Start()
 {
-    // mSphereModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
-    // mCubeModel   = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
-
-    mManager->AddEventListener<OctreeFinishedEvent>([](OctreeFinishedEvent octreeFinishedEvent) {
-
-    });
+    // mSphereModel =
+    // mMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
+    // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
 void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
-    mManager->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-        [octree = octree, manager = mManager,
-         deltaTime = deltaTime](fr::Entity entity, TransformComponent& transform,
-                                SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
+    mManager->ForEachAsync<TransformComponent, SphereColliderComponent,
+                           RigidBodyComponent>(
+        [octree = octree, manager = mManager, deltaTime = deltaTime](
+            fr::Entity entity, TransformComponent& transform,
+            SphereColliderComponent& sphereCollider,
+            RigidBodyComponent&      rigidBody) {
             auto collisions = std::vector<Particle*>(0);
 
-            auto particle = Particle { .entity = entity, .transform = transform, .sphereCollider = sphereCollider };
+            auto particle = Particle { .entity         = entity,
+                                       .transform      = transform,
+                                       .sphereCollider = sphereCollider };
 
             octree->Query(particle, collisions);
 
             for (const auto collision : collisions)
             {
-                manager->SendEvent<CollisionEvent>(
-                    CollisionEvent { .target = entity, .collisor = collision->entity, .deltaTime = deltaTime });
+                manager->SendEvent<CollisionEvent>(CollisionEvent {
+                    .target    = entity,
+                    .collisor  = collision->entity,
+                    .deltaTime = deltaTime });
             }
         });
 }

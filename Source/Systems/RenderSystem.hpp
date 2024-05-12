@@ -15,8 +15,9 @@ struct InstanceDraw
 class RenderSystem : public fr::System
 {
   public:
-    RenderSystem(std::shared_ptr<fra::Renderer> renderer, std::shared_ptr<fra::MeshPool> meshPool,
-                 std::shared_ptr<OctreeSystem> octreeSystem) :
+    RenderSystem(std::shared_ptr<fra::Renderer> renderer,
+                 std::shared_ptr<fra::MeshPool> meshPool,
+                 std::shared_ptr<OctreeSystem>  octreeSystem) :
         mRenderer(renderer),
         mMeshPool(meshPool), mOctreeSystem(octreeSystem)
     {
