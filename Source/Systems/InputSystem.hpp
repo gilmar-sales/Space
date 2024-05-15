@@ -15,9 +15,10 @@ class InputSystem : public fr::System
     {
     }
 
-    virtual ~InputSystem() = default;
-
     void PreUpdate(float deltaTime) override;
+
+    static glm::vec3 cameraPosition;
+    static glm::vec3 cameraForward;
 
   private:
     friend class SpaceApp;

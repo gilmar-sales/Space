@@ -4,6 +4,9 @@
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
 
+glm::vec3 InputSystem::cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
+glm::vec3 InputSystem::cameraForward  = glm::vec3(0.0f, 0.0f, 1.0f);
+
 void InputSystem::PreUpdate(float deltaTime)
 {
     static auto cameraRotation = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -16,9 +19,7 @@ void InputSystem::PreUpdate(float deltaTime)
     cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.z),
                                glm::vec3(0.0f, 0.0f, 1.0f));
 
-    static auto cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
-    auto        cameraForward =
-        glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 0.0) * cameraMatrix);
+    cameraForward = glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 0.0) * cameraMatrix);
     auto cameraRight =
         glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), cameraForward));
     auto cameraUp = glm::normalize(glm::cross(cameraForward, cameraRight));
@@ -118,8 +119,8 @@ void InputSystem::PreUpdate(float deltaTime)
         }
     }
 
-    cameraPosition += cameraForward * cameraVelocity.y * 100.0f * deltaTime;
-    cameraPosition += cameraRight * cameraVelocity.x * 100.0f * deltaTime;
+    cameraPosition += cameraForward * cameraVelocity.y * 1000.0f * deltaTime;
+    cameraPosition += cameraRight * cameraVelocity.x * 1000.0f * deltaTime;
 
     auto projection = fra::ProjectionUniformBuffer {
         .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,

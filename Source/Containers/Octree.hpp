@@ -6,7 +6,15 @@
 
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Frustum.hpp"
+
+struct Frustum
+{
+    glm::vec3 apex;
+    glm::vec3 direction;
+    float     nearPlane;
+    float     farPlane;
+    float     fovAngle;
+};
 
 struct Particle
 {
@@ -14,27 +22,13 @@ struct Particle
     TransformComponent&      transform;
     SphereColliderComponent& sphereCollider;
 
-    bool Intersect(const Particle& other)
+    bool Intersect(const Particle& other) const
     {
         return glm::distance(transform.position, other.transform.position) <=
                sphereCollider.radius + other.sphereCollider.radius;
     }
 
-    bool isOnOrForwardPlane(const Plane& plane) const
-    {
-        return plane.getSignedDistanceToPlane(transform.position) >
-               -sphereCollider.radius;
-    }
-
-    bool isOnFrustum(const Frustum& camFrustum) const
-    {
-        return (isOnOrForwardPlane(camFrustum.leftFace) &&
-                isOnOrForwardPlane(camFrustum.rightFace) &&
-                isOnOrForwardPlane(camFrustum.farFace) &&
-                isOnOrForwardPlane(camFrustum.nearFace) &&
-                isOnOrForwardPlane(camFrustum.topFace) &&
-                isOnOrForwardPlane(camFrustum.bottomFace));
-    }
+    bool Intersect(const Frustum& frustum) const;
 };
 
 class Octree
@@ -42,23 +36,21 @@ class Octree
   public:
     Octree(glm::vec3 position, float halfRange, size_t capacity);
     ~Octree() = default;
-    Octree(const Octree&);
 
-    bool Contains(const Particle& particle);
+    bool Contains(const Particle& particle) const;
     bool Insert(Particle particle);
     void Subdivide();
 
     void Query(Particle& particle, std::vector<Particle*>& found);
-    bool Intersect(const Particle& particle);
+    bool Intersect(const Particle& particle) const;
 
-    void Query(Frustum& frustum, std::vector<Particle*>& found);
-    bool isOnOrForwardPlane(const Plane& plane) const;
-    bool Intersect(const Frustum& particle);
+    void Query(const Frustum& frustum, std::vector<Particle*>& found);
+    bool Intersect(const Frustum& frustum) const;
 
     void Draw(std::shared_ptr<fra::Renderer> renderer,
               std::shared_ptr<fra::MeshPool>
-                                          meshPool,
-              std::vector<std::uint32_t>& meshIds);
+                                                meshPool,
+              const std::vector<std::uint32_t>& meshIds);
     void PushInstanceData(std::vector<glm::mat4>& instanceData);
 
   private:
