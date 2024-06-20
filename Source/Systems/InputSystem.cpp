@@ -125,10 +125,10 @@ void InputSystem::PreUpdate(float deltaTime)
     auto projection = fra::ProjectionUniformBuffer {
         .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,
                             cameraUp),
-        .projection =
-            glm::perspective(glm::radians(45.0f),
-                             mWindow->GetWidth() / (float) mWindow->GetHeight(),
-                             0.1f, mRenderer->GetDrawDistance())
+        .projection = glm::perspective(
+            glm::radians(45.0f),
+            (float) mWindow->GetWidth() / (float) mWindow->GetHeight(), 0.1f,
+            mRenderer->GetDrawDistance())
     };
 
     mRenderer->UpdateProjection(projection);

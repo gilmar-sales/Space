@@ -153,98 +153,17 @@ bool Octree::Intersect(const Particle& particle) const
                 mPosition.z + (mHalfRange + particle.sphereCollider.radius));
 }
 
-bool Octree::Intersect(const Frustum& frustum) const
-{
-    glm::vec3 nearCenter = frustum.apex;
-    glm::vec3 farCenter  = {
-        frustum.apex.x + frustum.direction.x * frustum.farPlane,
-        frustum.apex.y + frustum.direction.y * frustum.farPlane,
-        frustum.apex.z + frustum.direction.z * frustum.farPlane
-    };
-
-    double tanHalfFOV = tan(frustum.fovAngle / 2);
-    double nearHeight = 2 * tanHalfFOV * frustum.nearPlane;
-    double farHeight  = 2 * tanHalfFOV * frustum.farPlane;
-
-    glm::vec3 nearTop = { nearCenter.x + frustum.direction.x * nearHeight / 2,
-                          nearCenter.y + frustum.direction.y * nearHeight / 2,
-                          nearCenter.z + frustum.direction.z * nearHeight / 2 };
-
-    glm::vec3 farTop = { farCenter.x + frustum.direction.x * farHeight / 2,
-                         farCenter.y + frustum.direction.y * farHeight / 2,
-                         farCenter.z + frustum.direction.z * farHeight / 2 };
-
-    if (double frontZ = mPosition.z + mHalfRange; frontZ > frustum.nearPlane)
-    {
-        double frontSize =
-            (frustum.nearPlane * mHalfRange * 2) / (frontZ - frustum.apex.z);
-        if (frontSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    if (double backZ = mPosition.z - mHalfRange; backZ < frustum.farPlane)
-    {
-        double backSize =
-            (frustum.farPlane * mHalfRange * 2) / (backZ - frustum.apex.z);
-        if (backSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    if (double leftX = mPosition.x - mHalfRange; leftX > frustum.apex.x)
-    {
-        double leftSize = (leftX - frustum.apex.x) * tanHalfFOV * 2;
-        if (leftSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    if (double rightX = mPosition.x + mHalfRange; rightX < frustum.apex.x)
-    {
-        double rightSize = (frustum.apex.x - rightX) * tanHalfFOV * 2;
-        if (rightSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    if (double topY = mPosition.y + mHalfRange;
-        topY < nearTop.y && topY < farTop.y)
-    {
-        double topSize = (nearTop.y - topY) * tanHalfFOV * 2;
-        if (topSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    if (double bottomY = mPosition.y - mHalfRange;
-        bottomY > nearCenter.y && bottomY > farCenter.y)
-    {
-        double bottomSize = (bottomY - nearCenter.y) * tanHalfFOV * 2;
-        if (bottomSize <= mHalfRange * 2)
-        {
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void Octree::Query(const Frustum& frustum, std::vector<Particle*>& found)
 {
-    if (!Intersect(frustum))
+    if (!frustum.SphereIntersect(mPosition, mHalfRange))
     {
         return;
     }
 
     for (auto& other : mElements)
     {
-        if (other.Intersect(frustum))
+        if (frustum.SphereIntersect(other.transform.position,
+                                    other.sphereCollider.radius))
         {
             found.push_back(&other);
         }
@@ -308,84 +227,4 @@ void Octree::Draw(std::shared_ptr<fra::Renderer> renderer,
     {
         meshPool->DrawInstanced(meshId, instanceData.size());
     }
-}
-
-bool Particle::Intersect(const Frustum& frustum) const
-{
-    glm::vec3 nearCenter = frustum.apex;
-    glm::vec3 farCenter  = {
-        frustum.apex.x + frustum.direction.x * frustum.farPlane,
-        frustum.apex.y + frustum.direction.y * frustum.farPlane,
-        frustum.apex.z + frustum.direction.z * frustum.farPlane
-    };
-
-    double tanHalfFOV = tan(frustum.fovAngle / 2);
-    double nearHeight = 2 * tanHalfFOV * frustum.nearPlane;
-    double farHeight  = 2 * tanHalfFOV * frustum.farPlane;
-
-    glm::vec3 nearTop = { nearCenter.x + frustum.direction.x * nearHeight / 2,
-                          nearCenter.y + frustum.direction.y * nearHeight / 2,
-                          nearCenter.z + frustum.direction.z * nearHeight / 2 };
-
-    glm::vec3 farTop = { farCenter.x + frustum.direction.x * farHeight / 2,
-                         farCenter.y + frustum.direction.y * farHeight / 2,
-                         farCenter.z + frustum.direction.z * farHeight / 2 };
-
-    glm::vec3 apexToCenter = { transform.position.x - frustum.apex.x,
-                               transform.position.y - frustum.apex.y,
-                               transform.position.z - frustum.apex.z };
-
-    double projection = (apexToCenter.x * frustum.direction.x) +
-                        (apexToCenter.y * frustum.direction.y) +
-                        (apexToCenter.z * frustum.direction.z);
-
-    if (projection + sphereCollider.radius < 0)
-    {
-        return false;
-    }
-
-    if (double distanceToNearPlane = projection;
-        distanceToNearPlane < frustum.nearPlane + sphereCollider.radius)
-    {
-        return true;
-    }
-
-    if (double distanceToFarPlane = projection;
-        distanceToFarPlane < frustum.farPlane + sphereCollider.radius)
-    {
-        return true;
-    }
-
-    double nearRadius = frustum.nearPlane * tanHalfFOV;
-
-    if (double distanceToNearLeftPlane = projection - nearRadius;
-        distanceToNearLeftPlane > 0 &&
-        distanceToNearLeftPlane < frustum.nearPlane)
-    {
-        return true;
-    }
-
-    if (double distanceToNearRightPlane = projection + nearRadius;
-        distanceToNearRightPlane > 0 &&
-        distanceToNearRightPlane < frustum.nearPlane)
-    {
-        return true;
-    }
-
-    double farRadius = frustum.farPlane * tanHalfFOV;
-
-    if (double distanceToFarLeftPlane = projection - farRadius;
-        distanceToFarLeftPlane > 0 && distanceToFarLeftPlane < frustum.farPlane)
-    {
-        return true;
-    }
-
-    if (double distanceToFarRightPlane = projection + farRadius;
-        distanceToFarRightPlane > 0 &&
-        distanceToFarRightPlane < frustum.farPlane)
-    {
-        return true;
-    }
-
-    return false;
 }

@@ -85,30 +85,40 @@ void RenderSystem::PostUpdate(float dt)
     // mManager->EndTraceProfiling();
 
     static float rotation = 0.0f;
-    auto matrix = glm::rotate(glm::mat4(1), rotation, glm::vec3(0, 1, 0));
+    auto         matrix =
+        glm::rotate(glm::mat4(1), glm::radians(rotation), glm::vec3(0, 1, 0));
 
-    auto direction = glm::vec3(glm::vec4(1, 0, 0, 0) * matrix);
+    auto direction = glm::normalize(glm::vec3(glm::vec4(1, 0, 0, 0) * matrix));
+    auto cameraRight =
+        glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
+    auto cameraUp = glm::normalize(glm::cross(direction, cameraRight));
 
-    // rotation += 1.f * dt;
+    // rotation += 30.f * dt;
 
-    auto frustum =
-        Frustum { .apex      = glm::vec3(0),
-                  .direction = direction,
-                  .nearPlane = 0.01f,
-                  .farPlane  = 10.f,
-                  .fovAngle  = glm::radians(60.0f) };
+    auto view =
+        glm::mat4(1) * glm::lookAt(glm::vec3(0, 0, 0), direction, cameraUp);
+    auto projection =
+        glm::mat4(1) *
+        glm::perspective(glm::radians(60.0f), 16.0f / 9.0f, 0.1f, 100000.0f);
+
+    auto frustum = Frustum((view * projection));
 
     auto renderable = std::vector<Particle*>();
     mOctreeSystem->GetOctree()->Query(frustum, renderable);
 
-    std::cout << "Renderables: " << renderable.size() << "\n";
+    if (renderable.empty())
+    {
+        mRenderer->EndFrame();
+        return;
+    }
 
     auto matrices = std::vector<glm::mat4>();
     matrices.reserve(renderable.size());
 
     for (const auto particle : renderable)
     {
-        auto matrix = glm::rotate(glm::mat4(1), particle->transform.rotation.z,
+        auto matrix = glm::rotate(glm::mat4(1),
+                                  particle->transform.rotation.z,
                                   glm::vec3(0.0f, 0.0f, 1.0f));
         matrix      = glm::rotate(matrix, particle->transform.rotation.y,
                                   glm::vec3(0.0f, 1.0f, 0.0f));

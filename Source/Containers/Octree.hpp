@@ -7,14 +7,7 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-struct Frustum
-{
-    glm::vec3 apex;
-    glm::vec3 direction;
-    float     nearPlane;
-    float     farPlane;
-    float     fovAngle;
-};
+#include "Frustum.hpp"
 
 struct Particle
 {
@@ -27,8 +20,6 @@ struct Particle
         return glm::distance(transform.position, other.transform.position) <=
                sphereCollider.radius + other.sphereCollider.radius;
     }
-
-    bool Intersect(const Frustum& frustum) const;
 };
 
 class Octree
@@ -45,7 +36,6 @@ class Octree
     bool Intersect(const Particle& particle) const;
 
     void Query(const Frustum& frustum, std::vector<Particle*>& found);
-    bool Intersect(const Frustum& frustum) const;
 
     void Draw(std::shared_ptr<fra::Renderer> renderer,
               std::shared_ptr<fra::MeshPool>
