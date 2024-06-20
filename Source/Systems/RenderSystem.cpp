@@ -85,15 +85,14 @@ void RenderSystem::PostUpdate(float dt)
     // mManager->EndTraceProfiling();
 
     static float rotation = 0.0f;
-    auto         matrix =
-        glm::rotate(glm::mat4(1), glm::radians(rotation), glm::vec3(0, 1, 0));
+    auto matrix = glm::rotate(glm::mat4(1), rotation, glm::vec3(0, 1, 0));
 
     auto direction = glm::normalize(glm::vec3(glm::vec4(1, 0, 0, 0) * matrix));
     auto cameraRight =
         glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), direction));
     auto cameraUp = glm::normalize(glm::cross(direction, cameraRight));
 
-    // rotation += 30.f * dt;
+    rotation += glm::radians(30.f * dt);
 
     auto view =
         glm::mat4(1) * glm::lookAt(glm::vec3(0, 0, 0), direction, cameraUp);
@@ -104,7 +103,9 @@ void RenderSystem::PostUpdate(float dt)
     auto frustum = Frustum((view * projection));
 
     auto renderable = std::vector<Particle*>();
+    mManager->StartTraceProfiling("Query renderables");
     mOctreeSystem->GetOctree()->Query(frustum, renderable);
+    mManager->EndTraceProfiling();
 
     if (renderable.empty())
     {
@@ -115,6 +116,7 @@ void RenderSystem::PostUpdate(float dt)
     auto matrices = std::vector<glm::mat4>();
     matrices.reserve(renderable.size());
 
+    mManager->StartTraceProfiling("Calculate matrizes");
     for (const auto particle : renderable)
     {
         auto matrix = glm::rotate(glm::mat4(1),
@@ -128,6 +130,7 @@ void RenderSystem::PostUpdate(float dt)
         matrix      = glm::scale(matrix, particle->transform.scale);
         matrices.push_back(matrix);
     }
+    mManager->EndTraceProfiling();
 
     mInstanceMatrixBuffers =
         mRenderer->GetBufferBuilder()
@@ -136,15 +139,61 @@ void RenderSystem::PostUpdate(float dt)
             .SetUsage(fra::BufferUsage::Instance)
             .Build();
 
+    mRenderer->BindBuffer(mInstanceMatrixBuffers);
+
+    auto instanceDraws = std::vector<InstanceDraw>();
+
+    mManager->StartTraceProfiling("Calculate instance sequence");
+    auto                        dataIndex     = 0;
+    auto                        instanceCount = 0;
+    std::vector<std::uint32_t>* currentMeshes = nullptr;
     for (int i = 0; i < renderable.size(); i++)
     {
         const auto& particle = renderable[i];
-        mRenderer->BindBuffer(mInstanceMatrixBuffers);
-
         auto& model = mManager->GetComponent<ModelComponent>(particle->entity);
-        for (auto mesh : *model.meshes)
-            mMeshPool->DrawInstanced(mesh, 1, i);
+
+        if (currentMeshes && currentMeshes != model.meshes)
+        {
+            instanceDraws.emplace_back(dataIndex, instanceCount, currentMeshes);
+            instanceCount = 0;
+            dataIndex     = i;
+        }
+
+        if (i == renderable.size() - 1)
+        {
+            instanceDraws.emplace_back(
+                dataIndex, instanceCount + 1, currentMeshes);
+        }
+        else
+        {
+            currentMeshes = model.meshes;
+            instanceCount += 1;
+        }
+
+        currentMeshes = model.meshes;
     }
+    mManager->EndTraceProfiling();
+
+    mManager->StartTraceProfiling("Draw calls");
+    mManager->StartTraceProfiling("Draw instance sequences");
+    for (const auto& draw : instanceDraws)
+    {
+        for (const auto& meshId : *draw.meshes)
+        {
+            mMeshPool->DrawInstanced(meshId, draw.instanceCount, draw.index);
+        }
+    }
+    mManager->EndTraceProfiling();
+    // for (int i = 0; i < renderable.size(); i++)
+    // {
+    //     const auto& particle = renderable[i];
+
+    //     auto& model =
+    //     mManager->GetComponent<ModelComponent>(particle->entity); for (auto
+    //     mesh : *model.meshes)
+    //         mMeshPool->DrawInstanced(mesh, 1, i);
+    // }
+    mManager->EndTraceProfiling();
 
     // mOctreeSystem->GetOctree()->Draw(mRenderer, mMeshPool, mCubeModel);
 
