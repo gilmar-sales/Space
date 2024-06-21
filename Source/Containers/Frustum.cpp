@@ -64,3 +64,16 @@ bool Frustum::SphereIntersect(glm::vec3& position, float radius) const
     }
     return true;
 }
+
+bool Frustum::PointInFrustum(const glm::vec3& point) const
+{
+    for (int i = 0; i < 6; i++)
+    {
+        if (glm::dot(planes[i].normal, point) + planes[i].distance < 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}

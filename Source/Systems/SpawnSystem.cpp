@@ -37,14 +37,14 @@ void SpawnSystem::Start()
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
-    for (auto i = 1; i <= 10000; i++)
+    for (auto i = 1; i <= 1000'000; i++)
     {
         auto redShip = mManager->CreateEntity();
         mManager->AddComponent(redShip,
                                ModelComponent { .meshes = &mRedShipModel });
 
         auto defaultRedTransform =
-            TransformComponent { .position = randomPosition(-10000, 10000),
+            TransformComponent { .position = randomPosition(-40000, 40000),
                                  .rotation = glm::vec3(0),
                                  .scale    = glm::vec3(randomNumber(1, 10)) };
         mManager->AddComponent(redShip, defaultRedTransform);
@@ -56,14 +56,14 @@ void SpawnSystem::Start()
         // });
     }
 
-    for (auto i = 1; i <= 10000; i++)
+    for (auto i = 1; i <= 1000'000; i++)
     {
         auto blueShip = mManager->CreateEntity();
         mManager->AddComponent(blueShip,
                                ModelComponent { .meshes = &mBlueShipModel });
 
         auto defaultBlueTransform =
-            TransformComponent { .position = randomPosition(-10000, 10000),
+            TransformComponent { .position = randomPosition(-40000, 40000),
                                  .rotation = glm::vec3(0.0),
                                  .scale    = glm::vec3(randomNumber(1, 10)) };
         mManager->AddComponent(blueShip, defaultBlueTransform);

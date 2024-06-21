@@ -153,12 +153,34 @@ bool Octree::Intersect(const Particle& particle) const
                 mPosition.z + (mHalfRange + particle.sphereCollider.radius));
 }
 
+bool Octree::IsInsideFrustum(const Frustum& frustum) const
+{
+    glm::vec3 halfSize = glm::vec3(mHalfRange);
+
+    for (int i = 0; i < 6; ++i)
+    {
+        glm::vec3 p = glm::vec3(
+            frustum.planes[i].normal.x > 0 ? mPosition.x + halfSize.x
+                                           : mPosition.x - halfSize.x,
+            frustum.planes[i].normal.y > 0 ? mPosition.y + halfSize.y
+                                           : mPosition.y - halfSize.y,
+            frustum.planes[i].normal.z > 0 ? mPosition.z + halfSize.z
+                                           : mPosition.z - halfSize.z);
+
+        if (glm::dot(frustum.planes[i].normal, p) + frustum.planes[i].distance <
+            0)
+        {
+            return false;
+        }
+    };
+
+    return true;
+}
+
 void Octree::Query(const Frustum& frustum, std::vector<Particle*>& found)
 {
-    if (!frustum.SphereIntersect(mPosition, mHalfRange))
-    {
+    if (!frustum.SphereIntersect(mPosition, mHalfRange * 1.735f))
         return;
-    }
 
     for (auto& other : mElements)
     {

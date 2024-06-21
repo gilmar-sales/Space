@@ -22,6 +22,7 @@ void CollisionSystem::Update(float deltaTime)
     auto octree = mOctreeSystem->GetOctree();
     mManager->ForEachAsync<TransformComponent, SphereColliderComponent,
                            RigidBodyComponent>(
+        "Calculate collisions",
         [octree = octree, manager = mManager, deltaTime = deltaTime](
             fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,

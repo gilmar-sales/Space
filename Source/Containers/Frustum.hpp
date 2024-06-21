@@ -15,4 +15,5 @@ struct Frustum
     Frustum(const glm::mat4& viewProjMatrix);
 
     bool SphereIntersect(glm::vec3& position, float radius) const;
+    bool PointInFrustum(const glm::vec3& point) const;
 };

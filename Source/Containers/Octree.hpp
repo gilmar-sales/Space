@@ -36,6 +36,7 @@ class Octree
     bool Intersect(const Particle& particle) const;
 
     void Query(const Frustum& frustum, std::vector<Particle*>& found);
+    bool IsInsideFrustum(const Frustum& frustum) const;
 
     void Draw(std::shared_ptr<fra::Renderer> renderer,
               std::shared_ptr<fra::MeshPool>
