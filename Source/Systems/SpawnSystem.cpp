@@ -30,21 +30,21 @@ void SpawnSystem::Start()
     mRedShipModel = mMeshPool->CreateMeshFromFile(
         "./Resources/Models/cartoon_spaceship_red.fbx");
     mBlueShipModel = mMeshPool->CreateMeshFromFile(
-        "./Resources/Models/cartoon_spaceship_blue.fbx");
+        "./Resources/Models/x-wing.fbx");
     mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
     mBlackHoleModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/black_hole.fbx");
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
-    for (auto i = 1; i <= 1000'000; i++)
+    for (auto i = 1; i <= 10'000; i++)
     {
         auto redShip = mManager->CreateEntity();
         mManager->AddComponent(redShip,
                                ModelComponent { .meshes = &mRedShipModel });
 
         auto defaultRedTransform =
-            TransformComponent { .position = randomPosition(-40000, 40000),
+            TransformComponent { .position = randomPosition(-80'000, 80'000),
                                  .rotation = glm::vec3(0),
                                  .scale    = glm::vec3(randomNumber(1, 10)) };
         mManager->AddComponent(redShip, defaultRedTransform);
@@ -52,18 +52,18 @@ void SpawnSystem::Start()
             redShip,
             SphereColliderComponent { .radius = defaultRedTransform.scale.x,
                                       .offset = glm::vec3(0) });
-        // mManager->AddComponent(redShip, RigidBodyComponent { .mass = 100.0f
-        // });
+        mManager->AddComponent(redShip, RigidBodyComponent { .mass = 100.0f
+        });
     }
 
-    for (auto i = 1; i <= 1000'000; i++)
+    for (auto i = 1; i <= 10'000; i++)
     {
         auto blueShip = mManager->CreateEntity();
         mManager->AddComponent(blueShip,
                                ModelComponent { .meshes = &mBlueShipModel });
 
         auto defaultBlueTransform =
-            TransformComponent { .position = randomPosition(-40000, 40000),
+            TransformComponent { .position = randomPosition(-80'000, 80'000),
                                  .rotation = glm::vec3(0.0),
                                  .scale    = glm::vec3(randomNumber(1, 10)) };
         mManager->AddComponent(blueShip, defaultBlueTransform);
@@ -71,8 +71,10 @@ void SpawnSystem::Start()
             blueShip,
             SphereColliderComponent { .radius = defaultBlueTransform.scale.x,
                                       .offset = glm::vec3(0) });
-        // mManager->AddComponent(blueShip, RigidBodyComponent { .mass = 100.0f
-        // });
+        mManager->AddComponent(blueShip, RigidBodyComponent 
+        {
+             .mass = 100.0f
+        });
     }
 
     for (auto i = 0; i < 100; i++)
@@ -81,7 +83,7 @@ void SpawnSystem::Start()
         mManager->AddComponent(moon, ModelComponent { .meshes = &mMoonModel });
 
         auto defaultMoonTransform =
-            TransformComponent { .position = randomPosition(-10000, 10000),
+            TransformComponent { .position = randomPosition(-80'000, 80'000),
                                  .rotation = glm::vec3(0.0),
                                  .scale = glm::vec3(randomNumber(100, 1000)) };
         mManager->AddComponent(moon, defaultMoonTransform);
@@ -102,7 +104,7 @@ void SpawnSystem::Start()
                                ModelComponent { .meshes = &mBlackHoleModel });
 
         auto defaultTransform = TransformComponent {
-            .position = randomPosition(-40000, 40000),
+            .position = randomPosition(-80'000, 80'000),
             .rotation = glm::vec3(0.0),
             .scale    = glm::vec3(randomNumber(1000, 10000))
         };
