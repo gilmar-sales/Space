@@ -50,7 +50,7 @@ void InputSystem::PreUpdate(float deltaTime)
                 mRenderer->RebuildSwapChain();
                 break;
             case SDL_EVENT_KEY_DOWN:
-                switch (event.key.keysym.scancode)
+                switch (event.key.scancode)
                 {
                     case SDL_SCANCODE_V:
                         mRenderer->SetVSync(!mRenderer->GetVSync());
@@ -92,7 +92,7 @@ void InputSystem::PreUpdate(float deltaTime)
                 }
                 break;
             case SDL_EVENT_KEY_UP:
-                switch (event.key.keysym.scancode)
+                switch (event.key.scancode)
                 {
                     case SDL_SCANCODE_W:
                         cameraVelocity.y = 0.0f;
