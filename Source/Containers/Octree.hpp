@@ -25,7 +25,10 @@ struct Particle
 class Octree
 {
   public:
-    Octree(glm::vec3 position, float halfRange, size_t capacity);
+    Octree(glm::vec3              position,
+           float                  halfRange,
+           size_t                 capacity,
+           std::allocator<Octree> allocator = std::allocator<Octree>());
     ~Octree() = default;
 
     bool Contains(const Particle& particle) const;
@@ -45,20 +48,21 @@ class Octree
     void PushInstanceData(std::vector<glm::mat4>& instanceData);
 
   private:
-    std::mutex mMutex;
+    std::mutex             mMutex;
+    std::allocator<Octree> mAllocator;
 
     glm::vec3             mPosition;
     size_t                mCapacity;
     float                 mHalfRange;
     std::vector<Particle> mElements;
 
-    std::unique_ptr<Octree> mNearTopLeft;
-    std::unique_ptr<Octree> mNearTopRight;
-    std::unique_ptr<Octree> mNearBotLeft;
-    std::unique_ptr<Octree> mNearBotRight;
+    std::shared_ptr<Octree> mNearTopLeft;
+    std::shared_ptr<Octree> mNearTopRight;
+    std::shared_ptr<Octree> mNearBotLeft;
+    std::shared_ptr<Octree> mNearBotRight;
 
-    std::unique_ptr<Octree> mFarTopLeft;
-    std::unique_ptr<Octree> mFarTopRight;
-    std::unique_ptr<Octree> mFarBotLeft;
-    std::unique_ptr<Octree> mFarBotRight;
+    std::shared_ptr<Octree> mFarTopLeft;
+    std::shared_ptr<Octree> mFarTopRight;
+    std::shared_ptr<Octree> mFarBotLeft;
+    std::shared_ptr<Octree> mFarBotRight;
 };

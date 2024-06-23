@@ -5,7 +5,9 @@ void OctreeSystem::PreUpdate(float deltaTime)
 {
     if (mOctree == nullptr)
     {
-        mOctree = std::make_shared<Octree>(glm::vec3(0), 100'000.0f, 4);
+        auto allocator = std::allocator<Octree>();
+        mOctree =
+            std::make_shared<Octree>(glm::vec3(0), 100'000.0f, 4, allocator);
 
         mManager->ForEachParallel<TransformComponent, SphereColliderComponent>(
             [octree = mOctree](fr::Entity entity, int index,

@@ -2,7 +2,7 @@
 
 void SpaceApp::Startup()
 {
-    mManager = std::make_shared<fr::ECSManager>(4'100'000);
+    mManager = std::make_shared<fr::ECSManager>(2'100'000);
 
     auto diContainer = mManager->GetDIContainer();
 

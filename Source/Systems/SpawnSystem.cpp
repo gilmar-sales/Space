@@ -29,8 +29,8 @@ void SpawnSystem::Start()
 {
     mRedShipModel = mMeshPool->CreateMeshFromFile(
         "./Resources/Models/cartoon_spaceship_red.fbx");
-    mBlueShipModel = mMeshPool->CreateMeshFromFile(
-        "./Resources/Models/x-wing.fbx");
+    mBlueShipModel =
+        mMeshPool->CreateMeshFromFile("./Resources/Models/x-wing.fbx");
     mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
     mBlackHoleModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/black_hole.fbx");
@@ -46,14 +46,13 @@ void SpawnSystem::Start()
         auto defaultRedTransform =
             TransformComponent { .position = randomPosition(-80'000, 80'000),
                                  .rotation = glm::vec3(0),
-                                 .scale    = glm::vec3(randomNumber(1, 10)) };
+                                 .scale = glm::vec3(randomNumber(100, 150)) };
         mManager->AddComponent(redShip, defaultRedTransform);
         mManager->AddComponent(
             redShip,
             SphereColliderComponent { .radius = defaultRedTransform.scale.x,
                                       .offset = glm::vec3(0) });
-        mManager->AddComponent(redShip, RigidBodyComponent { .mass = 100.0f
-        });
+        mManager->AddComponent(redShip, RigidBodyComponent { .mass = 100.0f });
     }
 
     for (auto i = 1; i <= 10'000; i++)
@@ -65,16 +64,13 @@ void SpawnSystem::Start()
         auto defaultBlueTransform =
             TransformComponent { .position = randomPosition(-80'000, 80'000),
                                  .rotation = glm::vec3(0.0),
-                                 .scale    = glm::vec3(randomNumber(1, 10)) };
+                                 .scale = glm::vec3(randomNumber(100, 150)) };
         mManager->AddComponent(blueShip, defaultBlueTransform);
         mManager->AddComponent(
             blueShip,
             SphereColliderComponent { .radius = defaultBlueTransform.scale.x,
                                       .offset = glm::vec3(0) });
-        mManager->AddComponent(blueShip, RigidBodyComponent 
-        {
-             .mass = 100.0f
-        });
+        mManager->AddComponent(blueShip, RigidBodyComponent { .mass = 100.0f });
     }
 
     for (auto i = 0; i < 100; i++)

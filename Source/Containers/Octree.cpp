@@ -2,8 +2,15 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-Octree::Octree(glm::vec3 position, float halfRange, size_t capacity) :
-    mPosition(position), mCapacity(capacity), mHalfRange(halfRange)
+#include <print>
+
+Octree::Octree(glm::vec3 position,
+               float     halfRange,
+               size_t    capacity,
+               std::allocator<Octree>
+                   allocator) :
+    mPosition(position),
+    mCapacity(capacity), mHalfRange(halfRange), mAllocator(allocator)
 {
     mElements.reserve(capacity);
 }
@@ -61,14 +68,33 @@ void Octree::Subdivide()
                                   mPosition.y + halfRange,
                                   mPosition.z - halfRange };
 
-    mNearTopLeft =
-        std::make_unique<Octree>(nearTopLeftPos, halfRange, mCapacity);
-    mNearTopRight =
-        std::make_unique<Octree>(nearTopRightPos, halfRange, mCapacity);
-    mNearBotLeft =
-        std::make_unique<Octree>(nearBotLeftPos, halfRange, mCapacity);
-    mNearBotRight =
-        std::make_unique<Octree>(nearBotRightPos, halfRange, mCapacity);
+    mNearTopLeft = std::allocate_shared<Octree>(
+        mAllocator,
+        nearTopLeftPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+
+    mNearTopRight = std::allocate_shared<Octree>(
+        mAllocator,
+        nearTopRightPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+
+    mNearBotLeft = std::allocate_shared<Octree>(
+        mAllocator,
+        nearBotLeftPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+
+    mNearBotRight = std::allocate_shared<Octree>(
+        mAllocator,
+        nearBotRightPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
 
     glm::vec3 farTopLeftPos  = { mPosition.x - halfRange,
                                  mPosition.y - halfRange,
@@ -83,12 +109,30 @@ void Octree::Subdivide()
                                  mPosition.y + halfRange,
                                  mPosition.z + halfRange };
 
-    mFarTopLeft = std::make_unique<Octree>(farTopLeftPos, halfRange, mCapacity);
-    mFarTopRight =
-        std::make_unique<Octree>(farTopRightPos, halfRange, mCapacity);
-    mFarBotLeft = std::make_unique<Octree>(farBotLeftPos, halfRange, mCapacity);
-    mFarBotRight =
-        std::make_unique<Octree>(farBotRightPos, halfRange, mCapacity);
+    mFarTopLeft = std::allocate_shared<Octree>(
+        mAllocator,
+        farTopLeftPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+    mFarTopRight = std::allocate_shared<Octree>(
+        mAllocator,
+        farTopRightPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+    mFarBotLeft = std::allocate_shared<Octree>(
+        mAllocator,
+        farBotLeftPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
+    mFarBotRight = std::allocate_shared<Octree>(
+        mAllocator,
+        farBotRightPos,
+        halfRange,
+        mCapacity,
+        mAllocator);
 }
 
 void Octree::Query(Particle& particle, std::vector<Particle*>& found)

@@ -20,9 +20,11 @@ void RenderSystem::PostUpdate(float dt)
     mRenderer->BeginFrame();
 
     auto projectionBuffer = mRenderer->GetCurrentProjection();
+
     auto frustum = Frustum(projectionBuffer.projection * projectionBuffer.view);
 
     auto renderable = std::vector<Particle*>();
+    renderable.reserve(2'000);
     mManager->StartTraceProfiling("Query renderables");
     mOctreeSystem->GetOctree()->Query(frustum, renderable);
     mManager->EndTraceProfiling();
