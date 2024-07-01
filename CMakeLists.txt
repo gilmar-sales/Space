@@ -14,7 +14,7 @@ add_executable(SpaceAiWar ${SPACE_SRC})
 
 target_compile_features(SpaceAiWar PUBLIC cxx_std_23)
 
-target_link_libraries(SpaceAiWar freyr::freyr Freya-static)
+target_link_libraries(SpaceAiWar freyr::freyr Freya-static tbb)
 
 target_include_directories(SpaceAiWar PUBLIC Source)
 

@@ -1,14 +1,13 @@
 #include "RenderSystem.hpp"
 
-#include <shared_mutex>
-
 #include "Components/ModelComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 #include "InputSystem.hpp"
-#include <glm/ext/matrix_transform.hpp>
+
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/quaternion.hpp"
+#include <glm/ext/matrix_transform.hpp>
 
 void RenderSystem::Start()
 {
@@ -23,29 +22,31 @@ void RenderSystem::PostUpdate(float dt)
 
     auto frustum = Frustum(projectionBuffer.projection * projectionBuffer.view);
 
-    auto renderable = std::vector<Particle*>();
-    renderable.reserve(2'000);
+    auto renderables = std::vector<Particle*>();
+    renderables.reserve(2'000);
     mManager->StartTraceProfiling("Query renderables");
-    mOctreeSystem->GetOctree()->Query(frustum, renderable);
+    mOctreeSystem->GetOctree()->Query(frustum, renderables);
     mManager->EndTraceProfiling();
 
-    if (renderable.empty())
+    if (renderables.empty())
     {
         mRenderer->EndFrame();
         return;
     }
 
     std::sort(
-        renderable.begin(), renderable.end(), [this](Particle* a, Particle* b) {
+        renderables.begin(), renderables.end(),
+        [this](Particle* a, Particle* b) {
             return mManager->GetComponent<ModelComponent>(a->entity).meshes <
                    mManager->GetComponent<ModelComponent>(b->entity).meshes;
         });
 
     auto matrices = std::vector<glm::mat4>();
-    matrices.reserve(renderable.size());
+    matrices.reserve(renderables.size());
 
     mManager->StartTraceProfiling("Calculate matrizes");
-    for (const auto particle : renderable)
+
+    for (const auto particle : renderables)
     {
         auto matrix = glm::rotate(glm::mat4(1),
                                   particle->transform.rotation.z,
@@ -75,20 +76,25 @@ void RenderSystem::PostUpdate(float dt)
     auto                        dataIndex     = 0;
     auto                        instanceCount = 0;
     std::vector<std::uint32_t>* currentMeshes = nullptr;
-    for (int i = 0; i < renderable.size(); i++)
+    for (int i = 0; i < renderables.size(); i++)
     {
-        const auto& particle = renderable[i];
-        auto& model = mManager->GetComponent<ModelComponent>(particle->entity);
+        const auto& particle = renderables[i];
+        const auto& model =
+            mManager->GetComponent<ModelComponent>(particle->entity);
 
         if (currentMeshes && currentMeshes != model.meshes)
         {
             instanceDraws.emplace_back(dataIndex, instanceCount, currentMeshes);
+            currentMeshes = nullptr;
             instanceCount = 0;
             dataIndex     = i;
         }
 
-        if (i == renderable.size() - 1)
+        if (i == renderables.size() - 1)
         {
+            if (!currentMeshes)
+                currentMeshes = model.meshes;
+
             instanceDraws.emplace_back(
                 dataIndex, instanceCount + 1, currentMeshes);
         }
@@ -97,33 +103,20 @@ void RenderSystem::PostUpdate(float dt)
             currentMeshes = model.meshes;
             instanceCount += 1;
         }
-
-        currentMeshes = model.meshes;
     }
     mManager->EndTraceProfiling();
 
-    mManager->StartTraceProfiling("Draw calls");
     mManager->StartTraceProfiling("Draw instance sequences");
     for (const auto& draw : instanceDraws)
     {
-        for (const auto& meshId : *draw.meshes)
-        {
-            mMeshPool->DrawInstanced(meshId, draw.instanceCount, draw.index);
-        }
+        if (draw.meshes != nullptr)
+            for (const auto& meshId : *draw.meshes)
+            {
+                mMeshPool->DrawInstanced(
+                    meshId, draw.instanceCount, draw.index);
+            }
     }
     mManager->EndTraceProfiling();
-    // for (int i = 0; i < renderable.size(); i++)
-    // {
-    //     const auto& particle = renderable[i];
-
-    //     auto& model =
-    //     mManager->GetComponent<ModelComponent>(particle->entity); for (auto
-    //     mesh : *model.meshes)
-    //         mMeshPool->DrawInstanced(mesh, 1, i);
-    // }
-    mManager->EndTraceProfiling();
-
-    // mOctreeSystem->GetOctree()->Draw(mRenderer, mMeshPool, mCubeModel);
 
     mManager->StartTraceProfiling("Render");
     mRenderer->EndFrame();

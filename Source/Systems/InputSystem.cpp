@@ -119,8 +119,8 @@ void InputSystem::PreUpdate(float deltaTime)
         }
     }
 
-    cameraPosition += cameraForward * cameraVelocity.y * 1000.0f * deltaTime;
-    cameraPosition += cameraRight * cameraVelocity.x * 1000.0f * deltaTime;
+    cameraPosition += cameraForward * cameraVelocity.y * 10000.0f * deltaTime;
+    cameraPosition += cameraRight * cameraVelocity.x * 10000.0f * deltaTime;
 
     auto projection = fra::ProjectionUniformBuffer {
         .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,

@@ -12,7 +12,6 @@ class SpawnSystem : public fr::System
     }
 
     void Start() override;
-    void Update(float dt) override;
 
   private:
     std::shared_ptr<fra::MeshPool> mMeshPool;
@@ -22,4 +21,5 @@ class SpawnSystem : public fr::System
     std::vector<std::uint32_t> mCheckpointModel;
     std::vector<std::uint32_t> mRedShipModel;
     std::vector<std::uint32_t> mBlueShipModel;
+    std::vector<std::uint32_t> mXWingModel;
 };
