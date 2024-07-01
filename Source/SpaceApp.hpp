@@ -4,6 +4,7 @@
 #include <Freyr/Freyr.hpp>
 
 #include "Components/ModelComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"

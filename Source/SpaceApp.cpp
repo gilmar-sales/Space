@@ -15,9 +15,10 @@ void SpaceApp::Startup()
     mManager->RegisterComponent<TransformComponent>();
     mManager->RegisterComponent<SphereColliderComponent>();
     mManager->RegisterComponent<RigidBodyComponent>();
+    mManager->RegisterComponent<PlayerComponent>();
 
-    mManager->RegisterSystem<InputSystem>();
     mManager->RegisterSystem<SpawnSystem>();
+    mManager->RegisterSystem<InputSystem>();
     mManager->RegisterSystem<OctreeSystem>();
     mManager->RegisterSystem<CollisionSystem>();
     mManager->RegisterSystem<MovementSystem>();

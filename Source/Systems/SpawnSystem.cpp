@@ -3,10 +3,11 @@
 #include <random>
 
 #include "Components/ModelComponent.hpp"
+#include "Components/PlayerComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-#include "Components/RigidBodyComponent.hpp"
 #include "Events/CollisionEvent.hpp"
 
 int randomNumber(int min, int max)
@@ -40,63 +41,64 @@ void SpawnSystem::Start()
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
-    mManager->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mBlueShipModel })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(10'000)
-        .ForEach<TransformComponent, SphereColliderComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-80'000, 80'000),
-                              .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(randomNumber(5, 10)) };
+    // mManager->CreateArchetypeBuilder()
+    //     .WithDefault(ModelComponent { .meshes = &mBlueShipModel })
+    //     .WithDefault(TransformComponent {})
+    //     .WithDefault(SphereColliderComponent {})
+    //     .WithDefault(RigidBodyComponent { .mass = 100.0f })
+    //     .WithEntities(10'000)
+    //     .ForEach<TransformComponent, SphereColliderComponent>(
+    //         [](auto entity, TransformComponent& transform,
+    //            SphereColliderComponent& sphereCollider) {
+    //             transform = { .position = randomPosition(-80'000, 80'000),
+    //                           .rotation = glm::vec3(0),
+    //                           .scale    = glm::vec3(randomNumber(5, 10)) };
 
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
-            })
-        .Build();
+    //             sphereCollider = { .radius = transform.scale.x,
+    //                                .offset = glm::vec3(0) };
+    //         })
+    //     .Build();
 
-    mManager->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mRedShipModel })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(10'000)
-        .ForEach<TransformComponent, SphereColliderComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-80'000, 80'000),
-                              .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(randomNumber(5, 10)) };
+    // mManager->CreateArchetypeBuilder()
+    //     .WithDefault(ModelComponent { .meshes = &mRedShipModel })
+    //     .WithDefault(TransformComponent {})
+    //     .WithDefault(SphereColliderComponent {})
+    //     .WithDefault(RigidBodyComponent { .mass = 100.0f })
+    //     .WithEntities(10'000)
+    //     .ForEach<TransformComponent, SphereColliderComponent>(
+    //         [](auto entity, TransformComponent& transform,
+    //            SphereColliderComponent& sphereCollider) {
+    //             transform = { .position = randomPosition(-80'000, 80'000),
+    //                           .rotation = glm::vec3(0),
+    //                           .scale    = glm::vec3(randomNumber(5, 10)) };
 
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
-            })
-        .Build();
+    //             sphereCollider = { .radius = transform.scale.x,
+    //                                .offset = glm::vec3(0) };
+    //         })
+    //     .Build();
 
-    mManager->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mMoonModel })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent {})
-        .WithEntities(1000)
-        .ForEach<TransformComponent, SphereColliderComponent,
-                 RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider,
-               RigidBodyComponent&      rigidBody) {
-                transform = { .position = randomPosition(-80'000, 80'000),
-                              .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(10, 1000)) };
+    // mManager->CreateArchetypeBuilder()
+    //     .WithDefault(ModelComponent { .meshes = &mMoonModel })
+    //     .WithDefault(TransformComponent {})
+    //     .WithDefault(SphereColliderComponent {})
+    //     .WithDefault(RigidBodyComponent {})
+    //     .WithEntities(1000)
+    //     .ForEach<TransformComponent, SphereColliderComponent,
+    //              RigidBodyComponent>(
+    //         [](auto entity, TransformComponent& transform,
+    //            SphereColliderComponent& sphereCollider,
+    //            RigidBodyComponent&      rigidBody) {
+    //             transform = { .position = randomPosition(-80'000, 80'000),
+    //                           .rotation = glm::vec3(0.0),
+    //                           .scale    = glm::vec3(randomNumber(10, 1000))
+    //                           };
 
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
+    //             sphereCollider = { .radius = transform.scale.x,
+    //                                .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 1000.0f };
-            })
-        .Build();
+    //             rigidBody = { .mass = transform.scale.x * 1000.0f };
+    //         })
+    //     .Build();
 
     mManager->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes = &mBlackHoleModel })
@@ -120,23 +122,15 @@ void SpawnSystem::Start()
         .Build();
 
     mManager->CreateArchetypeBuilder()
+        .WithDefault(PlayerComponent { .hitPoints = 1000 })
         .WithDefault(ModelComponent { .meshes = &mXWingModel })
         .WithDefault(TransformComponent {
             .position = glm::vec3(10000.0, 10000.0, 0),
             .rotation = glm::vec3(0.0, 0, 0),
             .scale    = glm::vec3(1000) })
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent {})
+        .WithDefault(
+            SphereColliderComponent { .radius = 1000, .offset = glm::vec3(0) })
+        .WithDefault(RigidBodyComponent { .mass = 100.0f })
         .WithEntities(1)
-        .ForEach<TransformComponent, SphereColliderComponent,
-                 RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider,
-               RigidBodyComponent&      rigidBody) {
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
-
-                rigidBody = { .mass = transform.scale.x * 100.0f };
-            })
         .Build();
 }
