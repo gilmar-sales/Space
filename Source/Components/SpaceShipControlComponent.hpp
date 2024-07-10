@@ -4,6 +4,7 @@
 
 struct SpaceShipControlComponent : fr::Component
 {
+    float boost;
     float rollTorque;
     float pitchTorque;
     float yawTorque;

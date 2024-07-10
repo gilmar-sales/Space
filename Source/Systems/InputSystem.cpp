@@ -3,28 +3,12 @@
 #include <Core/UniformBuffer.hpp>
 #include <glm/ext/matrix_transform.hpp>
 #include <glm/glm.hpp>
-
-glm::vec3 InputSystem::cameraPosition = glm::vec3(0.0f, 0.0f, -10.0f);
-glm::vec3 InputSystem::cameraForward  = glm::vec3(0.0f, 0.0f, 1.0f);
+#include <Events/KeyDownEvent.hpp>
+#include <Events/KeyUpEvent.hpp>
+#include <Events/MouseMoveEvent.hpp>
 
 void InputSystem::PreUpdate(float deltaTime)
 {
-    static auto cameraRotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
-    auto cameraMatrix = glm::mat4(1.0f);
-    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.x),
-                               glm::vec3(1.0f, 0.0f, 0.0f));
-    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.y),
-                               glm::vec3(0.0f, 1.0f, 0.0f));
-    cameraMatrix = glm::rotate(cameraMatrix, glm::radians(cameraRotation.z),
-                               glm::vec3(0.0f, 0.0f, 1.0f));
-
-    cameraForward = glm::vec3(glm::vec4(0.0f, 0.0f, 1.0f, 0.0) * cameraMatrix);
-    auto cameraRight =
-        glm::normalize(glm::cross(glm::vec3(0.0f, 1.0f, 0.0f), cameraForward));
-    auto cameraUp = glm::normalize(glm::cross(cameraForward, cameraRight));
-
-    static auto     cameraVelocity = glm::vec2(0.0f, 0.0f);
     static SDL_bool grab           = SDL_FALSE;
 
     SDL_Event event;
@@ -49,6 +33,10 @@ void InputSystem::PreUpdate(float deltaTime)
                 mWindow->Resize(event.window.data1, event.window.data2);
                 mRenderer->RebuildSwapChain();
                 break;
+            case SDL_EVENT_MOUSE_MOTION:
+                mManager->SendEvent<MouseMoveEvent>(
+                    { .deltaX=event.motion.xrel, .deltaY=event.motion.yrel });
+                break;
             case SDL_EVENT_KEY_DOWN:
                 switch (event.key.scancode)
                 {
@@ -67,7 +55,6 @@ void InputSystem::PreUpdate(float deltaTime)
                         }
                         break;
                     case SDL_SCANCODE_M:
-
                         if (grab == SDL_TRUE)
                             grab = SDL_FALSE;
                         else
@@ -75,61 +62,18 @@ void InputSystem::PreUpdate(float deltaTime)
 
                         SDL_SetRelativeMouseMode(grab);
                         break;
-                    case SDL_SCANCODE_W:
-                        cameraVelocity.y = 1.0f;
-                        break;
-                    case SDL_SCANCODE_S:
-                        cameraVelocity.y = -1.0f;
-                        break;
-                    case SDL_SCANCODE_D:
-                        cameraVelocity.x = -1.0f;
-                        break;
-                    case SDL_SCANCODE_A:
-                        cameraVelocity.x = 1.0f;
-                        break;
                     default:
+                        mManager->SendEvent(KeyDownEvent {.scancode = event.key.scancode});
                         break;
                 }
                 break;
-            case SDL_EVENT_KEY_UP:
-                switch (event.key.scancode)
+            case SDL_EVENT_KEY_UP: 
                 {
-                    case SDL_SCANCODE_W:
-                        cameraVelocity.y = 0.0f;
-                        break;
-                    case SDL_SCANCODE_S:
-                        cameraVelocity.y = 0.0f;
-                        break;
-                    case SDL_SCANCODE_D:
-                        cameraVelocity.x = 0.0f;
-                        break;
-                    case SDL_SCANCODE_A:
-                        cameraVelocity.x = 0.0f;
-                        break;
-                    default:
-                        break;
+                    mManager->SendEvent<KeyUpEvent>({ .scancode = event.key.scancode });
+                    break;
                 }
-                break;
-            case SDL_EVENT_MOUSE_MOTION:
-                cameraRotation.y += event.motion.xrel * 10.0f * deltaTime;
-                cameraRotation.x += event.motion.yrel * 10.0f * deltaTime;
-                break;
             default:
                 break;
         }
     }
-
-    cameraPosition += cameraForward * cameraVelocity.y * 10000.0f * deltaTime;
-    cameraPosition += cameraRight * cameraVelocity.x * 10000.0f * deltaTime;
-
-    auto projection = fra::ProjectionUniformBuffer {
-        .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,
-                            glm::vec3(0.0f, 1.0f, 0.0f)),
-        .projection = glm::perspective(
-            glm::radians(45.0f),
-            (float) mWindow->GetWidth() / (float) mWindow->GetHeight(), 0.1f,
-            mRenderer->GetDrawDistance())
-    };
-
-    mRenderer->UpdateProjection(projection);
 }

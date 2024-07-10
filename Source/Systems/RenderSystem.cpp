@@ -45,19 +45,9 @@ void RenderSystem::PostUpdate(float dt)
     matrices.reserve(renderables.size());
 
     mManager->StartTraceProfiling("Calculate matrizes");
-
     for (const auto particle : renderables)
     {
-        auto matrix = glm::rotate(glm::mat4(1),
-                                  particle->transform.rotation.z,
-                                  glm::vec3(0.0f, 0.0f, 1.0f));
-        matrix      = glm::rotate(matrix, particle->transform.rotation.y,
-                                  glm::vec3(0.0f, 1.0f, 0.0f));
-        matrix      = glm::rotate(matrix, particle->transform.rotation.x,
-                                  glm::vec3(1.0f, 0.0f, 0.0f));
-        matrix      = glm::translate(matrix, particle->transform.position);
-        matrix      = glm::scale(matrix, particle->transform.scale);
-        matrices.push_back(matrix);
+        matrices.push_back(particle->transform.GetModel());
     }
     mManager->EndTraceProfiling();
 

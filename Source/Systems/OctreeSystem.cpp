@@ -3,7 +3,7 @@
 
 void OctreeSystem::PreUpdate(float deltaTime)
 {
-    if (mOctree == nullptr)
+    //if (mOctree == nullptr)
     {
         auto allocator = std::allocator<Octree>();
         mOctree =

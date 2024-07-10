@@ -183,6 +183,9 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
 bool Octree::Intersect(const Particle& particle) const
 {
+    if (this == nullptr)
+        return false;
+
     return (particle.transform.position.x >=
                 mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
             particle.transform.position.x <=

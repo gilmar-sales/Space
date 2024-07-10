@@ -1,5 +1,9 @@
 #include "SpaceApp.hpp"
 
+#include <Components/SpaceShipControlComponent.hpp>
+#include <Systems/PlayerCameraSystem.hpp>
+#include <Systems/PlayerControlSystem.hpp>
+
 void SpaceApp::Startup()
 {
     mManager = std::make_shared<fr::ECSManager>(2'100'000);
@@ -16,10 +20,13 @@ void SpaceApp::Startup()
     mManager->RegisterComponent<SphereColliderComponent>();
     mManager->RegisterComponent<RigidBodyComponent>();
     mManager->RegisterComponent<PlayerComponent>();
+    mManager->RegisterComponent<SpaceShipControlComponent>();
 
     mManager->RegisterSystem<SpawnSystem>();
     mManager->RegisterSystem<InputSystem>();
     mManager->RegisterSystem<OctreeSystem>();
+    mManager->RegisterSystem<PlayerControlSystem>();
+    mManager->RegisterSystem<PlayerCameraSystem>();
     mManager->RegisterSystem<CollisionSystem>();
     mManager->RegisterSystem<MovementSystem>();
     mManager->RegisterSystem<PhysicsSystem>();

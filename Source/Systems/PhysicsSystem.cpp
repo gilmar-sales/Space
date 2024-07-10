@@ -7,6 +7,7 @@
 #include <Components/TransformComponent.hpp>
 
 #include <Events/ApplyForceEvent.hpp>
+#include <Events/ApplyTorqueEvent.hpp>
 #include <Events/CollisionEvent.hpp>
 
 void PhysicsSystem::Start()
@@ -63,6 +64,25 @@ void PhysicsSystem::Start()
                                       applyForceEvent.deltaTime;
             }
         });
+
+    mManager->AddEventListener<ApplyTorqueEvent>(
+        [&](ApplyTorqueEvent applyTorqueEvent) {
+            if (mManager->HasComponent<RigidBodyComponent>(
+                    applyTorqueEvent.target))
+            {
+                auto& transform = mManager->GetComponent<TransformComponent>(
+                    applyTorqueEvent.target);
+                auto& rigidBody = mManager->GetComponent<RigidBodyComponent>(
+                    applyTorqueEvent.target);
+
+                auto angularAcceleration =
+                    applyTorqueEvent.magnetiude / rigidBody.mass * applyTorqueEvent.deltaTime;
+
+                transform.rotation *= glm::angleAxis(
+                    angularAcceleration,
+                    applyTorqueEvent.axis);
+            }
+        });
 }
 
 void PhysicsSystem::Update(float deltaTime)
@@ -71,6 +91,6 @@ void PhysicsSystem::Update(float deltaTime)
         [=](fr::Entity entity, TransformComponent& transform,
             RigidBodyComponent& rigidBody) {
             transform.position += rigidBody.velocity * deltaTime;
-            rigidBody.velocity *= 1.0f - 0.07f * deltaTime;
+            rigidBody.velocity *= 1.0f - 0.8f * deltaTime;
         });
 }
