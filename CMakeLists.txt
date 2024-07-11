@@ -10,8 +10,6 @@ project(
     LANGUAGES C CXX
     )
 
-find_package(TBB)
-
 file(GLOB_RECURSE SPACE_SRC Source/**.cpp Source/**.hpp)
 
 add_executable(SpaceAiWar ${SPACE_SRC})
@@ -20,9 +18,6 @@ target_compile_features(SpaceAiWar PUBLIC cxx_std_23)
 
 target_link_libraries(SpaceAiWar freyr::freyr Freya-static)
 
-if  (${TBB_FOUND})
-  target_link_libraries(SpaceAiWar tbb)
-endif()
 
 target_include_directories(SpaceAiWar PUBLIC Source)
 
