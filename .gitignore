@@ -15,3 +15,5 @@ cmake-build-*/
 .idea
 .vscode
 .vs
+.cache
+.fleet
