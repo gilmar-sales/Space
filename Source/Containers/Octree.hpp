@@ -28,11 +28,11 @@ class Octree
     Octree(glm::vec3              position,
            float                  halfRange,
            size_t                 capacity,
-           std::allocator<Octree> allocator = std::allocator<Octree>());
+            const std::allocator<Octree>& allocator = std::allocator<Octree>());
     ~Octree() = default;
 
     bool Contains(const Particle& particle) const;
-    bool Insert(Particle particle);
+    bool Insert(const Particle& particle);
     void Subdivide();
 
     void Query(Particle& particle, std::vector<Particle*>& found);
@@ -41,11 +41,10 @@ class Octree
     void Query(const Frustum& frustum, std::vector<Particle*>& found);
     bool IsInsideFrustum(const Frustum& frustum) const;
 
-    void Draw(std::shared_ptr<fra::Renderer> renderer,
-              std::shared_ptr<fra::MeshPool>
-                                                meshPool,
-              const std::vector<std::uint32_t>& meshIds);
-    void PushInstanceData(std::vector<glm::mat4>& instanceData);
+    void Draw(const std::shared_ptr<fra::Renderer>& renderer,
+              const std::shared_ptr<fra::MeshPool>& meshPool,
+              const std::vector<std::uint32_t>& meshIds) const;
+    void PushInstanceData(std::vector<glm::mat4>& instanceData) const;
 
   private:
     std::mutex             mMutex;

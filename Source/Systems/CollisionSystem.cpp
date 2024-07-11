@@ -20,11 +20,11 @@ void CollisionSystem::Start()
 void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
-    mManager->ForEachAsync<TransformComponent, SphereColliderComponent,
+    mManager->ForEachParallel<TransformComponent, SphereColliderComponent,
                            RigidBodyComponent>(
         "Calculate collisions",
         [octree = octree, manager = mManager, deltaTime = deltaTime](
-            fr::Entity entity, TransformComponent& transform,
+            const fr::Entity entity, auto index, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
             auto collisions = std::vector<Particle*>(0);

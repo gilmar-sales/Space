@@ -3,14 +3,14 @@
 
 void OctreeSystem::PreUpdate(float deltaTime)
 {
-    //if (mOctree == nullptr)
+    // if (mOctree == nullptr)
     {
         auto allocator = std::allocator<Octree>();
         mOctree =
             std::make_shared<Octree>(glm::vec3(0), 100'000.0f, 4, allocator);
 
         mManager->ForEachParallel<TransformComponent, SphereColliderComponent>(
-            [octree = mOctree](fr::Entity entity, int index,
+            [octree = mOctree](const fr::Entity entity, int index,
                                TransformComponent&      transform,
                                SphereColliderComponent& sphereCollider) {
                 octree->Insert(Particle { .entity         = entity,
