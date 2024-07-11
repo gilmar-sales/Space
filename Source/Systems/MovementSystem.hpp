@@ -2,7 +2,7 @@
 
 #include <Freyr/Freyr.hpp>
 
-class MovementSystem : public fr::System
+class MovementSystem final : public fr::System
 {
   public:
     virtual ~MovementSystem() = default;

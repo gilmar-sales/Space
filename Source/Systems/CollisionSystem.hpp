@@ -3,17 +3,14 @@
 #include <Core/Renderer.hpp>
 #include <Freyr/Freyr.hpp>
 
-#include "Containers/Octree.hpp"
 #include <Systems/OctreeSystem.hpp>
 
-class CollisionSystem : public fr::System
+class CollisionSystem final : public fr::System
 {
   public:
-    CollisionSystem(std::shared_ptr<fra::Renderer> renderer,
-                    std::shared_ptr<fra::MeshPool>
-                        meshPool,
-                    std::shared_ptr<OctreeSystem>
-                        octreeSystem) :
+    CollisionSystem(const std::shared_ptr<fra::Renderer>& renderer,
+                    const std::shared_ptr<fra::MeshPool>& meshPool,
+                    const std::shared_ptr<OctreeSystem>&  octreeSystem) :
         mRenderer(renderer),
         mMeshPool(meshPool), mOctreeSystem(octreeSystem)
     {

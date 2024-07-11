@@ -1,7 +1,6 @@
 #include "CollisionSystem.hpp"
 
 #include <Asset/MeshPool.hpp>
-#include <glm/ext/matrix_transform.hpp>
 
 #include "Events/CollisionEvent.hpp"
 
@@ -12,9 +11,6 @@
 
 void CollisionSystem::Start()
 {
-    // mSphereModel =
-    // mMeshPool->CreateMeshFromFile("C:/Models/debug_sphere.obj");
-    // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
 void CollisionSystem::Update(float deltaTime)

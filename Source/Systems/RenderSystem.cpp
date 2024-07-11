@@ -5,10 +5,6 @@
 
 #include "InputSystem.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/quaternion.hpp"
-#include <glm/ext/matrix_transform.hpp>
-
 void RenderSystem::Start()
 {
     // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
@@ -18,9 +14,9 @@ void RenderSystem::PostUpdate(float dt)
 {
     mRenderer->BeginFrame();
 
-    auto projectionBuffer = mRenderer->GetCurrentProjection();
+    auto [view, projection] = mRenderer->GetCurrentProjection();
 
-    auto frustum = Frustum(projectionBuffer.projection * projectionBuffer.view);
+    const auto frustum = Frustum(projection * view);
 
     auto renderables = std::vector<Particle*>();
     renderables.reserve(2'000);
@@ -34,9 +30,8 @@ void RenderSystem::PostUpdate(float dt)
         return;
     }
 
-    std::sort(
-        renderables.begin(), renderables.end(),
-        [this](Particle* a, Particle* b) {
+    std::ranges::sort(renderables,
+        [this](const Particle* a, const Particle* b) {
             return mManager->GetComponent<ModelComponent>(a->entity).meshes <
                    mManager->GetComponent<ModelComponent>(b->entity).meshes;
         });

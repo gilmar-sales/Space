@@ -1,5 +1,4 @@
 #include "OctreeSystem.hpp"
-#include <Events/OctreeFinishedEvent.hpp>
 
 void OctreeSystem::PreUpdate(float deltaTime)
 {

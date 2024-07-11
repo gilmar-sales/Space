@@ -4,7 +4,7 @@
 
 #include <Containers/Octree.hpp>
 
-class OctreeSystem : public fr::System
+class OctreeSystem final : public fr::System
 {
   public:
     virtual ~OctreeSystem() = default;

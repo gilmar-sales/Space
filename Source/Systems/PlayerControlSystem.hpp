@@ -2,9 +2,13 @@
 
 #include <Freyr/Freyr.hpp>
 
-class PlayerControlSystem : public fr::System
+class PlayerControlSystem final : public fr::System
 {
   public:
+    PlayerControlSystem() :
+        mPlayer(), mYawTorque()
+    {
+    }
     void Start() override;
 
     void PostUpdate(float deltaTime) override;

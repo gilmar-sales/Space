@@ -1,6 +1,20 @@
 #include "SpaceApp.hpp"
 
+
+
+#include "Components/ModelComponent.hpp"
+#include "Components/PlayerComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
+#include "Components/SphereColliderComponent.hpp"
+#include "Components/TransformComponent.hpp"
 #include <Components/SpaceShipControlComponent.hpp>
+
+#include "Systems/CollisionSystem.hpp"
+#include "Systems/InputSystem.hpp"
+#include "Systems/MovementSystem.hpp"
+#include "Systems/PhysicsSystem.hpp"
+#include "Systems/RenderSystem.hpp"
+#include "Systems/SpawnSystem.hpp"
 #include <Systems/PlayerCameraSystem.hpp>
 #include <Systems/PlayerControlSystem.hpp>
 
@@ -8,7 +22,7 @@ void SpaceApp::Startup()
 {
     mManager = std::make_shared<fr::ECSManager>(2'100'000);
 
-    auto diContainer = mManager->GetDIContainer();
+    const auto diContainer = mManager->GetDIContainer();
 
     diContainer->AddSingleton<fra::Window>(mWindow);
     diContainer->AddSingleton<fra::Renderer>(mRenderer);

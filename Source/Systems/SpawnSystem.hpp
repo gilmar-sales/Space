@@ -4,10 +4,10 @@
 
 #include <Asset/MeshPool.hpp>
 
-class SpawnSystem : public fr::System
+class SpawnSystem final : public fr::System
 {
   public:
-    SpawnSystem(std::shared_ptr<fra::MeshPool> meshPool) : mMeshPool(meshPool)
+    explicit SpawnSystem(const std::shared_ptr<fra::MeshPool>& meshPool) : mMeshPool(meshPool)
     {
     }
 

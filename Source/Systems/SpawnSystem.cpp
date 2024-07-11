@@ -9,9 +9,7 @@
 #include "Components/TransformComponent.hpp"
 #include "Components/SpaceShipControlComponent.hpp"
 
-#include "Events/CollisionEvent.hpp"
-
-static int randomNumber(int min, int max)
+static int randomNumber(const int min, const int max)
 {
     std::random_device              r;
     std::default_random_engine      e1(r());

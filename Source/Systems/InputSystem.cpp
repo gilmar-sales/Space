@@ -1,8 +1,5 @@
 #include "InputSystem.hpp"
 
-#include <Core/UniformBuffer.hpp>
-#include <glm/ext/matrix_transform.hpp>
-#include <glm/glm.hpp>
 #include <Events/KeyDownEvent.hpp>
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>

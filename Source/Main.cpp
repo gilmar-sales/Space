@@ -4,7 +4,7 @@
 
 int main(int argc, char const* argv[])
 {
-    auto app = fra::ApplicationBuilder()
+    const auto app = fra::ApplicationBuilder()
                    .WithWindow([](fra::WindowBuilder& windowBuilder) {
                        windowBuilder.SetVSync(false);
                    })

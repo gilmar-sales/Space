@@ -2,7 +2,7 @@
 
 #include <Freyr/Freyr.hpp>
 
-class PhysicsSystem : public fr::System
+class PhysicsSystem final : public fr::System
 {
   public:
     virtual ~PhysicsSystem() = default;

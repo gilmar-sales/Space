@@ -4,12 +4,11 @@
 #include <Core/Window.hpp>
 #include <Freyr/Freyr.hpp>
 
-class InputSystem : public fr::System
+class InputSystem final : public fr::System
 {
   public:
-    InputSystem(std::shared_ptr<fra::Renderer> renderer,
-                std::shared_ptr<fra::Window>
-                    window) :
+    InputSystem(const std::shared_ptr<fra::Renderer>& renderer,
+                const std::shared_ptr<fra::Window>&   window) :
         mRenderer(renderer),
         mWindow(window)
     {

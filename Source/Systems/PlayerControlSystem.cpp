@@ -12,7 +12,7 @@ void PlayerControlSystem::Start()
 {
     mPlayer = mManager->FindUnique<PlayerComponent>();
 
-    mManager->AddEventListener<KeyDownEvent>([this](KeyDownEvent keyDownEvent) {
+    mManager->AddEventListener<KeyDownEvent>([this](const KeyDownEvent keyDownEvent) {
         switch (keyDownEvent.scancode)
         {
             case SDL_SCANCODE_W:
@@ -25,18 +25,18 @@ void PlayerControlSystem::Start()
                 break;
             case SDL_SCANCODE_A:
                 mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
-                    .rollTorque = 10;
+                    .rollTorque = 100;
                 break;
             case SDL_SCANCODE_D:
                 mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
-                    .rollTorque = -10;
+                    .rollTorque = -100;
                 break;
             default:
                 break;
         }
     });
 
-    mManager->AddEventListener<KeyUpEvent>([this](KeyUpEvent keyUpEvent) {
+    mManager->AddEventListener<KeyUpEvent>([this](const KeyUpEvent keyUpEvent) {
         switch (keyUpEvent.scancode)
         {
             case SDL_SCANCODE_W:
@@ -55,7 +55,7 @@ void PlayerControlSystem::Start()
     });
 
     mManager->AddEventListener<MouseMoveEvent>(
-        [this](MouseMoveEvent mouseMoveEvent) {
+        [this](const MouseMoveEvent mouseMoveEvent) {
         mManager->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
             mouseMoveEvent.deltaX;
         mManager->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque =

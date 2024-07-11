@@ -2,6 +2,8 @@
 
 #include <Freyr/Freyr.hpp>
 
+#include <glm/glm.hpp>
+
 struct RigidBodyComponent : fr::Component
 {
     float     mass;

@@ -1,7 +1,5 @@
 #include "PhysicsSystem.hpp"
 
-#include <glm/ext/matrix_transform.hpp>
-
 #include <Components/RigidBodyComponent.hpp>
 #include <Components/SphereColliderComponent.hpp>
 #include <Components/TransformComponent.hpp>
@@ -13,23 +11,25 @@
 void PhysicsSystem::Start()
 {
     mManager->AddEventListener<CollisionEvent>(
-        [&](CollisionEvent collisionEvent) {
-            auto& targetTransform = mManager->GetComponent<TransformComponent>(
-                collisionEvent.target);
-            auto& targetCollider =
+        [&](const CollisionEvent collisionEvent) {
+            const auto& targetTransform =
+                mManager->GetComponent<TransformComponent>(
+                    collisionEvent.target);
+            const auto& targetCollider =
                 mManager->GetComponent<SphereColliderComponent>(
                     collisionEvent.target);
 
-            auto collisorTransform = mManager->GetComponent<TransformComponent>(
-                collisionEvent.collisor);
-            auto& collisorCollider =
+            const auto collisorTransform =
+                mManager->GetComponent<TransformComponent>(
+                    collisionEvent.collisor);
+            const auto& collisorCollider =
                 mManager->GetComponent<SphereColliderComponent>(
                     collisionEvent.collisor);
 
-            auto distance = glm::distance(
+            const auto distance = glm::distance(
                 targetTransform.position, collisorTransform.position);
 
-            auto force =
+            const auto force =
                 (targetCollider.radius + collisorCollider.radius - distance) *
                 200.0f;
 
@@ -49,16 +49,14 @@ void PhysicsSystem::Start()
         });
 
     mManager->AddEventListener<ApplyForceEvent>(
-        [&](ApplyForceEvent applyForceEvent) {
+        [&](const ApplyForceEvent& applyForceEvent) {
             if (mManager->HasComponent<RigidBodyComponent>(
                     applyForceEvent.target))
             {
-                auto& transform = mManager->GetComponent<TransformComponent>(
-                    applyForceEvent.target);
                 auto& rigidBody = mManager->GetComponent<RigidBodyComponent>(
                     applyForceEvent.target);
 
-                auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
+                const auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
 
                 rigidBody.velocity += applyForceEvent.direction * acceleration *
                                       applyForceEvent.deltaTime;
@@ -66,16 +64,17 @@ void PhysicsSystem::Start()
         });
 
     mManager->AddEventListener<ApplyTorqueEvent>(
-        [&](ApplyTorqueEvent applyTorqueEvent) {
+        [&](const ApplyTorqueEvent& applyTorqueEvent) {
             if (mManager->HasComponent<RigidBodyComponent>(
                     applyTorqueEvent.target))
             {
                 auto& transform = mManager->GetComponent<TransformComponent>(
                     applyTorqueEvent.target);
-                auto& rigidBody = mManager->GetComponent<RigidBodyComponent>(
-                    applyTorqueEvent.target);
+                const auto& rigidBody =
+                    mManager->GetComponent<RigidBodyComponent>(
+                        applyTorqueEvent.target);
 
-                auto angularAcceleration =
+                const auto angularAcceleration =
                     applyTorqueEvent.magnetiude / rigidBody.mass * applyTorqueEvent.deltaTime;
 
                 transform.rotation *= glm::angleAxis(

@@ -4,12 +4,11 @@
 #include <Core/Window.hpp>
 #include <Freyr/Freyr.hpp>
 
-class PlayerCameraSystem : public fr::System
+class PlayerCameraSystem final : public fr::System
 {
   public:
-    PlayerCameraSystem(std::shared_ptr<fra::Renderer> renderer,
-                       std::shared_ptr<fra::Window>
-                           window) :
+    PlayerCameraSystem(const std::shared_ptr<fra::Renderer>& renderer,
+                       const std::shared_ptr<fra::Window>&   window) :
         mRenderer(renderer),
         mWindow(window)
     {

@@ -1,12 +1,9 @@
 #include "MovementSystem.hpp"
 
-#include <glm/ext/matrix_transform.hpp>
-
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 #include "Events/ApplyForceEvent.hpp"
-#include "Events/CollisionEvent.hpp"
 #include <Components/SpaceShipControlComponent.hpp>
 #include <Events/ApplyTorqueEvent.hpp>
 
@@ -15,8 +12,9 @@ void MovementSystem::Update(float deltaTime)
     mManager->ForEachAsync<TransformComponent, RigidBodyComponent,
                            SpaceShipControlComponent>(
         [manager = mManager, deltaTime = deltaTime](
-            fr::Entity entity, TransformComponent& transform,
-            RigidBodyComponent& rigidBody, SpaceShipControlComponent& spaceShipControl) {
+            const fr::Entity entity, const TransformComponent& transform,
+            RigidBodyComponent& rigidBody,
+            const SpaceShipControlComponent& spaceShipControl) {
             if (spaceShipControl.boost != 0)
             {
                 manager->SendEvent(ApplyForceEvent {
