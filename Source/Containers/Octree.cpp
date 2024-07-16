@@ -2,8 +2,6 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-#include <print>
-
 Octree::Octree(const glm::vec3 position,
                const float     halfRange,
                const size_t    capacity,

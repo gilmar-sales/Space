@@ -1,7 +1,5 @@
 #include "Frustum.hpp"
 
-#include <print>
-
 Frustum::Frustum(const glm::mat4& viewProjMatrix)
 {
 
