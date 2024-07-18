@@ -1,7 +1,5 @@
 #include "SpaceApp.hpp"
 
-
-
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -20,7 +18,7 @@
 
 void SpaceApp::Startup()
 {
-    mManager = std::make_shared<fr::ECSManager>(2'100'000);
+    mManager = std::make_shared<fr::Scene>(2'100'000);
 
     const auto diContainer = mManager->GetDIContainer();
 

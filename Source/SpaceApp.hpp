@@ -11,5 +11,5 @@ class SpaceApp final : public fra::AbstractApplication
     void Run() override;
 
   private:
-    std::shared_ptr<fr::ECSManager> mManager;
+    std::shared_ptr<fr::Scene> mManager;
 };
