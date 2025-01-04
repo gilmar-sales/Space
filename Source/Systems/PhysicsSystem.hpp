@@ -5,8 +5,9 @@
 class PhysicsSystem final : public fr::System
 {
   public:
-    virtual ~PhysicsSystem() = default;
+    explicit PhysicsSystem(const std::shared_ptr<fr::Scene>& scene);
 
-    void Start() override;
+    ~PhysicsSystem() override = default;
+
     void Update(float deltaTime) override;
 };

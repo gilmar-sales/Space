@@ -6,7 +6,7 @@
 
 void InputSystem::PreUpdate(float deltaTime)
 {
-    static SDL_bool grab           = SDL_FALSE;
+    static SDL_bool grab = SDL_FALSE;
 
     SDL_Event event;
     while (SDL_PollEvent(&event))
@@ -31,8 +31,9 @@ void InputSystem::PreUpdate(float deltaTime)
                 mRenderer->RebuildSwapChain();
                 break;
             case SDL_EVENT_MOUSE_MOTION:
-                mManager->SendEvent<MouseMoveEvent>(
-                    { .deltaX=event.motion.xrel, .deltaY=event.motion.yrel });
+                mScene->SendEvent<MouseMoveEvent>(
+                    { .deltaX = event.motion.xrel,
+                      .deltaY = event.motion.yrel });
                 break;
             case SDL_EVENT_KEY_DOWN:
                 switch (event.key.scancode)
@@ -60,15 +61,16 @@ void InputSystem::PreUpdate(float deltaTime)
                         SDL_SetRelativeMouseMode(grab);
                         break;
                     default:
-                        mManager->SendEvent(KeyDownEvent {.scancode = event.key.scancode});
+                        mScene->SendEvent(
+                            KeyDownEvent { .scancode = event.key.scancode });
                         break;
                 }
                 break;
-            case SDL_EVENT_KEY_UP: 
-                {
-                    mManager->SendEvent<KeyUpEvent>({ .scancode = event.key.scancode });
-                    break;
-                }
+            case SDL_EVENT_KEY_UP: {
+                mScene->SendEvent<KeyUpEvent>(
+                    { .scancode = event.key.scancode });
+                break;
+            }
             default:
                 break;
         }

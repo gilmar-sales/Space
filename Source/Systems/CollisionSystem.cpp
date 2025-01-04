@@ -9,17 +9,13 @@
 #include "Components/TransformComponent.hpp"
 #include <Events/OctreeFinishedEvent.hpp>
 
-void CollisionSystem::Start()
-{
-}
-
 void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
-    mManager->ForEachParallel<TransformComponent, SphereColliderComponent,
-                           RigidBodyComponent>(
+    mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
+                            RigidBodyComponent>(
         "Calculate collisions",
-        [octree = octree, manager = mManager, deltaTime = deltaTime](
+        [octree = octree, manager = mScene, deltaTime = deltaTime](
             const fr::Entity entity, auto index, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {

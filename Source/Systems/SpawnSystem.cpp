@@ -5,9 +5,9 @@
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
+#include "Components/SpaceShipControlComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Components/SpaceShipControlComponent.hpp"
 
 static int randomNumber(const int min, const int max)
 {
@@ -24,7 +24,9 @@ static glm::vec3 randomPosition(int min, int max)
                        randomNumber(min, max) };
 }
 
-void SpawnSystem::Start()
+SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
+                         const std::shared_ptr<fra::MeshPool>& meshPool) :
+    System(scene), mMeshPool(meshPool)
 {
 
     mXWingModel =
@@ -39,7 +41,7 @@ void SpawnSystem::Start()
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
-    mManager->CreateArchetypeBuilder()
+    mScene->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes = &mBlueShipModel })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
@@ -57,7 +59,7 @@ void SpawnSystem::Start()
             })
         .Build();
 
-    mManager->CreateArchetypeBuilder()
+    mScene->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes = &mRedShipModel })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
@@ -75,7 +77,7 @@ void SpawnSystem::Start()
             })
         .Build();
 
-    mManager->CreateArchetypeBuilder()
+    mScene->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes = &mMoonModel })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
@@ -97,7 +99,7 @@ void SpawnSystem::Start()
             })
         .Build();
 
-    mManager->CreateArchetypeBuilder()
+    mScene->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes = &mBlackHoleModel })
         .WithDefault(TransformComponent {
             .position = glm::vec3(0.0),
@@ -118,13 +120,12 @@ void SpawnSystem::Start()
             })
         .Build();
 
-    mManager->CreateArchetypeBuilder()
+    mScene->CreateArchetypeBuilder()
         .WithDefault(PlayerComponent { .hitPoints = 1000 })
         .WithDefault(ModelComponent { .meshes = &mXWingModel })
-        .WithDefault(TransformComponent {
-            .position = glm::vec3(1000, 1000, 0),
-            .rotation = glm::vec3(0.0, 0, 0),
-            .scale    = glm::vec3(10) })
+        .WithDefault(TransformComponent { .position = glm::vec3(1000, 1000, 0),
+                                          .rotation = glm::vec3(0.0, 0, 0),
+                                          .scale    = glm::vec3(10) })
         .WithDefault(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithDefault(RigidBodyComponent { .mass = 100.0f })

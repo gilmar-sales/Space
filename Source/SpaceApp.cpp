@@ -20,11 +20,11 @@ void SpaceApp::Startup()
 {
     mManager = std::make_shared<fr::Scene>(2'100'000);
 
-    const auto diContainer = mManager->GetDIContainer();
+    const auto serviceCollection = mManager->GetServiceCollection();
 
-    diContainer->AddSingleton<fra::Window>(mWindow);
-    diContainer->AddSingleton<fra::Renderer>(mRenderer);
-    diContainer->AddSingleton<fra::MeshPool>(
+    serviceCollection->AddSingleton<fra::Window>(mWindow);
+    serviceCollection->AddSingleton<fra::Renderer>(mRenderer);
+    serviceCollection->AddSingleton<fra::MeshPool>(
         mRenderer->GetMeshPoolFactory()->CreateMeshPool());
 
     mManager->RegisterComponent<ModelComponent>();

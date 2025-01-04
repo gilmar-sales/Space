@@ -8,17 +8,17 @@
 class CollisionSystem final : public fr::System
 {
   public:
-    CollisionSystem(const std::shared_ptr<fra::Renderer>& renderer,
+    CollisionSystem(const std::shared_ptr<fr::Scene>&     scene,
+                    const std::shared_ptr<fra::Renderer>& renderer,
                     const std::shared_ptr<fra::MeshPool>& meshPool,
                     const std::shared_ptr<OctreeSystem>&  octreeSystem) :
-        mRenderer(renderer),
-        mMeshPool(meshPool), mOctreeSystem(octreeSystem)
+        System(scene), mRenderer(renderer), mMeshPool(meshPool),
+        mOctreeSystem(octreeSystem)
     {
     }
 
     virtual ~CollisionSystem() = default;
 
-    void Start() override;
     void Update(float deltaTime) override;
 
   private:

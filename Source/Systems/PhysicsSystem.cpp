@@ -8,22 +8,22 @@
 #include <Events/ApplyTorqueEvent.hpp>
 #include <Events/CollisionEvent.hpp>
 
-void PhysicsSystem::Start()
+PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
+    System(scene)
 {
-    mManager->AddEventListener<CollisionEvent>(
+    mScene->AddEventListener<CollisionEvent>(
         [&](const CollisionEvent collisionEvent) {
             const auto& targetTransform =
-                mManager->GetComponent<TransformComponent>(
-                    collisionEvent.target);
+                mScene->GetComponent<TransformComponent>(collisionEvent.target);
             const auto& targetCollider =
-                mManager->GetComponent<SphereColliderComponent>(
+                mScene->GetComponent<SphereColliderComponent>(
                     collisionEvent.target);
 
             const auto collisorTransform =
-                mManager->GetComponent<TransformComponent>(
+                mScene->GetComponent<TransformComponent>(
                     collisionEvent.collisor);
             const auto& collisorCollider =
-                mManager->GetComponent<SphereColliderComponent>(
+                mScene->GetComponent<SphereColliderComponent>(
                     collisionEvent.collisor);
 
             const auto distance = glm::distance(
@@ -33,14 +33,14 @@ void PhysicsSystem::Start()
                 (targetCollider.radius + collisorCollider.radius - distance) *
                 200.0f;
 
-            mManager->SendEvent(ApplyForceEvent {
+            mScene->SendEvent(ApplyForceEvent {
                 .target    = collisionEvent.target,
                 .direction = glm::normalize(
                     targetTransform.position - collisorTransform.position),
                 .magnetiude = force,
                 .deltaTime  = collisionEvent.deltaTime });
 
-            mManager->SendEvent(ApplyForceEvent {
+            mScene->SendEvent(ApplyForceEvent {
                 .target    = collisionEvent.collisor,
                 .direction = glm::normalize(
                     collisorTransform.position - targetTransform.position),
@@ -48,45 +48,45 @@ void PhysicsSystem::Start()
                 .deltaTime  = collisionEvent.deltaTime });
         });
 
-    mManager->AddEventListener<ApplyForceEvent>(
+    mScene->AddEventListener<ApplyForceEvent>(
         [&](const ApplyForceEvent& applyForceEvent) {
-            if (mManager->HasComponent<RigidBodyComponent>(
+            if (mScene->HasComponent<RigidBodyComponent>(
                     applyForceEvent.target))
             {
-                auto& rigidBody = mManager->GetComponent<RigidBodyComponent>(
+                auto& rigidBody = mScene->GetComponent<RigidBodyComponent>(
                     applyForceEvent.target);
 
-                const auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
+                const auto acceleration =
+                    applyForceEvent.magnetiude / rigidBody.mass;
 
                 rigidBody.velocity += applyForceEvent.direction * acceleration *
                                       applyForceEvent.deltaTime;
             }
         });
 
-    mManager->AddEventListener<ApplyTorqueEvent>(
+    mScene->AddEventListener<ApplyTorqueEvent>(
         [&](const ApplyTorqueEvent& applyTorqueEvent) {
-            if (mManager->HasComponent<RigidBodyComponent>(
+            if (mScene->HasComponent<RigidBodyComponent>(
                     applyTorqueEvent.target))
             {
-                auto& transform = mManager->GetComponent<TransformComponent>(
+                auto& transform = mScene->GetComponent<TransformComponent>(
                     applyTorqueEvent.target);
                 const auto& rigidBody =
-                    mManager->GetComponent<RigidBodyComponent>(
+                    mScene->GetComponent<RigidBodyComponent>(
                         applyTorqueEvent.target);
 
                 const auto angularAcceleration =
-                    applyTorqueEvent.magnetiude / rigidBody.mass * applyTorqueEvent.deltaTime;
+                    applyTorqueEvent.magnetiude / rigidBody.mass *
+                    applyTorqueEvent.deltaTime;
 
-                transform.rotation *= glm::angleAxis(
-                    angularAcceleration,
-                    applyTorqueEvent.axis);
+                transform.rotation *=
+                    glm::angleAxis(angularAcceleration, applyTorqueEvent.axis);
             }
         });
 }
-
 void PhysicsSystem::Update(float deltaTime)
 {
-    mManager->ForEachAsync<TransformComponent, RigidBodyComponent>(
+    mScene->ForEachAsync<TransformComponent, RigidBodyComponent>(
         [=](fr::Entity entity, TransformComponent& transform,
             RigidBodyComponent& rigidBody) {
             transform.position += rigidBody.velocity * deltaTime;

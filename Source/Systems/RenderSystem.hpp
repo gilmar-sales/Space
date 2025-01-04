@@ -15,14 +15,11 @@ struct InstanceDraw
 class RenderSystem final : public fr::System
 {
   public:
-    RenderSystem(const std::shared_ptr<fra::Renderer>& renderer,
+    RenderSystem(const std::shared_ptr<fr::Scene>&     scene,
+                 const std::shared_ptr<fra::Renderer>& renderer,
                  const std::shared_ptr<fra::MeshPool>& meshPool,
-                 const std::shared_ptr<OctreeSystem>&  octreeSystem) :
-        mRenderer(renderer),
-        mMeshPool(meshPool), mOctreeSystem(octreeSystem)
-    {
-    }
-    void Start() override;
+                 const std::shared_ptr<OctreeSystem>&  octreeSystem);
+
     void PostUpdate(float dt) override;
 
   private:

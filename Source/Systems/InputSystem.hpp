@@ -7,10 +7,10 @@
 class InputSystem final : public fr::System
 {
   public:
-    InputSystem(const std::shared_ptr<fra::Renderer>& renderer,
+    InputSystem(const std::shared_ptr<fr::Scene>&     scene,
+                const std::shared_ptr<fra::Renderer>& renderer,
                 const std::shared_ptr<fra::Window>&   window) :
-        mRenderer(renderer),
-        mWindow(window)
+        System(scene), mRenderer(renderer), mWindow(window)
     {
     }
 

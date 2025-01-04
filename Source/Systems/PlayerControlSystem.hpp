@@ -5,11 +5,7 @@
 class PlayerControlSystem final : public fr::System
 {
   public:
-    PlayerControlSystem() :
-        mPlayer(), mYawTorque()
-    {
-    }
-    void Start() override;
+    PlayerControlSystem(const std::shared_ptr<fr::Scene>& scene);
 
     void PostUpdate(float deltaTime) override;
 

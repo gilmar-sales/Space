@@ -7,7 +7,12 @@
 class OctreeSystem final : public fr::System
 {
   public:
-    virtual ~OctreeSystem() = default;
+    OctreeSystem(const std::shared_ptr<fr::Scene>& scene) :
+        System(scene), mOctree(nullptr)
+    {
+    }
+
+    ~OctreeSystem() override = default;
 
     void PreUpdate(float deltaTime) override;
 

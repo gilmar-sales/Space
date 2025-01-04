@@ -2,33 +2,35 @@
 
 #include <Components/PlayerComponent.hpp>
 
-#include <Events/KeyDownEvent.hpp>
 #include <Components/SpaceShipControlComponent.hpp>
-#include <Components/TransformComponent.hpp>
+#include <Events/KeyDownEvent.hpp>
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>
 
-void PlayerControlSystem::Start()
+PlayerControlSystem::PlayerControlSystem(
+    const std::shared_ptr<fr::Scene>& scene) :
+    System(scene), mPlayer(), mYawTorque()
 {
-    mPlayer = mManager->FindUnique<PlayerComponent>();
+    mPlayer = mScene->FindUnique<PlayerComponent>();
 
-    mManager->AddEventListener<KeyDownEvent>([this](const KeyDownEvent keyDownEvent) {
+    mScene->AddEventListener<KeyDownEvent>([this](const KeyDownEvent
+                                                      keyDownEvent) {
         switch (keyDownEvent.scancode)
         {
             case SDL_SCANCODE_W:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
-                    .boost = 100000.0f;
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer).boost =
+                    100000.0f;
                 break;
             case SDL_SCANCODE_S:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
-                    .boost = -100000.0f;
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer).boost =
+                    -100000.0f;
                 break;
             case SDL_SCANCODE_A:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer)
                     .rollTorque = 100;
                 break;
             case SDL_SCANCODE_D:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer)
                     .rollTorque = -100;
                 break;
             default:
@@ -36,17 +38,17 @@ void PlayerControlSystem::Start()
         }
     });
 
-    mManager->AddEventListener<KeyUpEvent>([this](const KeyUpEvent keyUpEvent) {
+    mScene->AddEventListener<KeyUpEvent>([this](const KeyUpEvent keyUpEvent) {
         switch (keyUpEvent.scancode)
         {
             case SDL_SCANCODE_W:
             case SDL_SCANCODE_S:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
-                    .boost = 0;
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer).boost =
+                    0;
                 break;
             case SDL_SCANCODE_A:
             case SDL_SCANCODE_D:
-                mManager->GetComponent<SpaceShipControlComponent>(mPlayer)
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer)
                     .rollTorque = 0;
                 break;
             default:
@@ -54,17 +56,16 @@ void PlayerControlSystem::Start()
         }
     });
 
-    mManager->AddEventListener<MouseMoveEvent>(
+    mScene->AddEventListener<MouseMoveEvent>(
         [this](const MouseMoveEvent mouseMoveEvent) {
-        mManager->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
-            mouseMoveEvent.deltaX;
-        mManager->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque =
-            mouseMoveEvent.deltaY;
+            mScene->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
+                mouseMoveEvent.deltaX;
+            mScene->GetComponent<SpaceShipControlComponent>(mPlayer)
+                .pitchTorque = mouseMoveEvent.deltaY;
         });
 }
-
 void PlayerControlSystem::PostUpdate(float deltaTime)
 {
-    mManager->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque = 0;
-    mManager->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque = 0;
+    mScene->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque   = 0;
+    mScene->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque = 0;
 }

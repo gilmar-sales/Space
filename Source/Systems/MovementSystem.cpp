@@ -9,11 +9,11 @@
 
 void MovementSystem::Update(float deltaTime)
 {
-    mManager->ForEachAsync<TransformComponent, RigidBodyComponent,
-                           SpaceShipControlComponent>(
-        [manager = mManager, deltaTime = deltaTime](
+    mScene->ForEachAsync<TransformComponent, RigidBodyComponent,
+                         SpaceShipControlComponent>(
+        [manager = mScene, deltaTime = deltaTime](
             const fr::Entity entity, const TransformComponent& transform,
-            RigidBodyComponent& rigidBody,
+            RigidBodyComponent&              rigidBody,
             const SpaceShipControlComponent& spaceShipControl) {
             if (spaceShipControl.boost != 0)
             {
@@ -47,10 +47,11 @@ void MovementSystem::Update(float deltaTime)
             if (spaceShipControl.rollTorque != 0)
             {
                 manager->SendEvent<ApplyTorqueEvent>(ApplyTorqueEvent {
-                    .target = entity,
-                    .axis = transform.GetForwardDirection(),
+                    .target     = entity,
+                    .axis       = transform.GetForwardDirection(),
                     .magnetiude = spaceShipControl.rollTorque,
-                    .deltaTime = deltaTime,});
+                    .deltaTime  = deltaTime,
+                });
             }
         });
 }

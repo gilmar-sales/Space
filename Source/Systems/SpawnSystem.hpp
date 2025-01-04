@@ -7,11 +7,8 @@
 class SpawnSystem final : public fr::System
 {
   public:
-    explicit SpawnSystem(const std::shared_ptr<fra::MeshPool>& meshPool) : mMeshPool(meshPool)
-    {
-    }
-
-    void Start() override;
+    explicit SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
+                         const std::shared_ptr<fra::MeshPool>& meshPool);
 
   private:
     std::shared_ptr<fra::MeshPool> mMeshPool;

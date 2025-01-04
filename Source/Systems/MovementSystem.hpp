@@ -5,7 +5,12 @@
 class MovementSystem final : public fr::System
 {
   public:
-    virtual ~MovementSystem() = default;
+    explicit MovementSystem(const std::shared_ptr<fr::Scene>& scene) :
+        System(scene)
+    {
+    }
+
+    ~MovementSystem() override = default;
 
     void Update(float deltaTime) override;
 };
