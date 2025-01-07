@@ -16,9 +16,10 @@
 #include <Systems/PlayerCameraSystem.hpp>
 #include <Systems/PlayerControlSystem.hpp>
 
-void SpaceApp::Startup()
+void SpaceApp::StartUp()
 {
     mScene = std::make_shared<fr::Scene>(2'100'000);
+    mScene->StartProfiling();
 
     const auto serviceCollection = mScene->GetServiceCollection();
 
@@ -26,6 +27,8 @@ void SpaceApp::Startup()
     serviceCollection->AddSingleton<fra::Renderer>(mRenderer);
     serviceCollection->AddSingleton<fra::MeshPool>(
         mRenderer->GetMeshPoolFactory()->CreateMeshPool());
+    serviceCollection->AddSingleton<fra::TexturePool>(
+        mRenderer->GetTexturePoolFactory()->CreateTexturePool());
 
     mScene->RegisterComponent<ModelComponent>();
     mScene->RegisterComponent<TransformComponent>();
@@ -47,7 +50,7 @@ void SpaceApp::Startup()
     SDL_AddGamepadMappingsFromFile("./Resources/gamecontrollerdb.txt");
 
     auto gamepadCount = 0;
-    auto gamepads = SDL_GetGamepads(&gamepadCount);
+    auto gamepads     = SDL_GetGamepads(&gamepadCount);
     if (gamepadCount > 0)
     {
         auto gamepad = SDL_OpenGamepad(gamepads[1]);
@@ -56,19 +59,14 @@ void SpaceApp::Startup()
             std::printf("Found gamepad %s\n", SDL_GetGamepadName(gamepad));
         }
     }
-
 }
 
-void SpaceApp::Run()
+void SpaceApp::Update()
 {
-    Startup();
-    mScene->StartProfiling();
+    mScene->Update(mWindow->GetDeltaTime());
+}
 
-    while (mWindow->IsRunning())
-    {
-        mWindow->Update();
-        mScene->Update(mWindow->GetDeltaTime());
-    }
-
+void SpaceApp::ShutDown()
+{
     mScene->EndProfiling();
 }

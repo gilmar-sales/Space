@@ -23,8 +23,8 @@ void CollisionSystem::Update(float deltaTime)
             collisions.reserve(1000);
 
             auto particle = Particle { .entity         = entity,
-                                       .transform      = transform,
-                                       .sphereCollider = sphereCollider };
+                                       .transform      = &transform,
+                                       .sphereCollider = &sphereCollider };
 
             octree->Query(particle, collisions);
 

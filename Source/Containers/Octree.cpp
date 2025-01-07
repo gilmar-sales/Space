@@ -2,6 +2,17 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
+void Octree::Remove(fr::Entity entity)
+{
+    const auto it =
+        std::ranges::find_if(mElements, [entity](Particle& particle) {
+            return particle.entity == entity;
+        });
+
+    if (it != mElements.end())
+        mElements.erase(it);
+}
+
 Octree::Octree(const glm::vec3               position,
                const float                   halfRange,
                const size_t                  capacity,
@@ -14,19 +25,19 @@ Octree::Octree(const glm::vec3               position,
 
 bool Octree::Contains(const Particle& particle) const
 {
-    return (particle.transform.position.x >= mPosition.x - mHalfRange &&
-            particle.transform.position.x <= mPosition.x + mHalfRange &&
-            particle.transform.position.y >= mPosition.y - mHalfRange &&
-            particle.transform.position.y <= mPosition.y + mHalfRange &&
-            particle.transform.position.z >= mPosition.z - mHalfRange &&
-            particle.transform.position.z <= mPosition.z + mHalfRange);
+    return (particle.transform->position.x >= mPosition.x - mHalfRange &&
+            particle.transform->position.x <= mPosition.x + mHalfRange &&
+            particle.transform->position.y >= mPosition.y - mHalfRange &&
+            particle.transform->position.y <= mPosition.y + mHalfRange &&
+            particle.transform->position.z >= mPosition.z - mHalfRange &&
+            particle.transform->position.z <= mPosition.z + mHalfRange);
 }
 
-bool Octree::Insert(const Particle& particle)
+Octree* Octree::Insert(const Particle& particle)
 {
     if (!Contains(particle))
     {
-        return false;
+        return nullptr;
     }
 
     {
@@ -34,7 +45,7 @@ bool Octree::Insert(const Particle& particle)
         if (mElements.size() < mCapacity)
         {
             mElements.emplace_back(particle);
-            return true;
+            return this;
         }
 
         if (mFarTopLeft == nullptr)
@@ -43,10 +54,47 @@ bool Octree::Insert(const Particle& particle)
         }
     }
 
-    return (mNearTopLeft->Insert(particle) || mNearTopRight->Insert(particle) ||
-            mNearBotLeft->Insert(particle) || mNearBotRight->Insert(particle) ||
-            mFarTopLeft->Insert(particle) || mFarTopRight->Insert(particle) ||
-            mFarBotLeft->Insert(particle) || mFarBotRight->Insert(particle));
+    auto ptr = mNearTopLeft->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mNearTopRight->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mNearBotLeft->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mNearBotRight->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mFarTopLeft->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mFarTopRight->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mFarBotLeft->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    ptr = mFarBotRight->Insert(particle);
+
+    if (ptr)
+        return ptr;
+
+    return nullptr;
 }
 
 void Octree::Subdivide()
@@ -181,18 +229,18 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
 bool Octree::Intersect(const Particle& particle) const
 {
-    return (particle.transform.position.x >=
-                mPosition.x - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.x <=
-                mPosition.x + (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.y >=
-                mPosition.y - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.y <=
-                mPosition.y + (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.z >=
-                mPosition.z - (mHalfRange + particle.sphereCollider.radius) &&
-            particle.transform.position.z <=
-                mPosition.z + (mHalfRange + particle.sphereCollider.radius));
+    return (particle.transform->position.x >=
+                mPosition.x - (mHalfRange + particle.sphereCollider->radius) &&
+            particle.transform->position.x <=
+                mPosition.x + (mHalfRange + particle.sphereCollider->radius) &&
+            particle.transform->position.y >=
+                mPosition.y - (mHalfRange + particle.sphereCollider->radius) &&
+            particle.transform->position.y <=
+                mPosition.y + (mHalfRange + particle.sphereCollider->radius) &&
+            particle.transform->position.z >=
+                mPosition.z - (mHalfRange + particle.sphereCollider->radius) &&
+            particle.transform->position.z <=
+                mPosition.z + (mHalfRange + particle.sphereCollider->radius));
 }
 
 bool Octree::IsInsideFrustum(const Frustum& frustum) const
@@ -222,8 +270,8 @@ void Octree::Query(const Frustum& frustum, std::vector<Particle*>& found)
 
     for (auto& other : mElements)
     {
-        if (frustum.SphereIntersect(other.transform.position,
-                                    other.sphereCollider.radius))
+        if (frustum.SphereIntersect(other.transform->position,
+                                    other.sphereCollider->radius))
         {
             found.push_back(&other);
         }

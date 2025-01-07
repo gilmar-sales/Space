@@ -30,7 +30,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
 {
 
     mXWingModel =
-        mMeshPool->CreateMeshFromFile("./Resources/Models/x-wing.fbx");
+        mMeshPool->CreateMeshFromFile("./Resources/Models/Ship_test.fbx");
     mRedShipModel = mMeshPool->CreateMeshFromFile(
         "./Resources/Models/cartoon_spaceship_red.fbx");
     mBlueShipModel = mMeshPool->CreateMeshFromFile(
@@ -125,7 +125,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(ModelComponent { .meshes = &mXWingModel })
         .WithDefault(TransformComponent { .position = glm::vec3(1000, 1000, 0),
                                           .rotation = glm::vec3(0.0, 0, 0),
-                                          .scale    = glm::vec3(10) })
+                                          .scale    = glm::vec3(1000) })
         .WithDefault(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithDefault(RigidBodyComponent { .mass = 100.0f })

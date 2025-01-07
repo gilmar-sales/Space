@@ -5,13 +5,16 @@
 
 #include "InputSystem.hpp"
 
-RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&     scene,
-                           const std::shared_ptr<fra::Renderer>& renderer,
-                           const std::shared_ptr<fra::MeshPool>& meshPool,
-                           const std::shared_ptr<OctreeSystem>&  octreeSystem) :
+RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
+                           const std::shared_ptr<fra::Renderer>&    renderer,
+                           const std::shared_ptr<fra::MeshPool>&    meshPool,
+                           const std::shared_ptr<fra::TexturePool>& texturePool,
+                           const std::shared_ptr<OctreeSystem>& octreeSystem) :
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
-    mOctreeSystem(octreeSystem)
+    mTexturePool(texturePool), mOctreeSystem(octreeSystem)
 {
+    mBlankTexture =
+        mTexturePool->CreateTextureFromFile("./Resources/Textures/Ship_Base_color.png");
     // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
@@ -19,7 +22,7 @@ void RenderSystem::PostUpdate(float dt)
 {
     mRenderer->BeginFrame();
 
-    auto [view, projection] = mRenderer->GetCurrentProjection();
+    auto [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
     const auto frustum = Frustum(projection * view);
 
@@ -48,7 +51,7 @@ void RenderSystem::PostUpdate(float dt)
     mScene->StartTraceProfiling("Calculate matrizes");
     for (const auto particle : renderables)
     {
-        matrices.emplace_back(particle->transform.GetModel());
+        matrices.emplace_back(particle->transform->GetModel());
     }
     mScene->EndTraceProfiling();
 
@@ -99,6 +102,7 @@ void RenderSystem::PostUpdate(float dt)
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Draw instance sequences");
+    mTexturePool->Bind(mBlankTexture);
     for (const auto& draw : instanceDraws)
     {
         if (draw.meshes != nullptr)

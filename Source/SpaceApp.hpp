@@ -6,9 +6,9 @@
 class SpaceApp final : public fra::AbstractApplication
 {
   public:
-    void Startup();
-
-    void Run() override;
+    void StartUp() override;
+    void Update() override;
+    void ShutDown() override;
 
   private:
     std::shared_ptr<fr::Scene> mScene;

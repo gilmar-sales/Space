@@ -8,32 +8,34 @@
 #include "Components/TransformComponent.hpp"
 
 #include "Frustum.hpp"
+class Octree;
 
 struct Particle
 {
     fr::Entity               entity;
-    TransformComponent&      transform;
-    SphereColliderComponent& sphereCollider;
+    TransformComponent*      transform;
+    SphereColliderComponent* sphereCollider;
 
-    bool Intersect(const Particle& other) const
+    [[nodiscard]] bool Intersect(const Particle& other) const
     {
-        return glm::distance(transform.position, other.transform.position) <=
-               sphereCollider.radius + other.sphereCollider.radius;
+        return glm::distance(transform->position, other.transform->position) <=
+               sphereCollider->radius + other.sphereCollider->radius;
     }
 };
 
 class Octree
 {
   public:
-    Octree(glm::vec3              position,
-           float                  halfRange,
-           size_t                 capacity,
-            const std::allocator<Octree>& allocator = std::allocator<Octree>());
+    Octree(glm::vec3                     position,
+           float                         halfRange,
+           size_t                        capacity,
+           const std::allocator<Octree>& allocator = std::allocator<Octree>());
     ~Octree() = default;
 
-    bool Contains(const Particle& particle) const;
-    bool Insert(const Particle& particle);
-    void Subdivide();
+    bool    Contains(const Particle& particle) const;
+    Octree* Insert(const Particle& particle);
+    void    Remove(fr::Entity entity);
+    void    Subdivide();
 
     void Query(Particle& particle, std::vector<Particle*>& found);
     bool Intersect(const Particle& particle) const;
@@ -43,10 +45,12 @@ class Octree
 
     void Draw(const std::shared_ptr<fra::Renderer>& renderer,
               const std::shared_ptr<fra::MeshPool>& meshPool,
-              const std::vector<std::uint32_t>& meshIds) const;
+              const std::vector<std::uint32_t>&     meshIds) const;
     void PushInstanceData(std::vector<glm::mat4>& instanceData) const;
 
   private:
+    friend struct Particle;
+
     std::mutex             mMutex;
     std::allocator<Octree> mAllocator;
 

@@ -23,7 +23,9 @@ void PlayerCameraSystem::PostUpdate(float deltaTime)
             glm::radians(75.0f),
             static_cast<float>(mWindow->GetWidth()) /
                 static_cast<float>(mWindow->GetHeight()),
-            0.1f, mRenderer->GetDrawDistance())
+            0.1f, mRenderer->GetDrawDistance()),
+        .ambientLight =
+            glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.1f)
     };
 
     mRenderer->UpdateProjection(projection);
