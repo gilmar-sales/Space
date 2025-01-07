@@ -18,40 +18,57 @@
 
 void SpaceApp::Startup()
 {
-    mManager = std::make_shared<fr::Scene>(2'100'000);
+    mScene = std::make_shared<fr::Scene>(2'100'000);
 
-    const auto serviceCollection = mManager->GetServiceCollection();
+    const auto serviceCollection = mScene->GetServiceCollection();
 
     serviceCollection->AddSingleton<fra::Window>(mWindow);
     serviceCollection->AddSingleton<fra::Renderer>(mRenderer);
     serviceCollection->AddSingleton<fra::MeshPool>(
         mRenderer->GetMeshPoolFactory()->CreateMeshPool());
 
-    mManager->RegisterComponent<ModelComponent>();
-    mManager->RegisterComponent<TransformComponent>();
-    mManager->RegisterComponent<SphereColliderComponent>();
-    mManager->RegisterComponent<RigidBodyComponent>();
-    mManager->RegisterComponent<PlayerComponent>();
-    mManager->RegisterComponent<SpaceShipControlComponent>();
+    mScene->RegisterComponent<ModelComponent>();
+    mScene->RegisterComponent<TransformComponent>();
+    mScene->RegisterComponent<SphereColliderComponent>();
+    mScene->RegisterComponent<RigidBodyComponent>();
+    mScene->RegisterComponent<PlayerComponent>();
+    mScene->RegisterComponent<SpaceShipControlComponent>();
 
-    mManager->RegisterSystem<SpawnSystem>();
-    mManager->RegisterSystem<InputSystem>();
-    mManager->RegisterSystem<OctreeSystem>();
-    mManager->RegisterSystem<PlayerControlSystem>();
-    mManager->RegisterSystem<PlayerCameraSystem>();
-    mManager->RegisterSystem<CollisionSystem>();
-    mManager->RegisterSystem<MovementSystem>();
-    mManager->RegisterSystem<PhysicsSystem>();
-    mManager->RegisterSystem<RenderSystem>();
+    mScene->RegisterSystem<SpawnSystem>();
+    mScene->RegisterSystem<InputSystem>();
+    mScene->RegisterSystem<OctreeSystem>();
+    mScene->RegisterSystem<PlayerControlSystem>();
+    mScene->RegisterSystem<PlayerCameraSystem>();
+    mScene->RegisterSystem<CollisionSystem>();
+    mScene->RegisterSystem<MovementSystem>();
+    mScene->RegisterSystem<PhysicsSystem>();
+    mScene->RegisterSystem<RenderSystem>();
+
+    SDL_AddGamepadMappingsFromFile("./Resources/gamecontrollerdb.txt");
+
+    auto gamepadCount = 0;
+    auto gamepads = SDL_GetGamepads(&gamepadCount);
+    if (gamepadCount > 0)
+    {
+        auto gamepad = SDL_OpenGamepad(gamepads[1]);
+        if (gamepad)
+        {
+            std::printf("Found gamepad %s\n", SDL_GetGamepadName(gamepad));
+        }
+    }
+
 }
 
 void SpaceApp::Run()
 {
     Startup();
+    mScene->StartProfiling();
 
     while (mWindow->IsRunning())
     {
         mWindow->Update();
-        mManager->Update(mWindow->GetDeltaTime());
+        mScene->Update(mWindow->GetDeltaTime());
     }
+
+    mScene->EndProfiling();
 }

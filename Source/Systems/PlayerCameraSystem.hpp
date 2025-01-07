@@ -4,6 +4,8 @@
 #include <Core/Window.hpp>
 #include <Freyr/Freyr.hpp>
 
+#include "Components/PlayerComponent.hpp"
+
 class PlayerCameraSystem final : public fr::System
 {
   public:
@@ -12,6 +14,7 @@ class PlayerCameraSystem final : public fr::System
                        const std::shared_ptr<fra::Window>&   window) :
         System(scene), mRenderer(renderer), mWindow(window)
     {
+        mPlayer = mScene->FindUnique<PlayerComponent>();
     }
 
     void PostUpdate(float deltaTime) override;
@@ -19,4 +22,5 @@ class PlayerCameraSystem final : public fr::System
   private:
     std::shared_ptr<fra::Renderer> mRenderer;
     std::shared_ptr<fra::Window>   mWindow;
+    fr::Entity                     mPlayer;
 };

@@ -2,12 +2,12 @@
 
 #include <glm/ext/matrix_transform.hpp>
 
-Octree::Octree(const glm::vec3 position,
-               const float     halfRange,
-               const size_t    capacity,
+Octree::Octree(const glm::vec3               position,
+               const float                   halfRange,
+               const size_t                  capacity,
                const std::allocator<Octree>& allocator) :
-    mAllocator(allocator),
-    mPosition(position), mCapacity(capacity), mHalfRange(halfRange)
+    mAllocator(allocator), mPosition(position), mCapacity(capacity),
+    mHalfRange(halfRange)
 {
     mElements.reserve(capacity);
 }
@@ -33,10 +33,11 @@ bool Octree::Insert(const Particle& particle)
         auto lock = std::lock_guard(mMutex);
         if (mElements.size() < mCapacity)
         {
-            mElements.push_back(particle);
+            mElements.emplace_back(particle);
             return true;
         }
-        else if (mFarTopLeft == nullptr)
+
+        if (mFarTopLeft == nullptr)
         {
             Subdivide();
         }
@@ -201,15 +202,11 @@ bool Octree::IsInsideFrustum(const Frustum& frustum) const
     for (const auto& [normal, distance] : frustum.planes)
     {
         auto p = glm::vec3(
-            normal.x > 0 ? mPosition.x + halfSize.x
-                                           : mPosition.x - halfSize.x,
-            normal.y > 0 ? mPosition.y + halfSize.y
-                                           : mPosition.y - halfSize.y,
-            normal.z > 0 ? mPosition.z + halfSize.z
-                                           : mPosition.z - halfSize.z);
+            normal.x > 0 ? mPosition.x + halfSize.x : mPosition.x - halfSize.x,
+            normal.y > 0 ? mPosition.y + halfSize.y : mPosition.y - halfSize.y,
+            normal.z > 0 ? mPosition.z + halfSize.z : mPosition.z - halfSize.z);
 
-        if (glm::dot(normal, p) + distance <
-            0)
+        if (glm::dot(normal, p) + distance < 0)
         {
             return false;
         }
@@ -269,7 +266,7 @@ void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData) const
 
 void Octree::Draw(const std::shared_ptr<fra::Renderer>& renderer,
                   const std::shared_ptr<fra::MeshPool>& meshPool,
-                  const std::vector<std::uint32_t>& meshIds) const
+                  const std::vector<std::uint32_t>&     meshIds) const
 {
     static std::shared_ptr<fra::Buffer> instanceBuffer = nullptr;
     auto                                instanceData = std::vector<glm::mat4>();

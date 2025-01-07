@@ -24,7 +24,7 @@ void RenderSystem::PostUpdate(float dt)
     const auto frustum = Frustum(projection * view);
 
     auto renderables = std::vector<Particle*>();
-    renderables.reserve(2'000);
+    renderables.reserve(10'000);
     mScene->StartTraceProfiling("Query renderables");
     mOctreeSystem->GetOctree()->Query(frustum, renderables);
     mScene->EndTraceProfiling();
@@ -48,7 +48,7 @@ void RenderSystem::PostUpdate(float dt)
     mScene->StartTraceProfiling("Calculate matrizes");
     for (const auto particle : renderables)
     {
-        matrices.push_back(particle->transform.GetModel());
+        matrices.emplace_back(particle->transform.GetModel());
     }
     mScene->EndTraceProfiling();
 

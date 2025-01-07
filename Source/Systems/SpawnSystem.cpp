@@ -46,13 +46,13 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(10'000)
+        .WithEntities(5'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
                 transform = { .position = randomPosition(-80'000, 80'000),
                               .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(15) };
+                              .scale    = glm::vec3(19) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
@@ -64,13 +64,13 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(10'000)
+        .WithEntities(5'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
                 transform = { .position = randomPosition(-80'000, 80'000),
                               .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(15) };
+                              .scale    = glm::vec3(19) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };

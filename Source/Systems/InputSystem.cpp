@@ -4,6 +4,9 @@
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>
 
+#include <SDL3/SDL.h>
+#include <print>
+
 void InputSystem::PreUpdate(float deltaTime)
 {
     static SDL_bool grab = SDL_FALSE;
@@ -35,6 +38,23 @@ void InputSystem::PreUpdate(float deltaTime)
                     { .deltaX = event.motion.xrel,
                       .deltaY = event.motion.yrel });
                 break;
+            case SDL_EVENT_GAMEPAD_ADDED: {
+                std::println("Gamepad added");
+                break;
+            }
+            case SDL_EVENT_GAMEPAD_REMOVED: {
+                std::println("Gamepad removed");
+                break;
+            }
+            case SDL_EVENT_GAMEPAD_BUTTON_DOWN: {
+                std::println("axis: {}", event.gbutton.button);
+                break;
+                ;
+            }
+            case SDL_EVENT_GAMEPAD_AXIS_MOTION: {
+                std::println("axis: {}", event.gaxis.value);
+                break;
+            }
             case SDL_EVENT_KEY_DOWN:
                 switch (event.key.scancode)
                 {
