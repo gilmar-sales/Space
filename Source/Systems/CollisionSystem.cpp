@@ -12,11 +12,12 @@
 void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
+
     mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
                             RigidBodyComponent>(
-        "Calculate collisions",
+        "Calculate collisions", mChangedEntities,
         [octree = octree, manager = mScene, deltaTime = deltaTime](
-            const fr::Entity entity, auto index, TransformComponent& transform,
+            const fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
             auto collisions = std::vector<Particle*>(0);
@@ -36,4 +37,6 @@ void CollisionSystem::Update(float deltaTime)
                     .deltaTime = deltaTime });
             }
         });
+
+    mChangedEntities.clear();
 }

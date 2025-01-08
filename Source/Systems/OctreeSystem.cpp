@@ -9,7 +9,7 @@ void OctreeSystem::PreUpdate(float deltaTime)
         auto allocator = std::allocator<Octree>();
 
         mOctree =
-            std::make_shared<Octree>(glm::vec3(0), 100'000.0f, 6, allocator);
+            std::make_shared<Octree>(glm::vec3(0), 200'000.0f, 4, allocator);
 
         mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
                                 RigidBodyComponent>(
@@ -29,9 +29,10 @@ void OctreeSystem::PreUpdate(float deltaTime)
 
     mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
                             RigidBodyComponent>(
-        "Build Octree",
+        "Rebuild changed entities",
+        mChangedEntities,
         [octree = mOctree](
-            const fr::Entity entity, int index, TransformComponent& transform,
+            const fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
             if (!rigidBody.isKinematic)
@@ -50,4 +51,6 @@ void OctreeSystem::PreUpdate(float deltaTime)
                 }
             }
         });
+
+    mChangedEntities.size();
 }

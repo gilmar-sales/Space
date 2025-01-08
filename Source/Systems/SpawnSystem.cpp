@@ -46,7 +46,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(5'000)
+        .WithEntities(10'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
@@ -64,7 +64,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(5'000)
+        .WithEntities(10'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
@@ -82,20 +82,21 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent {})
-        .WithEntities(1'000)
+        .WithEntities(200'000)
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider,
                RigidBodyComponent&      rigidBody) {
-                transform = { .position = randomPosition(-80'000, 80'000),
+                transform = { .position = randomPosition(-180'000, 180'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1000, 10000)) };
+                              .scale    = glm::vec3(randomNumber(100, 1000)) };
 
-                sphereCollider = { .radius = transform.scale.x,
+                sphereCollider = { .radius = transform.scale.x * 2,
                                    .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 1000.0f };
+                rigidBody = { .mass        = transform.scale.x * 1000.0f,
+                              .isKinematic = true };
             })
         .Build();
 

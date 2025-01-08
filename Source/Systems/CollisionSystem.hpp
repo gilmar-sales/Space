@@ -13,8 +13,16 @@ class CollisionSystem final : public fr::System
                     const std::shared_ptr<fra::MeshPool>& meshPool,
                     const std::shared_ptr<OctreeSystem>&  octreeSystem) :
         System(scene), mRenderer(renderer), mMeshPool(meshPool),
-        mOctreeSystem(octreeSystem)
+        mOctreeSystem(octreeSystem), mChangedEntities(1000)
     {
+        mScene->AddEventListener<ApplyForceEvent>(
+            [this](const ApplyForceEvent& e) {
+                mChangedEntities.insert(e.target);
+            });
+        mScene->AddEventListener<ApplyTorqueEvent>(
+            [this](const ApplyTorqueEvent& e) {
+                mChangedEntities.insert(e.target);
+            });
     }
 
     virtual ~CollisionSystem() = default;
@@ -23,6 +31,7 @@ class CollisionSystem final : public fr::System
 
   private:
     friend class SpaceApp;
+    fr::SparseSet<fr::Entity> mChangedEntities;
 
     std::vector<std::uint32_t> mSphereModel;
     std::vector<std::uint32_t> mCubeModel;

@@ -13,8 +13,8 @@ RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
     mTexturePool(texturePool), mOctreeSystem(octreeSystem)
 {
-    mBlankTexture =
-        mTexturePool->CreateTextureFromFile("./Resources/Textures/Ship_Base_color.png");
+    mBlankTexture = mTexturePool->CreateTextureFromFile(
+        "./Resources/Textures/Ship_Base_color.png");
     // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
@@ -22,9 +22,10 @@ void RenderSystem::PostUpdate(float dt)
 {
     mRenderer->BeginFrame();
 
-    auto [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
+    auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
-    const auto frustum = Frustum(projection * view);
+    const auto frustum =
+        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 10000.0f) * view);
 
     auto renderables = std::vector<Particle*>();
     renderables.reserve(10'000);
