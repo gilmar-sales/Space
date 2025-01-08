@@ -8,28 +8,29 @@
 #include <Events/MouseMoveEvent.hpp>
 
 PlayerControlSystem::PlayerControlSystem(
-    const std::shared_ptr<fr::Scene>& scene) :
+    const std::shared_ptr<fr::Scene>&         scene,
+    const std::shared_ptr<fra::EventManager>& eventManger) :
     System(scene), mPlayer(), mYawTorque()
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();
 
-    mScene->AddEventListener<KeyDownEvent>(
-        [this](const KeyDownEvent keyDownEvent) {
+    eventManger->Subscribe<fra::KeyPressedEvent>(
+        [this](const fra::KeyPressedEvent& keyPressedEvent) {
             auto& spaceShipControl =
                 mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
-            switch (keyDownEvent.scancode)
+            switch (keyPressedEvent.key)
             {
-                case SDL_SCANCODE_W:
+                case fra::KeyCode::W:
                     spaceShipControl.boost =
                         100000.0f * spaceShipControl.boostFactor;
                     break;
-                case SDL_SCANCODE_A:
+                case fra::KeyCode::A:
                     spaceShipControl.rollTorque = -100;
                     break;
-                case SDL_SCANCODE_D:
+                case fra::KeyCode::D:
                     spaceShipControl.rollTorque = 100;
                     break;
-                case SDL_SCANCODE_LSHIFT:
+                case fra::KeyCode::LSHIFT:
                     spaceShipControl.boostFactor = 10.0f;
                     break;
                 default:
@@ -37,28 +38,29 @@ PlayerControlSystem::PlayerControlSystem(
             }
         });
 
-    mScene->AddEventListener<KeyUpEvent>([this](const KeyUpEvent keyUpEvent) {
-        auto& spaceShipControl =
-            mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
-        switch (keyUpEvent.scancode)
-        {
-            case SDL_SCANCODE_W:
-                spaceShipControl.boost = 0;
-                break;
-            case SDL_SCANCODE_A:
-            case SDL_SCANCODE_D:
-                spaceShipControl.rollTorque = 0;
-                break;
-            case SDL_SCANCODE_LSHIFT:
-                spaceShipControl.boostFactor = 1.0f;
-                break;
-            default:
-                break;
-        }
-    });
+    eventManger->Subscribe<fra::KeyReleasedEvent>(
+        [this](const fra::KeyReleasedEvent& keyReleasedEvent) {
+            auto& spaceShipControl =
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
+            switch (keyReleasedEvent.key)
+            {
+                case fra::KeyCode::W:
+                    spaceShipControl.boost = 0;
+                    break;
+                case fra::KeyCode::A:
+                case fra::KeyCode::D:
+                    spaceShipControl.rollTorque = 0;
+                    break;
+                case fra::KeyCode::LSHIFT:
+                    spaceShipControl.boostFactor = 1.0f;
+                    break;
+                default:
+                    break;
+            }
+        });
 
-    mScene->AddEventListener<MouseMoveEvent>(
-        [this](const MouseMoveEvent mouseMoveEvent) {
+    eventManger->Subscribe<fra::MouseMoveEvent>(
+        [this](const fra::MouseMoveEvent& mouseMoveEvent) {
             mScene->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
                 mouseMoveEvent.deltaX;
 

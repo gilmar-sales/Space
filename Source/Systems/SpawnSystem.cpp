@@ -82,7 +82,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent {})
-        .WithEntities(1000)
+        .WithEntities(1'000)
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
@@ -90,7 +90,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
                RigidBodyComponent&      rigidBody) {
                 transform = { .position = randomPosition(-80'000, 80'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(10, 1000)) };
+                              .scale    = glm::vec3(randomNumber(1000, 10000)) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
@@ -125,7 +125,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .WithDefault(ModelComponent { .meshes = &mXWingModel })
         .WithDefault(TransformComponent { .position = glm::vec3(1000, 1000, 0),
                                           .rotation = glm::vec3(0.0, 0, 0),
-                                          .scale    = glm::vec3(1000) })
+                                          .scale    = glm::vec3(1) })
         .WithDefault(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithDefault(RigidBodyComponent { .mass = 100.0f })

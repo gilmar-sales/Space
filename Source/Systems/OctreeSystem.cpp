@@ -36,13 +36,18 @@ void OctreeSystem::PreUpdate(float deltaTime)
             RigidBodyComponent&      rigidBody) {
             if (!rigidBody.isKinematic)
             {
-                if (rigidBody.octree != nullptr)
+                const auto particle =
+                    Particle { .entity         = entity,
+                               .transform      = &transform,
+                               .sphereCollider = &sphereCollider };
+
+                if (rigidBody.octree != nullptr &&
+                    !rigidBody.octree->Contains(particle))
+                {
                     rigidBody.octree->Remove(entity);
 
-                rigidBody.octree = octree->Insert(Particle {
-                    .entity         = entity,
-                    .transform      = &transform,
-                    .sphereCollider = &sphereCollider });
+                    rigidBody.octree = octree->Insert(particle);
+                }
             }
         });
 }

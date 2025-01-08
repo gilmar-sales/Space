@@ -29,6 +29,7 @@ void SpaceApp::StartUp()
         mRenderer->GetMeshPoolFactory()->CreateMeshPool());
     serviceCollection->AddSingleton<fra::TexturePool>(
         mRenderer->GetTexturePoolFactory()->CreateTexturePool());
+    serviceCollection->AddSingleton<fra::EventManager>(mEventManager);
 
     mScene->RegisterComponent<ModelComponent>();
     mScene->RegisterComponent<TransformComponent>();

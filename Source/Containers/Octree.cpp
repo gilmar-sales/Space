@@ -4,13 +4,16 @@
 
 void Octree::Remove(fr::Entity entity)
 {
+    auto       lock = std::lock_guard(mMutex);
     const auto it =
         std::ranges::find_if(mElements, [entity](Particle& particle) {
             return particle.entity == entity;
         });
 
     if (it != mElements.end())
+    {
         mElements.erase(it);
+    }
 }
 
 Octree::Octree(const glm::vec3               position,

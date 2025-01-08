@@ -8,8 +8,8 @@
 
 struct RigidBodyComponent : fr::Component
 {
-    float           mass;
-    glm::vec3       velocity;
-    bool            isKinematic;
-    mutable Octree* octree;
+    float     mass;
+    glm::vec3 velocity;
+    bool      isKinematic;
+    Octree*   octree;
 };
