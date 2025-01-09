@@ -2,6 +2,7 @@
 
 #include "Events/ApplyForceEvent.hpp"
 #include "Events/ApplyTorqueEvent.hpp"
+#include "Events/TransformChangeEvent.hpp"
 
 #include <Freyr/Freyr.hpp>
 
@@ -13,13 +14,9 @@ class OctreeSystem final : public fr::System
     explicit OctreeSystem(const std::shared_ptr<fr::Scene>& scene) :
         System(scene), mOctree(nullptr), mChangedEntities(1000)
     {
-        mScene->AddEventListener<ApplyForceEvent>(
-            [this](const ApplyForceEvent& e) {
-                mChangedEntities.insert(e.target);
-            });
-        mScene->AddEventListener<ApplyTorqueEvent>(
-            [this](const ApplyTorqueEvent& e) {
-                mChangedEntities.insert(e.target);
+        mScene->AddEventListener<TransformChangeEvent>(
+            [this](const TransformChangeEvent& e) {
+                mChangedEntities.insert(e.entity);
             });
     }
 

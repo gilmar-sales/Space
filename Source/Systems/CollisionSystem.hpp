@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Events/TransformChangeEvent.hpp"
+
 #include <Core/Renderer.hpp>
 #include <Freyr/Freyr.hpp>
 
@@ -15,13 +17,9 @@ class CollisionSystem final : public fr::System
         System(scene), mRenderer(renderer), mMeshPool(meshPool),
         mOctreeSystem(octreeSystem), mChangedEntities(1000)
     {
-        mScene->AddEventListener<ApplyForceEvent>(
-            [this](const ApplyForceEvent& e) {
-                mChangedEntities.insert(e.target);
-            });
-        mScene->AddEventListener<ApplyTorqueEvent>(
-            [this](const ApplyTorqueEvent& e) {
-                mChangedEntities.insert(e.target);
+        mScene->AddEventListener<TransformChangeEvent>(
+            [this](const TransformChangeEvent& e) {
+                mChangedEntities.insert(e.entity);
             });
     }
 
