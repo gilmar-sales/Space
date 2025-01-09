@@ -7,7 +7,7 @@ int main(int argc, char const* argv[])
     const auto app =
         fra::ApplicationBuilder()
             .WithWindow([](fra::WindowBuilder& windowBuilder) {
-                windowBuilder.SetWidth(1920).SetHeight(1080).SetVSync(false);
+                windowBuilder.SetWidth(1920).SetHeight(1080).SetVSync(true);
             })
             .WithRenderer([](fra::RendererBuilder& rendererBuilder) {
                 rendererBuilder.SetSamples(vk::SampleCountFlagBits::e8)

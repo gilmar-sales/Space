@@ -13,8 +13,6 @@ RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
     mTexturePool(texturePool), mOctreeSystem(octreeSystem)
 {
-    mBlankTexture = mTexturePool->CreateTextureFromFile(
-        "./Resources/Textures/Ship_Base_color.png");
     // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
@@ -43,7 +41,9 @@ void RenderSystem::PostUpdate(float dt)
         renderables,
         [this](const Particle* a, const Particle* b) {
             return mScene->GetComponent<ModelComponent>(a->entity).meshes <
-                   mScene->GetComponent<ModelComponent>(b->entity).meshes;
+                       mScene->GetComponent<ModelComponent>(b->entity).meshes &&
+                   mScene->GetComponent<ModelComponent>(a->entity).texture <
+                       mScene->GetComponent<ModelComponent>(b->entity).texture;
         });
 
     auto matrices = std::vector<glm::mat4>();
@@ -68,18 +68,23 @@ void RenderSystem::PostUpdate(float dt)
     auto instanceDraws = std::vector<InstanceDraw>();
 
     mScene->StartTraceProfiling("Calculate instance sequence");
-    auto                        dataIndex     = 0;
-    auto                        instanceCount = 0;
-    std::vector<std::uint32_t>* currentMeshes = nullptr;
+    auto                        dataIndex      = 0;
+    auto                        instanceCount  = 0;
+    std::vector<std::uint32_t>* currentMeshes  = nullptr;
+    std::uint32_t               currentTexture = 0;
     for (int i = 0; i < renderables.size(); i++)
     {
         const auto& particle = renderables[i];
         const auto& model =
             mScene->GetComponent<ModelComponent>(particle->entity);
 
-        if (currentMeshes && currentMeshes != model.meshes)
+        if (currentMeshes &&
+            (currentMeshes != model.meshes || currentTexture != model.texture))
         {
-            instanceDraws.emplace_back(dataIndex, instanceCount, currentMeshes);
+            instanceDraws.emplace_back(dataIndex,
+                                       instanceCount,
+                                       currentMeshes,
+                                       currentTexture);
             currentMeshes = nullptr;
             instanceCount = 0;
             dataIndex     = i;
@@ -88,24 +93,28 @@ void RenderSystem::PostUpdate(float dt)
         if (i == renderables.size() - 1)
         {
             if (!currentMeshes)
-                currentMeshes = model.meshes;
+            {
+                currentMeshes  = model.meshes;
+                currentTexture = model.texture;
+            }
 
-            instanceDraws.emplace_back(dataIndex,
-                                       instanceCount + 1,
-                                       currentMeshes);
+            instanceDraws.emplace_back(
+                dataIndex, instanceCount + 1, currentMeshes, currentTexture);
         }
         else
         {
-            currentMeshes = model.meshes;
+            currentMeshes  = model.meshes;
+            currentTexture = model.texture;
             instanceCount += 1;
         }
     }
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Draw instance sequences");
-    mTexturePool->Bind(mBlankTexture);
     for (const auto& draw : instanceDraws)
     {
+        mTexturePool->Bind(draw.texture);
+
         if (draw.meshes != nullptr)
             for (const auto& meshId : *draw.meshes)
             {

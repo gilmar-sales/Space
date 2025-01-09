@@ -24,25 +24,37 @@ static glm::vec3 randomPosition(int min, int max)
                        randomNumber(min, max) };
 }
 
-SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
-                         const std::shared_ptr<fra::MeshPool>& meshPool) :
-    System(scene), mMeshPool(meshPool)
+SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
+                         const std::shared_ptr<fra::MeshPool>&    meshPool,
+                         const std::shared_ptr<fra::TexturePool>& texturePool) :
+    System(scene), mMeshPool(meshPool), mTexturePool(texturePool)
 {
+    mBlankTexture = mTexturePool->CreateTextureFromFile(
+        "./Resources/Textures/blank_texture.png");
 
     mXWingModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/Ship_test.fbx");
+    mXWingTexture = mTexturePool->CreateTextureFromFile(
+        "./Resources/Textures/Ship_Base_color.png");
+
     mRedShipModel = mMeshPool->CreateMeshFromFile(
         "./Resources/Models/cartoon_spaceship_red.fbx");
     mBlueShipModel = mMeshPool->CreateMeshFromFile(
         "./Resources/Models/cartoon_spaceship_blue.fbx");
-    mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
+
     mBlackHoleModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/black_hole.fbx");
+
+    mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
+    mMoonTexture =
+        mTexturePool->CreateTextureFromFile("./Resources/Textures/8k_moon.jpg");
+
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mBlueShipModel })
+        .WithDefault(ModelComponent { .meshes  = &mBlueShipModel,
+                                      .texture = mBlankTexture })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
@@ -60,7 +72,8 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mRedShipModel })
+        .WithDefault(ModelComponent { .meshes  = &mRedShipModel,
+                                      .texture = mBlankTexture })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
@@ -78,7 +91,8 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mMoonModel })
+        .WithDefault(
+            ModelComponent { .meshes = &mMoonModel, .texture = mMoonTexture })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent {})
@@ -101,7 +115,8 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes = &mBlackHoleModel })
+        .WithDefault(ModelComponent { .meshes  = &mBlackHoleModel,
+                                      .texture = mBlankTexture })
         .WithDefault(TransformComponent {
             .position = glm::vec3(0.0),
             .rotation = glm::vec3(0.0, 60.0, 45.0),
@@ -123,7 +138,8 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&     scene,
 
     mScene->CreateArchetypeBuilder()
         .WithDefault(PlayerComponent { .hitPoints = 1000 })
-        .WithDefault(ModelComponent { .meshes = &mXWingModel })
+        .WithDefault(
+            ModelComponent { .meshes = &mXWingModel, .texture = mXWingTexture })
         .WithDefault(TransformComponent { .position = glm::vec3(1000, 1000, 0),
                                           .rotation = glm::vec3(0.0, 0, 0),
                                           .scale    = glm::vec3(1) })

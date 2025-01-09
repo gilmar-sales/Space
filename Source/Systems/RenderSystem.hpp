@@ -10,6 +10,7 @@ struct InstanceDraw
     size_t                      index;
     int                         instanceCount;
     std::vector<std::uint32_t>* meshes;
+    std::uint32_t               texture;
 };
 
 class RenderSystem final : public fr::System
@@ -32,9 +33,4 @@ class RenderSystem final : public fr::System
     std::shared_ptr<OctreeSystem>     mOctreeSystem;
 
     std::shared_ptr<fra::Buffer> mInstanceMatrixBuffers;
-
-    std::vector<std::uint32_t> mRedShipModel;
-    std::vector<std::uint32_t> mBlueShipModel;
-    std::vector<std::uint32_t> mCubeModel;
-    std::uint32_t mBlankTexture;
 };

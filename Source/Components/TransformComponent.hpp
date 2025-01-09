@@ -16,7 +16,7 @@ struct TransformComponent : fr::Component
 
     glm::vec3 GetForwardDirection() const
     {
-        return glm::vec3(0, 0, 1) * rotation;
+        return glm::vec3(0, 0, -1) * rotation;
     }
 
     glm::vec3 GetRightDirection() const
@@ -24,10 +24,7 @@ struct TransformComponent : fr::Component
         return glm::vec3(1, 0, 0) * rotation;
     }
 
-    glm::vec3 GetUpDirection() const
-    {
-        return glm::vec3(0, 1, 0) * rotation;
-    }
+    glm::vec3 GetUpDirection() const { return glm::vec3(0, 1, 0) * rotation; }
 
     glm::mat4 GetModel() const
     {
