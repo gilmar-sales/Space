@@ -23,7 +23,7 @@ class CollisionSystem final : public fr::System
             });
     }
 
-    virtual ~CollisionSystem() = default;
+    ~CollisionSystem() override = default;
 
     void Update(float deltaTime) override;
 

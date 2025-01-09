@@ -15,18 +15,15 @@ class InputSystem final : public fr::System
                 const std::shared_ptr<fra::EventManager>& eventManager) :
         System(scene), mRenderer(renderer), mWindow(window)
     {
-        static SDL_bool grab = SDL_FALSE;
+        static bool grab = false;
 
         eventManager->Subscribe<fra::KeyPressedEvent>(
             [this](const fra::KeyPressedEvent& event) {
                 if (event.key == fra::KeyCode::M)
                 {
-                    if (grab == SDL_TRUE)
-                        grab = SDL_FALSE;
-                    else
-                        grab = SDL_TRUE;
+                    grab = !grab;
 
-                    SDL_SetRelativeMouseMode(grab);
+                    mWindow->SetMouseGrab(grab);
                 }
             });
     }
