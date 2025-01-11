@@ -50,56 +50,37 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
     mMoonTexture =
         mTexturePool->CreateTextureFromFile("./Resources/Textures/8k_moon.jpg");
 
-    mMilkwayModel =
-        mMeshPool->CreateMeshFromFile("./Resources/Models/milky way.glb");
-    mMilkwayTexture = mTexturePool->CreateTextureFromFile(
-        "./Resources/Textures/milky_way.png");
+    mSunModel =
+        mMeshPool->CreateMeshFromFile("./Resources/Models/sun.fbx");
+    mSunTexture = mTexturePool->CreateTextureFromFile(
+        "./Resources/Textures/8k_sun.jpeg");
 
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes  = &mEnemyShipModel,
-                                      .texture = mEnemyShipTexture })
+        .WithDefault(
+            ModelComponent { .meshes = &mMoonModel, .texture = mMoonTexture })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithEntities(10'000)
-        .ForEach<TransformComponent, SphereColliderComponent>(
+        .WithDefault(RigidBodyComponent {})
+        .WithEntities(10)
+        .ForEach<TransformComponent, SphereColliderComponent,
+                 RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-15'000, 15'000),
-                              .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(3) };
+               SphereColliderComponent& sphereCollider,
+               RigidBodyComponent&      rigidBody) {
+                transform = { .position = randomPosition(-5'000, 5'000),
+                              .rotation = glm::vec3(0.0),
+                              .scale    = glm::vec3(randomNumber(50, 100)) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
+
+                rigidBody = { .mass        = transform.scale.x * 5000.0f,
+                              .isKinematic = true };
             })
         .Build();
-
-    // mScene->CreateArchetypeBuilder()
-    //     .WithDefault(
-    //         ModelComponent { .meshes = &mMoonModel, .texture = mMilkwayTexture })
-    //     .WithDefault(TransformComponent {})
-    //     .WithDefault(SphereColliderComponent {})
-    //     .WithDefault(RigidBodyComponent {})
-    //     .WithEntities(200'000)
-    //     .ForEach<TransformComponent, SphereColliderComponent,
-    //              RigidBodyComponent>(
-    //         [](auto entity, TransformComponent& transform,
-    //            SphereColliderComponent& sphereCollider,
-    //            RigidBodyComponent&      rigidBody) {
-    //             transform = { .position = randomPosition(-180'000, 180'000),
-    //                           .rotation = glm::vec3(0.0),
-    //                           .scale    = glm::vec3(randomNumber(100, 1000)) };
-    //
-    //             sphereCollider = { .radius = transform.scale.x * 2,
-    //                                .offset = glm::vec3(0) };
-    //
-    //             rigidBody = { .mass        = transform.scale.x * 1000.0f,
-    //                           .isKinematic = true };
-    //         })
-    //     .Build();
 
     // mScene->CreateArchetypeBuilder()
     //     .WithDefault(ModelComponent { .meshes  = &mBlackHoleModel,
@@ -124,14 +105,33 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
     //     .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes  = &mMilkwayModel,
-                                      .texture = mMilkwayTexture })
-        .WithDefault(TransformComponent { .position = glm::vec3(1000),
+        .WithDefault(ModelComponent { .meshes  = &mSunModel,
+                                      .texture = mSunTexture })
+        .WithDefault(TransformComponent { .position = glm::vec3(0),
                                           .rotation = glm::vec3(0.0),
-                                          .scale    = glm::vec3(100) })
+                                          .scale    = glm::vec3(200) })
         .WithDefault(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithEntities(1)
+        .Build();
+
+    mScene->CreateArchetypeBuilder()
+        .WithDefault(ModelComponent { .meshes  = &mEnemyShipModel,
+                                      .texture = mEnemyShipTexture })
+        .WithDefault(TransformComponent {})
+        .WithDefault(SphereColliderComponent {})
+        .WithDefault(RigidBodyComponent { .mass = 100.0f })
+        .WithEntities(1'000)
+        .ForEach<TransformComponent, SphereColliderComponent>(
+            [](auto entity, TransformComponent& transform,
+               SphereColliderComponent& sphereCollider) {
+                transform = { .position = randomPosition(-1'000, 1'000),
+                              .rotation = glm::vec3(0),
+                              .scale    = glm::vec3(3) };
+
+                sphereCollider = { .radius = transform.scale.x,
+                                   .offset = glm::vec3(0) };
+            })
         .Build();
 
     mScene->CreateArchetypeBuilder()
@@ -143,7 +143,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
                                           .scale    = glm::vec3(3) })
         .WithDefault(
             SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
+        .WithDefault(RigidBodyComponent { .mass = 110.0f })
         .WithDefault(SpaceShipControlComponent {})
         .WithEntities(1)
         .Build();

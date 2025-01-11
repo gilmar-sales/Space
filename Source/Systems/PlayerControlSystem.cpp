@@ -24,10 +24,10 @@ PlayerControlSystem::PlayerControlSystem(
                     spaceShipControl.boost = 10000.0f;
                     break;
                 case fra::KeyCode::A:
-                    spaceShipControl.rollTorque = -100;
+                    spaceShipControl.rollTorque = -10000;
                     break;
                 case fra::KeyCode::D:
-                    spaceShipControl.rollTorque = 100;
+                    spaceShipControl.rollTorque = 10000;
                     break;
                 case fra::KeyCode::LSHIFT:
                     spaceShipControl.boostFactor = 10.0f;
@@ -61,10 +61,10 @@ PlayerControlSystem::PlayerControlSystem(
     eventManger->Subscribe<fra::MouseMoveEvent>(
         [this](const fra::MouseMoveEvent& mouseMoveEvent) {
             mScene->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
-                mouseMoveEvent.deltaX;
+                mouseMoveEvent.deltaX * 180.0f;
 
             mScene->GetComponent<SpaceShipControlComponent>(mPlayer)
-                .pitchTorque = mouseMoveEvent.deltaY;
+                .pitchTorque = mouseMoveEvent.deltaY * 180.0f;
         });
 }
 void PlayerControlSystem::PostUpdate(float deltaTime)

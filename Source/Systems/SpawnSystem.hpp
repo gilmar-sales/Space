@@ -26,8 +26,8 @@ class SpawnSystem final : public fr::System
 
     std::vector<std::uint32_t> mBlackHoleModel;
 
-    std::vector<std::uint32_t> mMilkwayModel;
-    std::uint32_t              mMilkwayTexture;
+    std::vector<std::uint32_t> mSunModel;
+    std::uint32_t              mSunTexture;
 
     std::vector<std::uint32_t> mMoonModel;
     std::uint32_t              mMoonTexture;

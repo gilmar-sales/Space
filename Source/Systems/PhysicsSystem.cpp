@@ -15,15 +15,14 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
 {
     mScene->AddEventListener<CollisionEvent>(
         [&](const CollisionEvent collisionEvent) {
-            const auto& targetTransform =
+            auto& targetTransform =
                 mScene->GetComponent<TransformComponent>(collisionEvent.target);
             const auto& targetCollider =
                 mScene->GetComponent<SphereColliderComponent>(
                     collisionEvent.target);
 
-            const auto collisorTransform =
-                mScene->GetComponent<TransformComponent>(
-                    collisionEvent.collisor);
+            auto collisorTransform = mScene->GetComponent<TransformComponent>(
+                collisionEvent.collisor);
 
             const auto& collisorCollider =
                 mScene->GetComponent<SphereColliderComponent>(
@@ -33,8 +32,14 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
                 targetTransform.position, collisorTransform.position);
 
             const auto force =
-                (targetCollider.radius + collisorCollider.radius - distance) *
-                200.0f;
+                (targetCollider.radius + collisorCollider.radius - distance) /
+                2;
+
+            const auto direction = normalize(
+                targetTransform.position - collisorTransform.position);
+
+            targetTransform.position += direction * force;
+            collisorTransform.position += -direction * force;
 
             mScene->SendEvent(ApplyForceEvent {
                 .target    = collisionEvent.target,
@@ -83,8 +88,8 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
                         applyTorqueEvent.target);
 
                 const auto angularAcceleration =
-                    applyTorqueEvent.magnetiude / rigidBody.mass *
-                    applyTorqueEvent.deltaTime;
+                    glm::radians(applyTorqueEvent.magnetiude / rigidBody.mass *
+                                 applyTorqueEvent.deltaTime);
 
                 transform.rotation *=
                     glm::angleAxis(angularAcceleration, applyTorqueEvent.axis);
