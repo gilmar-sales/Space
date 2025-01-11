@@ -24,6 +24,7 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
             const auto collisorTransform =
                 mScene->GetComponent<TransformComponent>(
                     collisionEvent.collisor);
+
             const auto& collisorCollider =
                 mScene->GetComponent<SphereColliderComponent>(
                     collisionEvent.collisor);
@@ -64,8 +65,9 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
                 rigidBody.velocity += applyForceEvent.direction * acceleration *
                                       applyForceEvent.deltaTime;
 
-                mScene->SendEvent(
-                    TransformChangeEvent { .entity = applyForceEvent.target });
+                if (acceleration > 0.01f)
+                    mScene->SendEvent(TransformChangeEvent {
+                        .entity = applyForceEvent.target });
             }
         });
 
@@ -87,9 +89,16 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
                 transform.rotation *=
                     glm::angleAxis(angularAcceleration, applyTorqueEvent.axis);
 
-                mScene->SendEvent(
-                    TransformChangeEvent { .entity = applyTorqueEvent.target });
+                if (angularAcceleration > 0.01f)
+                    mScene->SendEvent(TransformChangeEvent {
+                        .entity = applyTorqueEvent.target });
             }
+        });
+
+    mScene->ForEach<TransformComponent, RigidBodyComponent>(
+        [=](fr::Entity entity, TransformComponent& transform,
+            RigidBodyComponent& rigidBody) {
+            mScene->SendEvent(TransformChangeEvent { .entity = entity });
         });
 }
 void PhysicsSystem::Update(float deltaTime)
@@ -97,7 +106,7 @@ void PhysicsSystem::Update(float deltaTime)
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent>(
         [=](fr::Entity entity, TransformComponent& transform,
             RigidBodyComponent& rigidBody) {
-            if (glm::length(rigidBody.velocity) > 0)
+            if (glm::length(rigidBody.velocity) > 0.01f)
             {
                 mScene->SendEvent(TransformChangeEvent { .entity = entity });
                 transform.position += rigidBody.velocity * deltaTime;

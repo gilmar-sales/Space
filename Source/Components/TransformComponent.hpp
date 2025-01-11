@@ -16,7 +16,7 @@ struct TransformComponent : fr::Component
 
     glm::vec3 GetForwardDirection() const
     {
-        return glm::vec3(0, 0, -1) * rotation;
+        return glm::vec3(0, 0, 1) * rotation;
     }
 
     glm::vec3 GetRightDirection() const

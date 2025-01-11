@@ -20,7 +20,7 @@ void MovementSystem::Update(float deltaTime)
                 manager->SendEvent(ApplyForceEvent {
                     .target     = entity,
                     .direction  = transform.GetForwardDirection(),
-                    .magnetiude = spaceShipControl.boost,
+                    .magnetiude = spaceShipControl.boost * spaceShipControl.boostFactor,
                     .deltaTime  = deltaTime });
             }
 

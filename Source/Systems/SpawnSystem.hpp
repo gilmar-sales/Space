@@ -20,13 +20,18 @@ class SpawnSystem final : public fr::System
     std::uint32_t mBlankTexture;
 
     std::vector<std::uint32_t> mCheckpointModel;
-    std::vector<std::uint32_t> mRedShipModel;
-    std::vector<std::uint32_t> mBlueShipModel;
+
+    std::vector<std::uint32_t> mEnemyShipModel;
+    std::uint32_t              mEnemyShipTexture;
+
     std::vector<std::uint32_t> mBlackHoleModel;
+
+    std::vector<std::uint32_t> mMilkwayModel;
+    std::uint32_t              mMilkwayTexture;
 
     std::vector<std::uint32_t> mMoonModel;
     std::uint32_t              mMoonTexture;
 
-    std::vector<std::uint32_t> mXWingModel;
-    std::uint32_t              mXWingTexture;
+    std::vector<std::uint32_t> mPlayerShipModel;
+    std::uint32_t              mPlayerShipTexture;
 };

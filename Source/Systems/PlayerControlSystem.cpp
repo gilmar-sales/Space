@@ -21,8 +21,7 @@ PlayerControlSystem::PlayerControlSystem(
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost =
-                        100000.0f * spaceShipControl.boostFactor;
+                    spaceShipControl.boost = 10000.0f;
                     break;
                 case fra::KeyCode::A:
                     spaceShipControl.rollTorque = -100;
