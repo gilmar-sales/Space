@@ -136,11 +136,11 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
         .WithDefault(SpaceShipControlComponent { .boost = 1000 })
-        .WithEntities(1'000)
+        .WithEntities(10'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-1'000, 1'000),
+                transform = { .position = randomPosition(-10'000, 10'000),
                               .rotation = glm::vec3(0),
                               .scale    = glm::vec3(3) };
 

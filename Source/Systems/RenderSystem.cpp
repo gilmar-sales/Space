@@ -13,7 +13,6 @@ RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
     mTexturePool(texturePool), mOctreeSystem(octreeSystem)
 {
-    // mCubeModel = mMeshPool->CreateMeshFromFile("C:/Models/debug_cube.obj");
 }
 
 void RenderSystem::PostUpdate(float dt)
@@ -23,7 +22,7 @@ void RenderSystem::PostUpdate(float dt)
     auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
     const auto frustum =
-        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 10000.0f) * view);
+        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 5000.0f) * view);
 
     auto renderables = std::vector<Particle*>();
     renderables.reserve(10'000);
