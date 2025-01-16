@@ -11,7 +11,7 @@ int main(int argc, char const* argv[])
             })
             .WithRenderer([](fra::RendererBuilder& rendererBuilder) {
                 rendererBuilder.SetSamples(vk::SampleCountFlagBits::e8)
-                    .SetClearColor({ 0.0f, 0.0f, 0.0f, 1.0f })
+                    .SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f })
                     .SetDrawDistance(100'000.0f);
             })
             .Build<SpaceApp>();
