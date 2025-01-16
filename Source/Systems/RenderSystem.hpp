@@ -27,6 +27,9 @@ class RenderSystem final : public fr::System
   private:
     friend class SpaceApp;
 
+    std::vector<Particle*> mRenderables;
+    std::vector<glm::mat4> mMatrices;
+
     std::shared_ptr<fra::Renderer>    mRenderer;
     std::shared_ptr<fra::TexturePool> mTexturePool;
     std::shared_ptr<fra::MeshPool>    mMeshPool;

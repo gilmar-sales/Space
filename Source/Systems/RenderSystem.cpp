@@ -11,56 +11,84 @@ RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
                            const std::shared_ptr<fra::TexturePool>& texturePool,
                            const std::shared_ptr<OctreeSystem>& octreeSystem) :
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
-    mTexturePool(texturePool), mOctreeSystem(octreeSystem)
+    mTexturePool(texturePool), mOctreeSystem(octreeSystem), mMatrices({}),
+    mRenderables({})
 {
+    mRenderables.reserve(1024);
+    mMatrices.reserve(1024);
+
+    mInstanceMatrixBuffers =
+        mRenderer->GetBufferBuilder()
+            .SetData(mMatrices.data())
+            .SetSize(sizeof(glm::mat4) * mMatrices.capacity())
+            .SetUsage(fra::BufferUsage::Instance)
+            .Build();
 }
 
 void RenderSystem::PostUpdate(float dt)
 {
+    mScene->StartTraceProfiling("Clear Buffers");
+    mRenderables.clear();
+    mMatrices.clear();
+    mScene->EndTraceProfiling();
+
+    mScene->StartTraceProfiling("Begin Frame");
     mRenderer->BeginFrame();
+    mScene->EndTraceProfiling();
 
     auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
+    mScene->StartTraceProfiling("Create Frustum");
     const auto frustum =
         Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 5000.0f) * view);
-
-    auto renderables = std::vector<Particle*>();
-    renderables.reserve(10'000);
-    mScene->StartTraceProfiling("Query renderables");
-    mOctreeSystem->GetOctree()->Query(frustum, renderables);
     mScene->EndTraceProfiling();
 
-    if (renderables.empty())
+    mScene->StartTraceProfiling("Query renderables");
+    mOctreeSystem->GetOctree()->Query(frustum, mRenderables);
+    mScene->EndTraceProfiling();
+
+    if (mRenderables.empty())
     {
         mRenderer->EndFrame();
         return;
     }
 
+    mScene->StartTraceProfiling("Sort Renderables");
     std::ranges::sort(
-        renderables,
+        mRenderables,
         [this](const Particle* a, const Particle* b) {
             return mScene->GetComponent<ModelComponent>(a->entity).meshes <
                        mScene->GetComponent<ModelComponent>(b->entity).meshes &&
                    mScene->GetComponent<ModelComponent>(a->entity).texture <
                        mScene->GetComponent<ModelComponent>(b->entity).texture;
         });
+    mScene->EndTraceProfiling();
 
-    auto matrices = std::vector<glm::mat4>();
-    matrices.reserve(renderables.size());
+    if (mRenderables.size() > mMatrices.capacity())
+        mMatrices.reserve(mRenderables.size());
 
-    mScene->StartTraceProfiling("Calculate matrizes");
-    for (const auto particle : renderables)
+    FREYR_PROFILING_BEGIN("USER",
+                          "Calculate matrizes",
+                          perfetto::Track(2),
+                          "rendeable count",
+                          mRenderables.size());
+    // mScene->StartTraceProfiling("Calculate matrizes");
+    for (const auto particle : mRenderables)
     {
-        matrices.emplace_back(particle->transform->GetModel());
+        mMatrices.emplace_back(particle->transform->GetModel());
     }
     mScene->EndTraceProfiling();
 
-    mInstanceMatrixBuffers =
-        mRenderer->GetBufferBuilder()
-            .SetData(matrices.data())
-            .SetSize(sizeof(glm::mat4) * matrices.size())
-            .SetUsage(fra::BufferUsage::Instance)
-            .Build();
+    if (mInstanceMatrixBuffers->GetSize() < mMatrices.capacity())
+        mInstanceMatrixBuffers =
+            mRenderer->GetBufferBuilder()
+                .SetData(mMatrices.data())
+                .SetSize(sizeof(glm::mat4) * mMatrices.capacity())
+                .SetUsage(fra::BufferUsage::Instance)
+                .Build();
+
+    mInstanceMatrixBuffers->Copy(mMatrices.data(),
+                                 sizeof(glm::mat4) * mMatrices.size());
 
     mRenderer->BindBuffer(mInstanceMatrixBuffers);
 
@@ -71,9 +99,9 @@ void RenderSystem::PostUpdate(float dt)
     auto                        instanceCount  = 0;
     std::vector<std::uint32_t>* currentMeshes  = nullptr;
     std::uint32_t               currentTexture = 0;
-    for (int i = 0; i < renderables.size(); i++)
+    for (int i = 0; i < mRenderables.size(); i++)
     {
-        const auto& particle = renderables[i];
+        const auto& particle = mRenderables[i];
         const auto& model =
             mScene->GetComponent<ModelComponent>(particle->entity);
 
@@ -89,7 +117,7 @@ void RenderSystem::PostUpdate(float dt)
             dataIndex     = i;
         }
 
-        if (i == renderables.size() - 1)
+        if (i == mRenderables.size() - 1)
         {
             if (!currentMeshes)
             {
@@ -97,8 +125,10 @@ void RenderSystem::PostUpdate(float dt)
                 currentTexture = model.texture;
             }
 
-            instanceDraws.emplace_back(
-                dataIndex, instanceCount + 1, currentMeshes, currentTexture);
+            instanceDraws.emplace_back(dataIndex,
+                                       instanceCount + 1,
+                                       currentMeshes,
+                                       currentTexture);
         }
         else
         {
