@@ -13,7 +13,7 @@ void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
 
-    // std::println("CollisionSystem::Update with {} entities", mChangedEntities.size());
+    mChangedEntities.sort();
 
     mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
                             RigidBodyComponent>(
@@ -23,7 +23,6 @@ void CollisionSystem::Update(float deltaTime)
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
             auto collisions = std::vector<Particle*>(0);
-            // collisions.reserve(1000);
 
             auto particle = Particle { .entity         = entity,
                                        .transform      = &transform,
@@ -41,6 +40,4 @@ void CollisionSystem::Update(float deltaTime)
         });
 
     mChangedEntities.clear();
-    // std::println("CollisionSystem::Update with {} entities",
-    //              mChangedEntities.size());
 }

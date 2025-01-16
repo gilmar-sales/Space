@@ -27,6 +27,8 @@ void OctreeSystem::PreUpdate(float deltaTime)
         return;
     }
 
+    mChangedEntities.sort();
+
     mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
                             RigidBodyComponent>(
         "Rebuild changed entities",
