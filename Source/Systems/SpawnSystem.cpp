@@ -11,17 +11,17 @@
 
 static int randomNumber(const int min, const int max)
 {
-    std::random_device              r;
-    std::default_random_engine      e1(r());
-    std::uniform_int_distribution<> uniform_dist(min, max);
+    std::random_device            r;
+    std::default_random_engine    e1(r());
+    std::uniform_int_distribution uniform_dist(min, max);
 
     return uniform_dist(e1);
 }
 
 static glm::vec3 randomPosition(int min, int max)
 {
-    return glm::vec3 { randomNumber(min, max), randomNumber(min, max),
-                       randomNumber(min, max) };
+    return glm::vec3(randomNumber(min, max), randomNumber(min, max),
+                     randomNumber(min, max));
 }
 
 SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,

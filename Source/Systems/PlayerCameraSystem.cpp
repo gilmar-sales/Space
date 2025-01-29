@@ -6,7 +6,7 @@
 
 void PlayerCameraSystem::PostUpdate(float deltaTime)
 {
-    auto& transform = mScene->GetComponent<TransformComponent>(mPlayer);
+    const auto& transform = mScene->GetComponent<TransformComponent>(mPlayer);
 
     const auto cameraPosition =
         transform.position - transform.GetForwardDirection() * 8.0f -

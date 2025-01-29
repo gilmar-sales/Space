@@ -101,19 +101,20 @@ PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
         });
 
     mScene->ForEach<TransformComponent, RigidBodyComponent>(
-        [=](fr::Entity entity, TransformComponent& transform,
-            RigidBodyComponent& rigidBody) {
-            mScene->SendEvent(TransformChangeEvent { .entity = entity });
+        [scene = mScene](fr::Entity entity, TransformComponent& transform,
+                         RigidBodyComponent& rigidBody) {
+            scene->SendEvent(TransformChangeEvent { .entity = entity });
         });
 }
 void PhysicsSystem::Update(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent>(
-        [=](fr::Entity entity, TransformComponent& transform,
-            RigidBodyComponent& rigidBody) {
+        [scene = mScene,
+         deltaTime](fr::Entity entity, TransformComponent& transform,
+                    RigidBodyComponent& rigidBody) {
             if (glm::length(rigidBody.velocity) > 0.01f)
             {
-                mScene->SendEvent(TransformChangeEvent { .entity = entity });
+                scene->SendEvent(TransformChangeEvent { .entity = entity });
                 transform.position += rigidBody.velocity * deltaTime;
             }
 

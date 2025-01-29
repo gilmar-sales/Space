@@ -29,7 +29,7 @@ PlayerControlSystem::PlayerControlSystem(
                 case fra::KeyCode::D:
                     spaceShipControl.rollTorque = 10000;
                     break;
-                case fra::KeyCode::LSHIFT:
+                case fra::KeyCode::LShift:
                     spaceShipControl.boostFactor = 10.0f;
                     break;
                 default:
@@ -50,7 +50,7 @@ PlayerControlSystem::PlayerControlSystem(
                 case fra::KeyCode::D:
                     spaceShipControl.rollTorque = 0;
                     break;
-                case fra::KeyCode::LSHIFT:
+                case fra::KeyCode::LShift:
                     spaceShipControl.boostFactor = 1.0f;
                     break;
                 default:

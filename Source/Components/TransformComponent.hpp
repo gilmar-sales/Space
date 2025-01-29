@@ -6,7 +6,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
 
 struct TransformComponent : fr::Component
 {
@@ -29,7 +28,7 @@ struct TransformComponent : fr::Component
     glm::mat4 GetModel() const
     {
         const auto translateM = glm::translate(glm::mat4(1), position);
-        const auto rotateM    = glm::toMat4(glm::inverse(rotation));
+        const auto rotateM    = glm::mat4(glm::inverse(rotation));
         const auto scaleM     = glm::scale(glm::mat4(1), scale);
 
         return translateM * rotateM * scaleM;
