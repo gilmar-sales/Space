@@ -58,6 +58,69 @@ PlayerControlSystem::PlayerControlSystem(
             }
         });
 
+    eventManger->Subscribe<fra::GamepadButtonPressedEvent>(
+        [this](
+            const fra::GamepadButtonPressedEvent& gamepadButtonPressedEvent) {
+            auto& spaceShipControl =
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
+
+            switch (gamepadButtonPressedEvent.button)
+            {
+                case fra::GamepadButton::GamepadButtonSouth: {
+                    spaceShipControl.boostFactor = 10.0f;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        });
+
+    eventManger->Subscribe<fra::GamepadButtonReleasedEvent>(
+        [this](
+            const fra::GamepadButtonReleasedEvent& gamepadButtonReleasedEvent) {
+            auto& spaceShipControl =
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
+
+            switch (gamepadButtonReleasedEvent.button)
+            {
+                case fra::GamepadButton::GamepadButtonSouth: {
+                    spaceShipControl.boostFactor = 1.0f;
+                    break;
+                }
+                default: {
+                    break;
+                }
+            }
+        });
+
+    eventManger->Subscribe<fra::GamepadAxisMotionEvent>(
+        [this](const fra::GamepadAxisMotionEvent& keyPressedEvent) {
+            auto& spaceShipControl =
+                mScene->GetComponent<SpaceShipControlComponent>(mPlayer);
+            switch (keyPressedEvent.axis)
+            {
+                case fra::GamepadAxis::GamepadAxisRightTrigger:
+                    spaceShipControl.boost =
+                        static_cast<float>(10000.0 * keyPressedEvent.value);
+                    break;
+                case fra::GamepadAxis::GamepadAxisLeftX:
+                    spaceShipControl.yawTorque =
+                        static_cast<float>(10000 * keyPressedEvent.value);
+                    break;
+                case fra::GamepadAxis::GamepadAxisLeftY:
+                    spaceShipControl.pitchTorque =
+                        static_cast<float>(10000 * keyPressedEvent.value);
+                    break;
+                case fra::GamepadAxis::GamepadAxisRightX:
+                    spaceShipControl.rollTorque =
+                        static_cast<float>(10000 * keyPressedEvent.value);
+                    break;
+                default:
+                    break;
+            }
+        });
+
     eventManger->Subscribe<fra::MouseMoveEvent>(
         [this](const fra::MouseMoveEvent& mouseMoveEvent) {
             mScene->GetComponent<SpaceShipControlComponent>(mPlayer).yawTorque =
@@ -69,6 +132,6 @@ PlayerControlSystem::PlayerControlSystem(
 }
 void PlayerControlSystem::PostUpdate(float deltaTime)
 {
-    mScene->GetComponent<SpaceShipControlComponent>(mPlayer).rollTorque  = 0;
-    mScene->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque = 0;
+    // mScene->GetComponent<SpaceShipControlComponent>(mPlayer).rollTorque  = 0;
+    // mScene->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque = 0;
 }
