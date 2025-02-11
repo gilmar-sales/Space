@@ -40,7 +40,7 @@ class Octree
     void Query(Particle& particle, std::vector<Particle*>& found);
     bool Intersect(const Particle& particle) const;
 
-    void Query(const Frustum& frustum, std::vector<Particle*>& found);
+    void Query(const Frustum& frustum, std::vector<Particle>& found);
     bool IsInsideFrustum(const Frustum& frustum) const;
 
     void Draw(const std::shared_ptr<fra::Renderer>& renderer,

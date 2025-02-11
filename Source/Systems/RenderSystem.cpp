@@ -3,6 +3,7 @@
 #include "Components/ModelComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
+#include "Components/AlwaysRenderedComponent.hpp"
 #include "InputSystem.hpp"
 
 RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
@@ -47,37 +48,47 @@ void RenderSystem::PostUpdate(float dt)
     mOctreeSystem->GetOctree()->Query(frustum, mRenderables);
     mScene->EndTraceProfiling();
 
-    if (mRenderables.empty())
-    {
-        mRenderer->EndFrame();
-        return;
-    }
-
     mScene->StartTraceProfiling("Sort Renderables");
     std::ranges::sort(
         mRenderables,
-        [this](const Particle* a, const Particle* b) {
-            return mScene->GetComponent<ModelComponent>(a->entity).meshes <
-                       mScene->GetComponent<ModelComponent>(b->entity).meshes &&
-                   mScene->GetComponent<ModelComponent>(a->entity).texture <
-                       mScene->GetComponent<ModelComponent>(b->entity).texture;
+        [this](const Particle& a, const Particle& b) {
+            return mScene->GetComponent<ModelComponent>(a.entity).meshes <
+                       mScene->GetComponent<ModelComponent>(b.entity).meshes &&
+                   mScene->GetComponent<ModelComponent>(a.entity).texture <
+                       mScene->GetComponent<ModelComponent>(b.entity).texture;
         });
     mScene->EndTraceProfiling();
+
+    mScene
+        ->ForEach<AlwaysRenderedComponent, ModelComponent, TransformComponent>(
+            [&](auto                     entity,
+                AlwaysRenderedComponent& alwaysRendered,
+                ModelComponent&          model,
+                TransformComponent&      transform) {
+                mRenderables.push_back(
+                    { .entity = entity, .transform = &transform });
+            });
 
     if (mRenderables.size() > mMatrices.capacity())
         mMatrices.reserve(mRenderables.size());
 
-    FREYR_PROFILING_BEGIN("USER",
-                          "Calculate matrizes",
-                          perfetto::Track(2),
-                          "rendeable count",
-                          mRenderables.size());
-    // mScene->StartTraceProfiling("Calculate matrizes");
+    mScene->StartTraceProfiling("Calculate matrizes");
+
     for (const auto particle : mRenderables)
     {
-        mMatrices.emplace_back(particle->transform->GetModel());
+        mMatrices.emplace_back(particle.transform->GetModel());
     }
+
     mScene->EndTraceProfiling();
+
+    if (mMatrices.empty())
+    {
+        mScene->StartTraceProfiling("Render");
+        mRenderer->EndFrame();
+        mScene->EndTraceProfiling();
+
+        return;
+    }
 
     if (mInstanceMatrixBuffers->GetSize() < mMatrices.capacity())
         mInstanceMatrixBuffers =
@@ -103,7 +114,7 @@ void RenderSystem::PostUpdate(float dt)
     {
         const auto& particle = mRenderables[i];
         const auto& model =
-            mScene->GetComponent<ModelComponent>(particle->entity);
+            mScene->GetComponent<ModelComponent>(particle.entity);
 
         if (currentMeshes &&
             (currentMeshes != model.meshes || currentTexture != model.texture))

@@ -204,29 +204,14 @@ void Octree::Query(Particle& particle, std::vector<Particle*>& found)
 
     if (mNearTopLeft)
     {
-        if (!mNearTopLeft->mElements.empty())
-            mNearTopLeft->Query(particle, found);
-
-        if (!mNearTopRight->mElements.empty())
-            mNearTopRight->Query(particle, found);
-
-        if (!mNearBotLeft->mElements.empty())
-            mNearBotLeft->Query(particle, found);
-
-        if (!mNearBotRight->mElements.empty())
-            mNearBotRight->Query(particle, found);
-
-        if (!mFarTopLeft->mElements.empty())
-            mFarTopLeft->Query(particle, found);
-
-        if (!mFarTopRight->mElements.empty())
-            mFarTopRight->Query(particle, found);
-
-        if (!mFarBotLeft->mElements.empty())
-            mFarBotLeft->Query(particle, found);
-
-        if (!mFarBotRight->mElements.empty())
-            mFarBotRight->Query(particle, found);
+        mNearTopLeft->Query(particle, found);
+        mNearTopRight->Query(particle, found);
+        mNearBotLeft->Query(particle, found);
+        mNearBotRight->Query(particle, found);
+        mFarTopLeft->Query(particle, found);
+        mFarTopRight->Query(particle, found);
+        mFarBotLeft->Query(particle, found);
+        mFarBotRight->Query(particle, found);
     }
 }
 
@@ -266,7 +251,7 @@ bool Octree::IsInsideFrustum(const Frustum& frustum) const
     return true;
 }
 
-void Octree::Query(const Frustum& frustum, std::vector<Particle*>& found)
+void Octree::Query(const Frustum& frustum, std::vector<Particle>& found)
 {
     if (!frustum.SphereIntersect(mPosition, mHalfRange * 1.735f))
         return;
@@ -276,7 +261,7 @@ void Octree::Query(const Frustum& frustum, std::vector<Particle*>& found)
         if (frustum.SphereIntersect(other.transform->position,
                                     other.sphereCollider->radius))
         {
-            found.push_back(&other);
+            found.emplace_back(other);
         }
     }
 

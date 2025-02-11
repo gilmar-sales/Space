@@ -2,6 +2,7 @@
 
 #include <random>
 
+#include "Components/AlwaysRenderedComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -84,11 +85,12 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .WithDefault(ModelComponent { .meshes  = &mBlackHoleModel,
                                       .texture = mBlankTexture })
         .WithDefault(TransformComponent {
-            .position = glm::vec3(0),
+            .position = randomPosition(-40'000, 40'000),
             .rotation = glm::vec3(0.0, 60.0, 45.0),
             .scale    = glm::vec3(10'000) })
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent {})
+        .WithDefault(AlwaysRenderedComponent {})
         .WithEntities(1)
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
@@ -130,26 +132,6 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes  = &mEnemyShipModel,
-                                      .texture = mEnemyShipTexture })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithDefault(SpaceShipControlComponent { .boost = 1000 })
-        .WithEntities(10'000)
-        .ForEach<TransformComponent, SphereColliderComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-10'000, 10'000),
-                              .rotation = glm::vec3(0),
-                              .scale    = glm::vec3(3) };
-
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
-            })
-        .Build();
-
-    mScene->CreateArchetypeBuilder()
         .WithDefault(PlayerComponent { .hitPoints = 1000 })
         .WithDefault(ModelComponent { .meshes  = &mPlayerShipModel,
                                       .texture = mPlayerShipTexture })
@@ -161,5 +143,25 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .WithDefault(RigidBodyComponent { .mass = 110.0f })
         .WithDefault(SpaceShipControlComponent {})
         .WithEntities(1)
+        .Build();
+
+    mScene->CreateArchetypeBuilder()
+        .WithDefault(ModelComponent { .meshes  = &mEnemyShipModel,
+                                      .texture = mEnemyShipTexture })
+        .WithDefault(TransformComponent {})
+        .WithDefault(SphereColliderComponent {})
+        .WithDefault(RigidBodyComponent { .mass = 100.0f })
+        .WithDefault(SpaceShipControlComponent { .boost = 1000 })
+        .WithEntities(1'500)
+        .ForEach<TransformComponent, SphereColliderComponent>(
+            [](auto entity, TransformComponent& transform,
+               SphereColliderComponent& sphereCollider) {
+                transform = { .position = randomPosition(-4'000, 4'000),
+                              .rotation = glm::vec3(0),
+                              .scale    = glm::vec3(3) };
+
+                sphereCollider = { .radius = transform.scale.x,
+                                   .offset = glm::vec3(0) };
+            })
         .Build();
 }

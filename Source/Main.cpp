@@ -30,7 +30,7 @@ int main(int argc, char const* argv[])
                 rendererBuilder.SetSamples(vk::SampleCountFlagBits::e8)
                     .SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f })
                     .SetDrawDistance(100'000.0f)
-                .SetSamples(vk::SampleCountFlagBits::e1);
+                    .SetSamples(vk::SampleCountFlagBits::e1);
             });
 
     builder.GetServiceCollection()->AddSingleton<fr::Scene>(
@@ -51,7 +51,7 @@ int main(int argc, char const* argv[])
                 .AddSystem<MovementSystem>()
                 .AddSystem<PhysicsSystem>()
                 .AddSystem<RenderSystem>()
-                .SetMaxEntities(2'100'000)
+                .SetMaxEntities(100'000)
                 .Build(serviceProvider);
         });
 
