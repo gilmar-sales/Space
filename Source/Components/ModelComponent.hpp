@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Asset/MeshPool.hpp>
 #include <Freyr/Freyr.hpp>
 
 struct ModelComponent : fr::Component

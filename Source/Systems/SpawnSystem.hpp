@@ -1,10 +1,7 @@
 #pragma once
 
-#include "Asset/TexturePool.hpp"
-
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
-
-#include <Asset/MeshPool.hpp>
 
 class SpawnSystem final : public fr::System
 {

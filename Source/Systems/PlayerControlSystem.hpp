@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Events/EventManager.hpp>
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
 class PlayerControlSystem final : public fr::System

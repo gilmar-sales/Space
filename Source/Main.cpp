@@ -1,6 +1,6 @@
 #include "SpaceApp.hpp"
 
-#include <Builders/ApplicationBuilder.hpp>
+#include <Freya/Freya.hpp>
 #include <Freyr/Builders/SceneBuilder.hpp>
 
 #include "Components/ModelComponent.hpp"

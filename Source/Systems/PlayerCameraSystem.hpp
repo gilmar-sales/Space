@@ -1,7 +1,6 @@
 #pragma once
 
-#include <Core/Renderer.hpp>
-#include <Core/Window.hpp>
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
 #include "Components/PlayerComponent.hpp"

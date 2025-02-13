@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Events/ApplyForceEvent.hpp"
-#include "Events/ApplyTorqueEvent.hpp"
 #include "Events/TransformChangeEvent.hpp"
 
 #include <Freyr/Freyr.hpp>

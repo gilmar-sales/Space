@@ -1,9 +1,6 @@
 #pragma once
 
-#include "Events/KeyDownEvent.hpp"
-
-#include <Core/Renderer.hpp>
-#include <Core/Window.hpp>
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
 class InputSystem final : public fr::System

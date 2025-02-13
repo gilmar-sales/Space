@@ -2,7 +2,7 @@
 
 #include "Events/TransformChangeEvent.hpp"
 
-#include <Core/Renderer.hpp>
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
 #include <Systems/OctreeSystem.hpp>

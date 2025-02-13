@@ -1,13 +1,10 @@
 #include "CollisionSystem.hpp"
 
-#include <Asset/MeshPool.hpp>
-
 #include "Events/CollisionEvent.hpp"
 
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include <Events/OctreeFinishedEvent.hpp>
 
 void CollisionSystem::Update(float deltaTime)
 {
