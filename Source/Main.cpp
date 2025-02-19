@@ -21,7 +21,7 @@
 
 int main(int argc, char const* argv[])
 {
-    auto builder =
+    auto applicationBuilder =
         fra::ApplicationBuilder()
             .WithWindow([](fra::WindowBuilder& windowBuilder) {
                 windowBuilder.SetWidth(1920).SetHeight(1080).SetVSync(false);
@@ -33,9 +33,9 @@ int main(int argc, char const* argv[])
                     .SetSamples(vk::SampleCountFlagBits::e1);
             });
 
-    builder.GetServiceCollection()->AddSingleton<fr::Scene>(
+    applicationBuilder.GetServiceCollection()->AddSingleton<fr::Scene>(
         [&](ServiceProvider& serviceProvider) {
-            return fr::SceneBuilder(builder.GetServiceCollection())
+            return fr::SceneBuilder(applicationBuilder.GetServiceCollection())
                 .AddComponent<ModelComponent>()
                 .AddComponent<TransformComponent>()
                 .AddComponent<SphereColliderComponent>()
@@ -51,11 +51,13 @@ int main(int argc, char const* argv[])
                 .AddSystem<MovementSystem>()
                 .AddSystem<PhysicsSystem>()
                 .AddSystem<RenderSystem>()
-                .SetMaxEntities(100'000)
+                .WithOptions([](fr::FreyrOptionsBuilder& freyrOptionsBuilder) {
+                    freyrOptionsBuilder.SetInitialCapacity(100'000);
+                })
                 .Build(serviceProvider);
         });
 
-    const auto app = builder.Build<SpaceApp>();
+    const auto app = applicationBuilder.Build<SpaceApp>();
 
     app->Run();
 
