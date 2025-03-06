@@ -11,10 +11,10 @@ void OctreeSystem::PreUpdate(float deltaTime)
         mOctree =
             std::make_shared<Octree>(glm::vec3(0), 200'000.0f, 4, allocator);
 
-        mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
-                                RigidBodyComponent>(
+        mScene->ForEachAsync<TransformComponent, SphereColliderComponent,
+                             RigidBodyComponent>(
             "Build Octree",
-            [octree = mOctree](const fr::Entity entity, int index,
+            [octree = mOctree](const fr::Entity         entity,
                                TransformComponent&      transform,
                                SphereColliderComponent& sphereCollider,
                                RigidBodyComponent&      rigidBody) {
@@ -27,12 +27,9 @@ void OctreeSystem::PreUpdate(float deltaTime)
         return;
     }
 
-    mChangedEntities.sort();
-
-    mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
-                            RigidBodyComponent>(
+    mScene->ForEachAsync<TransformComponent, SphereColliderComponent,
+                         RigidBodyComponent>(
         "Rebuild changed entities",
-        mChangedEntities,
         [octree = mOctree](
             const fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
@@ -44,15 +41,15 @@ void OctreeSystem::PreUpdate(float deltaTime)
                                .transform      = &transform,
                                .sphereCollider = &sphereCollider };
 
-                if (rigidBody.octree != nullptr &&
+                if (const auto actualOctree = rigidBody.octree;
+                    actualOctree != nullptr &&
                     !rigidBody.octree->Contains(particle))
                 {
-                    rigidBody.octree->Remove(entity);
+                    rigidBody.octree = nullptr;
+                    actualOctree->Remove(entity);
 
                     rigidBody.octree = octree->Insert(particle);
                 }
             }
         });
-
-    mChangedEntities.size();
 }

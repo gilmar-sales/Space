@@ -84,10 +84,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
     mScene->CreateArchetypeBuilder()
         .WithDefault(ModelComponent { .meshes  = &mBlackHoleModel,
                                       .texture = mBlankTexture })
-        .WithDefault(TransformComponent {
-            .position = randomPosition(-40'000, 40'000),
-            .rotation = glm::vec3(0.0, 60.0, 45.0),
-            .scale    = glm::vec3(10'000) })
+        .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent {})
         .WithDefault(AlwaysRenderedComponent {})
@@ -97,6 +94,9 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider,
                RigidBodyComponent&      rigidBody) {
+                transform      = { .position = randomPosition(-30'000, 30'000),
+                                   .rotation = glm::vec3(0.0, 60.0, 45.0),
+                                   .scale    = glm::vec3(10'000) };
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
 
@@ -152,11 +152,11 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
         .WithDefault(SpaceShipControlComponent { .boost = 1000 })
-        .WithEntities(1'500)
+        .WithEntities(200'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-4'000, 4'000),
+                transform = { .position = randomPosition(-25'000, 25'000),
                               .rotation = glm::vec3(0),
                               .scale    = glm::vec3(3) };
 

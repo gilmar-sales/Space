@@ -10,12 +10,10 @@ void CollisionSystem::Update(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
 
-    mChangedEntities.sort();
-
-    mScene->ForEachParallel<TransformComponent, SphereColliderComponent,
-                            RigidBodyComponent>(
-        "Calculate collisions", mChangedEntities,
-        [octree = octree, manager = mScene, deltaTime = deltaTime](
+    mScene->ForEachAsync<TransformComponent, SphereColliderComponent,
+                         RigidBodyComponent>(
+        "Calculate collisions",
+        [this, octree = octree, manager = mScene, deltaTime = deltaTime](
             const fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
@@ -35,6 +33,4 @@ void CollisionSystem::Update(float deltaTime)
                     .deltaTime = deltaTime });
             }
         });
-
-    mChangedEntities.clear();
 }
