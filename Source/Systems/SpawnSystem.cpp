@@ -152,7 +152,7 @@ SpawnSystem::SpawnSystem(const std::shared_ptr<fr::Scene>&        scene,
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 100.0f })
         .WithDefault(SpaceShipControlComponent { .boost = 1000 })
-        .WithEntities(200'000)
+        .WithEntities(50'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {

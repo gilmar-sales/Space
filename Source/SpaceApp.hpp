@@ -6,8 +6,8 @@
 class SpaceApp final : public fra::AbstractApplication
 {
   public:
-    SpaceApp(const Ref<ServiceProvider>&       serviceProvider,
-             const std::shared_ptr<fr::Scene>& scene) :
+    SpaceApp(const Ref<skr::ServiceProvider>& serviceProvider,
+             const Ref<fr::Scene>&            scene) :
         AbstractApplication(serviceProvider), mScene(scene)
     {
     }
@@ -17,5 +17,5 @@ class SpaceApp final : public fra::AbstractApplication
     void ShutDown() override;
 
   private:
-    std::shared_ptr<fr::Scene> mScene;
+    Ref<fr::Scene> mScene;
 };

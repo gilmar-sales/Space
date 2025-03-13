@@ -34,7 +34,7 @@ int main(int argc, char const* argv[])
             });
 
     applicationBuilder.GetServiceCollection()->AddSingleton<fr::Scene>(
-        [&](ServiceProvider& serviceProvider) {
+        [&](skr::ServiceProvider& serviceProvider) {
             return fr::SceneBuilder(applicationBuilder.GetServiceCollection())
                 .AddComponent<ModelComponent>()
                 .AddComponent<TransformComponent>()
