@@ -1,6 +1,0 @@
-[submodule "ThirdParty/Freyr"]
-	path = ThirdParty/Freyr
-	url = git@github.com:gilmar-sales/Freyr.git
-[submodule "ThirdParty/Freya"]
-	path = ThirdParty/Freya
-	url = git@github.com:gilmar-sales/Freya.git

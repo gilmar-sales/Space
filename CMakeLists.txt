@@ -2,8 +2,21 @@ cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_subdirectory(ThirdParty/Freyr)
-add_subdirectory(ThirdParty/Freya)
+include(FetchContent)
+
+FetchContent_Declare(
+  freyr
+  GIT_REPOSITORY "git@github.com:gilmar-sales/Freyr.git"
+  GIT_TAG        "archetype-chunk"
+)
+FetchContent_MakeAvailable(freyr)
+
+FetchContent_Declare(
+  freya
+  GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
+  GIT_TAG        "main"
+)
+FetchContent_MakeAvailable(freya)
 
 project(
         SpaceAiWar
