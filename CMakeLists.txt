@@ -31,13 +31,21 @@ add_executable(SpaceAiWar ${SPACE_SRC})
 
 target_compile_features(SpaceAiWar PUBLIC cxx_std_23)
 
-target_link_libraries(SpaceAiWar freyr::freyr Freya-static)
+target_link_libraries(SpaceAiWar freyr::freyr Freya::Freya)
 
 target_include_directories(SpaceAiWar PUBLIC Source)
 
 target_precompile_headers(SpaceAiWar PUBLIC
         <memory>
 )
+if (WIN32)
+  if (MSVC)
+  target_compile_options(SpaceAiWar PUBLIC "/bigobj")
+  else()
+  target_compile_options(SpaceAiWar PUBLIC "-Wa,-mbig-obj")
+  target_compile_options(SpaceAiWar PRIVATE "-Os")
+  endif()
+endif (WIN32)
 
 if (MSVC)
     target_compile_options(SpaceAiWar PUBLIC "/ZI" "/MP")

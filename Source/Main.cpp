@@ -22,16 +22,11 @@
 int main(int argc, char const* argv[])
 {
     auto applicationBuilder =
-        fra::ApplicationBuilder()
-            .WithWindow([](fra::WindowBuilder& windowBuilder) {
-                windowBuilder.SetWidth(1920).SetHeight(1080).SetVSync(false);
-            })
-            .WithRenderer([](fra::RendererBuilder& rendererBuilder) {
-                rendererBuilder.SetSamples(vk::SampleCountFlagBits::e8)
-                    .SetClearColor({ 0.0f, 0.0f, 0.0f, 0.0f })
-                    .SetDrawDistance(1000'000.0f)
-                    .SetSamples(vk::SampleCountFlagBits::e1);
-            });
+        fra::ApplicationBuilder().WithOptions([](fra::FreyaOptions& options) {
+            options.title        = "Space";
+            options.drawDistance = 1000'000.0f;
+            options.vSync        = false;
+        });
 
     applicationBuilder.GetServiceCollection()->AddSingleton<fr::Scene>(
         [&](skr::ServiceProvider& serviceProvider) {
