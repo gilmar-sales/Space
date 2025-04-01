@@ -24,7 +24,10 @@ int main(int argc, char const* argv[])
     auto applicationBuilder =
         fra::ApplicationBuilder().WithOptions([](fra::FreyaOptions& options) {
             options.title        = "Space";
+            options.width        = 1920;
+            options.height       = 1080;
             options.drawDistance = 1000'000.0f;
+            options.sampleCount  = vk::SampleCountFlagBits::e8;
             options.vSync        = false;
         });
 

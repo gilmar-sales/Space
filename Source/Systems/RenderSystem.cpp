@@ -6,13 +6,14 @@
 #include "Components/AlwaysRenderedComponent.hpp"
 #include "InputSystem.hpp"
 
-RenderSystem::RenderSystem(const std::shared_ptr<fr::Scene>&        scene,
-                           const std::shared_ptr<fra::Renderer>&    renderer,
-                           const std::shared_ptr<fra::MeshPool>&    meshPool,
-                           const std::shared_ptr<fra::TexturePool>& texturePool,
-                           const std::shared_ptr<OctreeSystem>& octreeSystem) :
+RenderSystem::RenderSystem(
+    const std::shared_ptr<fr::Scene>&         scene,
+    const std::shared_ptr<fra::Renderer>&     renderer,
+    const std::shared_ptr<fra::MeshPool>&     meshPool,
+    const std::shared_ptr<fra::MaterialPool>& materialPool,
+    const std::shared_ptr<OctreeSystem>&      octreeSystem) :
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
-    mTexturePool(texturePool), mOctreeSystem(octreeSystem), mMatrices({}),
+    mMaterialPool(materialPool), mOctreeSystem(octreeSystem), mMatrices({}),
     mRenderables({})
 {
     mRenderables.reserve(1024);
@@ -54,8 +55,8 @@ void RenderSystem::PostUpdate(float dt)
         [this](const Particle& a, const Particle& b) {
             return mScene->GetComponent<ModelComponent>(a.entity).meshes <
                        mScene->GetComponent<ModelComponent>(b.entity).meshes &&
-                   mScene->GetComponent<ModelComponent>(a.entity).texture <
-                       mScene->GetComponent<ModelComponent>(b.entity).texture;
+                   mScene->GetComponent<ModelComponent>(a.entity).material <
+                       mScene->GetComponent<ModelComponent>(b.entity).material;
         });
     mScene->EndTraceProfiling();
 
@@ -106,23 +107,23 @@ void RenderSystem::PostUpdate(float dt)
     auto instanceDraws = std::vector<InstanceDraw>();
 
     mScene->StartTraceProfiling("Calculate instance sequence");
-    auto                        dataIndex      = 0;
-    auto                        instanceCount  = 0;
-    std::vector<std::uint32_t>* currentMeshes  = nullptr;
-    std::uint32_t               currentTexture = 0;
+    auto                        dataIndex       = 0;
+    auto                        instanceCount   = 0;
+    std::vector<std::uint32_t>* currentMeshes   = nullptr;
+    std::uint32_t               currentMaterial = 0;
     for (int i = 0; i < mRenderables.size(); i++)
     {
         const auto& particle = mRenderables[i];
         const auto& model =
             mScene->GetComponent<ModelComponent>(particle.entity);
 
-        if (currentMeshes &&
-            (currentMeshes != model.meshes || currentTexture != model.texture))
+        if (currentMeshes && (currentMeshes != model.meshes ||
+                              currentMaterial != model.material))
         {
             instanceDraws.emplace_back(dataIndex,
                                        instanceCount,
                                        currentMeshes,
-                                       currentTexture);
+                                       currentMaterial);
             currentMeshes = nullptr;
             instanceCount = 0;
             dataIndex     = i;
@@ -132,19 +133,19 @@ void RenderSystem::PostUpdate(float dt)
         {
             if (!currentMeshes)
             {
-                currentMeshes  = model.meshes;
-                currentTexture = model.texture;
+                currentMeshes   = model.meshes;
+                currentMaterial = model.material;
             }
 
             instanceDraws.emplace_back(dataIndex,
                                        instanceCount + 1,
                                        currentMeshes,
-                                       currentTexture);
+                                       currentMaterial);
         }
         else
         {
-            currentMeshes  = model.meshes;
-            currentTexture = model.texture;
+            currentMeshes   = model.meshes;
+            currentMaterial = model.material;
             instanceCount += 1;
         }
     }
@@ -153,7 +154,7 @@ void RenderSystem::PostUpdate(float dt)
     mScene->StartTraceProfiling("Draw instance sequences");
     for (const auto& draw : instanceDraws)
     {
-        mTexturePool->Bind(draw.texture);
+        mMaterialPool->Bind(draw.material);
 
         if (draw.meshes != nullptr)
             for (const auto& meshId : *draw.meshes)
