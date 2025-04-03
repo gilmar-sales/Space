@@ -27,7 +27,7 @@ int main(int argc, char const* argv[])
             options.width        = 1920;
             options.height       = 1080;
             options.drawDistance = 1000'000.0f;
-            options.sampleCount  = vk::SampleCountFlagBits::e8;
+            options.sampleCount  = 8;
             options.vSync        = false;
         });
 

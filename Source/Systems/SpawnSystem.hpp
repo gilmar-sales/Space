@@ -25,8 +25,14 @@ class SpawnSystem final : public fr::System
     std::vector<std::uint32_t> mEnemyShipModel;
     std::uint32_t              mEnemyShipMaterial;
 
-    std::vector<std::uint32_t> mSunModel;
+    std::vector<std::uint32_t> mJupiter;
     std::uint32_t              mSunMaterial;
+
+    std::vector<std::uint32_t> mRock1Model;
+    std::uint32_t              mRock1Material;
+
+    std::vector<std::uint32_t> mRock2Model;
+    std::uint32_t              mRock2Material;
 
     std::vector<std::uint32_t> mMoonModel;
     std::uint32_t              mMoonMaterial;

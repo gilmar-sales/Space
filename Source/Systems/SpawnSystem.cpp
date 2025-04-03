@@ -60,17 +60,38 @@ SpawnSystem::SpawnSystem(
 
     mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
     mMoonMaterial = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile(
-              "./Resources/Textures/8k_moon.jpg"),
-          mBlankTexture, mBlankTexture });
+        { mTexturePool->CreateTextureFromFile("./Resources/Textures/moon.jpg"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/moon_normal.png"),
+          mBlankTexture });
 
-    mSunModel    = mMeshPool->CreateMeshFromFile("./Resources/Models/sun.fbx");
+    mJupiter     = mMeshPool->CreateMeshFromFile("./Resources/Models/sun.fbx");
     mSunMaterial = mMaterialPool->Create(
         { mTexturePool->CreateTextureFromFile(
-              "./Resources/Textures/8k_sun.jpeg"),
-          mBlankTexture, mBlankTexture
+              "./Resources/Textures/jupiter.png"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/jupiter_normal.png"),
+          mBlankTexture });
 
-        });
+    mRock1Model =
+        mMeshPool->CreateMeshFromFile("./Resources/Models/rock_01.fbx");
+    mRock1Material = mMaterialPool->Create(
+        { mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_01.tga"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_01_normal.tga"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_01_roughness.tga") });
+
+    mRock2Model =
+        mMeshPool->CreateMeshFromFile("./Resources/Models/rock_02.fbx");
+    mRock2Material = mMaterialPool->Create(
+        { mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_02.tga"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_02_normal.tga"),
+          mTexturePool->CreateTextureFromFile(
+              "./Resources/Textures/rock_02_roughness.tga") });
 
     mCheckpointModel =
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
@@ -101,7 +122,7 @@ SpawnSystem::SpawnSystem(
 
     mScene->CreateArchetypeBuilder()
         .WithDefault(
-            ModelComponent { .meshes = &mSunModel, .material = mSunMaterial })
+            ModelComponent { .meshes = &mJupiter, .material = mSunMaterial })
         .WithDefault(TransformComponent { .position = glm::vec3(0),
                                           .rotation = glm::vec3(0.0),
                                           .scale    = glm::vec3(200) })
@@ -115,7 +136,7 @@ SpawnSystem::SpawnSystem(
                RigidBodyComponent&      rigidBody) {
                 transform = { .position = randomPosition(-5'000, 5'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(50, 100)) };
+                              .scale    = glm::vec3(randomNumber(200, 1000)) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
@@ -125,6 +146,60 @@ SpawnSystem::SpawnSystem(
             })
         .WithEntities(10)
         .Build();
+
+    mScene->CreateArchetypeBuilder()
+        .WithDefault(ModelComponent { .meshes   = &mRock1Model,
+                                      .material = mRock1Material })
+        .WithDefault(TransformComponent { .position = glm::vec3(0),
+                                          .rotation = glm::vec3(0.0),
+                                          .scale    = glm::vec3(1) })
+        .WithDefault(
+            SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
+        .WithDefault(RigidBodyComponent {})
+        .ForEach<TransformComponent, SphereColliderComponent,
+                 RigidBodyComponent>(
+            [](auto entity, TransformComponent& transform,
+               SphereColliderComponent& sphereCollider,
+               RigidBodyComponent&      rigidBody) {
+                transform = { .position = randomPosition(-1'000, 1'000),
+                              .rotation = glm::vec3(0.0),
+                              .scale    = glm::vec3(randomNumber(50, 100)) };
+
+                sphereCollider = { .radius = transform.scale.x,
+                                   .offset = glm::vec3(0) };
+
+                rigidBody = { .mass        = transform.scale.x * 5000.0f,
+                              .isKinematic = true };
+            })
+        .WithEntities(2'000)
+        .Build();
+
+    // mScene->CreateArchetypeBuilder()
+    //     .WithDefault(ModelComponent { .meshes   = &mRock2Model,
+    //                                   .material = mRock2Material })
+    //     .WithDefault(TransformComponent { .position = glm::vec3(0),
+    //                                       .rotation = glm::vec3(0.0),
+    //                                       .scale    = glm::vec3(30) })
+    //     .WithDefault(
+    //         SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
+    //     .WithDefault(RigidBodyComponent {})
+    //     .ForEach<TransformComponent, SphereColliderComponent,
+    //              RigidBodyComponent>(
+    //         [](auto entity, TransformComponent& transform,
+    //            SphereColliderComponent& sphereCollider,
+    //            RigidBodyComponent&      rigidBody) {
+    //             transform = { .position = randomPosition(-7'000, 7'000),
+    //                           .rotation = glm::vec3(0.0),
+    //                           .scale    = glm::vec3(randomNumber(50, 100)) };
+
+    //             sphereCollider = { .radius = transform.scale.x,
+    //                                .offset = glm::vec3(0) };
+
+    //             rigidBody = { .mass        = transform.scale.x * 5000.0f,
+    //                           .isKinematic = true };
+    //         })
+    //     .WithEntities(2'000)
+    //     .Build();
 
     mScene->CreateArchetypeBuilder()
         .WithDefault(PlayerComponent { .hitPoints = 1000 })
@@ -145,8 +220,8 @@ SpawnSystem::SpawnSystem(
                                       .material = mEnemyShipMaterial })
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 100.0f })
-        .WithDefault(SpaceShipControlComponent { .boost = 1000 })
+        .WithDefault(RigidBodyComponent { .mass = 110.0f })
+        // .WithDefault(SpaceShipControlComponent { .boost = 1000 })
         .WithEntities(50'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
