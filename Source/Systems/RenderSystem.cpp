@@ -16,8 +16,8 @@ RenderSystem::RenderSystem(
     mMaterialPool(materialPool), mOctreeSystem(octreeSystem), mMatrices({}),
     mRenderables({})
 {
-    mRenderables.reserve(1024);
-    mMatrices.reserve(1024);
+    mRenderables.reserve(10000);
+    mMatrices.reserve(10000);
 
     mInstanceMatrixBuffers =
         mRenderer->GetBufferBuilder()
@@ -42,7 +42,7 @@ void RenderSystem::PostUpdate(float dt)
 
     mScene->StartTraceProfiling("Create Frustum");
     const auto frustum =
-        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 5000.0f) * view);
+        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 10000.0f) * view);
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Query renderables");
@@ -107,46 +107,47 @@ void RenderSystem::PostUpdate(float dt)
     auto instanceDraws = std::vector<InstanceDraw>();
 
     mScene->StartTraceProfiling("Calculate instance sequence");
-    auto                        dataIndex       = 0;
-    auto                        instanceCount   = 0;
-    std::vector<std::uint32_t>* currentMeshes   = nullptr;
-    std::uint32_t               currentMaterial = 0;
+
+    auto currentInstance =
+        InstanceDraw { .index         = 0,
+                       .instanceCount = 0,
+                       .meshes        = nullptr,
+                       .material      = 9 };
+
     for (int i = 0; i < mRenderables.size(); i++)
     {
         const auto& particle = mRenderables[i];
         const auto& model =
             mScene->GetComponent<ModelComponent>(particle.entity);
 
-        if (currentMeshes && (currentMeshes != model.meshes ||
-                              currentMaterial != model.material))
+        if (currentInstance.meshes &&
+            (currentInstance.meshes != model.meshes ||
+             currentInstance.material != model.material))
         {
-            instanceDraws.emplace_back(dataIndex,
-                                       instanceCount,
-                                       currentMeshes,
-                                       currentMaterial);
-            currentMeshes = nullptr;
-            instanceCount = 0;
-            dataIndex     = i;
+            instanceDraws.push_back(currentInstance);
+
+            currentInstance.meshes        = nullptr;
+            currentInstance.instanceCount = 0;
+            currentInstance.index         = i;
         }
 
         if (i == mRenderables.size() - 1)
         {
-            if (!currentMeshes)
+            if (!currentInstance.meshes)
             {
-                currentMeshes   = model.meshes;
-                currentMaterial = model.material;
+                currentInstance.meshes   = model.meshes;
+                currentInstance.material = model.material;
             }
 
-            instanceDraws.emplace_back(dataIndex,
-                                       instanceCount + 1,
-                                       currentMeshes,
-                                       currentMaterial);
+            currentInstance.instanceCount += 1;
+
+            instanceDraws.push_back(currentInstance);
         }
         else
         {
-            currentMeshes   = model.meshes;
-            currentMaterial = model.material;
-            instanceCount += 1;
+            currentInstance.meshes   = model.meshes;
+            currentInstance.material = model.material;
+            currentInstance.instanceCount += 1;
         }
     }
     mScene->EndTraceProfiling();

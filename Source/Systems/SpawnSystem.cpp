@@ -161,9 +161,9 @@ SpawnSystem::SpawnSystem(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider,
                RigidBodyComponent&      rigidBody) {
-                transform = { .position = randomPosition(-1'000, 1'000),
+                transform = { .position = randomPosition(-15'000, 15'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(50, 100)) };
+                              .scale    = glm::vec3(randomNumber(1, 100)) };
 
                 sphereCollider = { .radius = transform.scale.x,
                                    .offset = glm::vec3(0) };
@@ -171,35 +171,36 @@ SpawnSystem::SpawnSystem(
                 rigidBody = { .mass        = transform.scale.x * 5000.0f,
                               .isKinematic = true };
             })
-        .WithEntities(2'000)
+        .WithEntities(4'000)
         .Build();
 
-    // mScene->CreateArchetypeBuilder()
-    //     .WithDefault(ModelComponent { .meshes   = &mRock2Model,
-    //                                   .material = mRock2Material })
-    //     .WithDefault(TransformComponent { .position = glm::vec3(0),
-    //                                       .rotation = glm::vec3(0.0),
-    //                                       .scale    = glm::vec3(30) })
-    //     .WithDefault(
-    //         SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
-    //     .WithDefault(RigidBodyComponent {})
-    //     .ForEach<TransformComponent, SphereColliderComponent,
-    //              RigidBodyComponent>(
-    //         [](auto entity, TransformComponent& transform,
-    //            SphereColliderComponent& sphereCollider,
-    //            RigidBodyComponent&      rigidBody) {
-    //             transform = { .position = randomPosition(-7'000, 7'000),
-    //                           .rotation = glm::vec3(0.0),
-    //                           .scale    = glm::vec3(randomNumber(50, 100)) };
+    mScene->CreateArchetypeBuilder()
+        .WithDefault(ModelComponent { .meshes   = &mRock2Model,
+                                      .material = mRock2Material })
+        .WithDefault(TransformComponent {
+            .position = glm::vec3(0),
+            .rotation = glm::vec3(0.0),
+            .scale    = glm::vec3(randomNumber(1, 100)) })
+        .WithDefault(
+            SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
+        .WithDefault(RigidBodyComponent {})
+        .ForEach<TransformComponent, SphereColliderComponent,
+                 RigidBodyComponent>(
+            [](auto entity, TransformComponent& transform,
+               SphereColliderComponent& sphereCollider,
+               RigidBodyComponent&      rigidBody) {
+                transform = { .position = randomPosition(-15'000, 15'000),
+                              .rotation = glm::vec3(0.0),
+                              .scale    = glm::vec3(randomNumber(1, 100)) };
 
-    //             sphereCollider = { .radius = transform.scale.x,
-    //                                .offset = glm::vec3(0) };
+                sphereCollider = { .radius = transform.scale.x,
+                                   .offset = glm::vec3(0) };
 
-    //             rigidBody = { .mass        = transform.scale.x * 5000.0f,
-    //                           .isKinematic = true };
-    //         })
-    //     .WithEntities(2'000)
-    //     .Build();
+                rigidBody = { .mass        = transform.scale.x * 5000.0f,
+                              .isKinematic = true };
+            })
+        .WithEntities(8'000)
+        .Build();
 
     mScene->CreateArchetypeBuilder()
         .WithDefault(PlayerComponent { .hitPoints = 1000 })
@@ -221,7 +222,7 @@ SpawnSystem::SpawnSystem(
         .WithDefault(TransformComponent {})
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 110.0f })
-        // .WithDefault(SpaceShipControlComponent { .boost = 1000 })
+        .WithDefault(SpaceShipControlComponent { .boost = 1000 })
         .WithEntities(50'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
