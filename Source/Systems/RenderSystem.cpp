@@ -6,12 +6,11 @@
 #include "Components/AlwaysRenderedComponent.hpp"
 #include "InputSystem.hpp"
 
-RenderSystem::RenderSystem(
-    const std::shared_ptr<fr::Scene>&         scene,
-    const std::shared_ptr<fra::Renderer>&     renderer,
-    const std::shared_ptr<fra::MeshPool>&     meshPool,
-    const std::shared_ptr<fra::MaterialPool>& materialPool,
-    const std::shared_ptr<OctreeSystem>&      octreeSystem) :
+RenderSystem::RenderSystem(const Ref<fr::Scene>&         scene,
+                           const Ref<fra::Renderer>&     renderer,
+                           const Ref<fra::MeshPool>&     meshPool,
+                           const Ref<fra::MaterialPool>& materialPool,
+                           const Ref<OctreeSystem>&      octreeSystem) :
     System(scene), mRenderer(renderer), mMeshPool(meshPool),
     mMaterialPool(materialPool), mOctreeSystem(octreeSystem), mMatrices({}),
     mRenderables({})

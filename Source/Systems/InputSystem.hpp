@@ -6,21 +6,43 @@
 class InputSystem final : public fr::System
 {
   public:
-    InputSystem(const std::shared_ptr<fr::Scene>&         scene,
-                const std::shared_ptr<fra::Renderer>&     renderer,
-                const std::shared_ptr<fra::Window>&       window,
-                const std::shared_ptr<fra::EventManager>& eventManager) :
+    InputSystem(const Ref<fr::Scene>&         scene,
+                const Ref<fra::Renderer>&     renderer,
+                const Ref<fra::Window>&       window,
+                const Ref<fra::EventManager>& eventManager) :
         System(scene), mRenderer(renderer), mWindow(window)
     {
-        static bool grab = false;
-
         eventManager->Subscribe<fra::KeyPressedEvent>(
             [this](const fra::KeyPressedEvent& event) {
                 if (event.key == fra::KeyCode::M)
                 {
-                    grab = !grab;
+                    mMouseGrab = !mMouseGrab;
 
-                    mWindow->SetMouseGrab(grab);
+                    mWindow->SetMouseGrab(mMouseGrab);
+                }
+
+                if (event.key == fra::KeyCode::Escape)
+                {
+                    mWindow->Close();
+                }
+
+                if (event.key == fra::KeyCode::F11)
+                {
+                    mWindow->SetFullscreen(!mWindow->IsFullscreen());
+                }
+
+                if (event.key == fra::KeyCode::F6)
+                {
+                    if (!mProfilingStarted)
+                    {
+                        mScene->StartProfiling();
+                        mProfilingStarted = true;
+                    }
+                    else
+                    {
+                        mScene->EndProfiling();
+                        mProfilingStarted = false;
+                    }
                 }
             });
     }
@@ -30,6 +52,9 @@ class InputSystem final : public fr::System
   private:
     friend class SpaceApp;
 
-    std::shared_ptr<fra::Renderer> mRenderer;
-    std::shared_ptr<fra::Window>   mWindow;
+    bool mMouseGrab        = false;
+    bool mProfilingStarted = false;
+
+    Ref<fra::Renderer> mRenderer;
+    Ref<fra::Window>   mWindow;
 };

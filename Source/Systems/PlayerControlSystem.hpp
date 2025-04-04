@@ -6,11 +6,12 @@
 class PlayerControlSystem final : public fr::System
 {
   public:
-    PlayerControlSystem(const std::shared_ptr<fr::Scene>& scene, const std::shared_ptr<fra::EventManager>& eventManger);
+    PlayerControlSystem(const Ref<fr::Scene>&         scene,
+                        const Ref<fra::EventManager>& eventManger);
 
     void PostUpdate(float deltaTime) override;
 
   private:
     fr::Entity mPlayer;
-    float mYawTorque;
+    float      mYawTorque;
 };

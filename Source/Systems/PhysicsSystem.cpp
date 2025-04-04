@@ -10,8 +10,7 @@
 #include <Events/ApplyTorqueEvent.hpp>
 #include <Events/CollisionEvent.hpp>
 
-PhysicsSystem::PhysicsSystem(const std::shared_ptr<fr::Scene>& scene) :
-    System(scene)
+PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
 {
     mScene->AddEventListener<CollisionEvent>(
         [&](const CollisionEvent collisionEvent) {

@@ -5,7 +5,7 @@
 class PhysicsSystem final : public fr::System
 {
   public:
-    explicit PhysicsSystem(const std::shared_ptr<fr::Scene>& scene);
+    explicit PhysicsSystem(const Ref<fr::Scene>& scene);
 
     ~PhysicsSystem() override = default;
 

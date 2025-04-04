@@ -5,10 +5,7 @@
 class MovementSystem final : public fr::System
 {
   public:
-    explicit MovementSystem(const std::shared_ptr<fr::Scene>& scene) :
-        System(scene)
-    {
-    }
+    explicit MovementSystem(const Ref<fr::Scene>& scene) : System(scene) {}
 
     ~MovementSystem() override = default;
 

@@ -300,12 +300,12 @@ void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData) const
     }
 }
 
-void Octree::Draw(const std::shared_ptr<fra::Renderer>& renderer,
-                  const std::shared_ptr<fra::MeshPool>& meshPool,
-                  const std::vector<std::uint32_t>&     meshIds) const
+void Octree::Draw(const Ref<fra::Renderer>&         renderer,
+                  const Ref<fra::MeshPool>&         meshPool,
+                  const std::vector<std::uint32_t>& meshIds) const
 {
-    static std::shared_ptr<fra::Buffer> instanceBuffer = nullptr;
-    auto                                instanceData = std::vector<glm::mat4>();
+    static Ref<fra::Buffer> instanceBuffer = nullptr;
+    auto                    instanceData   = std::vector<glm::mat4>();
 
     PushInstanceData(instanceData);
 

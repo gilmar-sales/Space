@@ -8,9 +8,9 @@
 class PlayerCameraSystem final : public fr::System
 {
   public:
-    PlayerCameraSystem(const std::shared_ptr<fr::Scene>&     scene,
-                       const std::shared_ptr<fra::Renderer>& renderer,
-                       const std::shared_ptr<fra::Window>&   window) :
+    PlayerCameraSystem(const Ref<fr::Scene>&     scene,
+                       const Ref<fra::Renderer>& renderer,
+                       const Ref<fra::Window>&   window) :
         System(scene), mRenderer(renderer), mWindow(window)
     {
         mPlayer = mScene->FindUnique<PlayerComponent>();
@@ -19,7 +19,7 @@ class PlayerCameraSystem final : public fr::System
     void PostUpdate(float deltaTime) override;
 
   private:
-    std::shared_ptr<fra::Renderer> mRenderer;
-    std::shared_ptr<fra::Window>   mWindow;
-    fr::Entity                     mPlayer;
+    Ref<fra::Renderer> mRenderer;
+    Ref<fra::Window>   mWindow;
+    fr::Entity         mPlayer;
 };

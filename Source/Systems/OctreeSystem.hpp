@@ -9,7 +9,7 @@
 class OctreeSystem final : public fr::System
 {
   public:
-    explicit OctreeSystem(const std::shared_ptr<fr::Scene>& scene) :
+    explicit OctreeSystem(const Ref<fr::Scene>& scene) :
         System(scene), mOctree(nullptr), mChangedEntities(1000)
     {
         mScene->AddEventListener<TransformChangeEvent>(
@@ -22,13 +22,13 @@ class OctreeSystem final : public fr::System
 
     void PreUpdate(float deltaTime) override;
 
-    std::shared_ptr<Octree>          GetOctree() const { return mOctree; }
+    Ref<Octree>                      GetOctree() const { return mOctree; }
     const fr::SparseSet<fr::Entity>& GetChangedEntities() const
     {
         return mChangedEntities;
     }
 
   private:
-    std::shared_ptr<Octree>   mOctree;
+    Ref<Octree>               mOctree;
     fr::SparseSet<fr::Entity> mChangedEntities;
 };

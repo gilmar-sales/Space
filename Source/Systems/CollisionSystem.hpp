@@ -10,10 +10,10 @@
 class CollisionSystem final : public fr::System
 {
   public:
-    CollisionSystem(const std::shared_ptr<fr::Scene>&     scene,
-                    const std::shared_ptr<fra::Renderer>& renderer,
-                    const std::shared_ptr<fra::MeshPool>& meshPool,
-                    const std::shared_ptr<OctreeSystem>&  octreeSystem) :
+    CollisionSystem(const Ref<fr::Scene>&     scene,
+                    const Ref<fra::Renderer>& renderer,
+                    const Ref<fra::MeshPool>& meshPool,
+                    const Ref<OctreeSystem>&  octreeSystem) :
         System(scene), mRenderer(renderer), mMeshPool(meshPool),
         mOctreeSystem(octreeSystem), mChangedEntities(1000)
     {
@@ -34,7 +34,7 @@ class CollisionSystem final : public fr::System
     std::vector<std::uint32_t> mSphereModel;
     std::vector<std::uint32_t> mCubeModel;
 
-    std::shared_ptr<fra::Renderer> mRenderer;
-    std::shared_ptr<fra::MeshPool> mMeshPool;
-    std::shared_ptr<OctreeSystem>  mOctreeSystem;
+    Ref<fra::Renderer> mRenderer;
+    Ref<fra::MeshPool> mMeshPool;
+    Ref<OctreeSystem>  mOctreeSystem;
 };

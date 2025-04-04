@@ -5,5 +5,5 @@
 
 struct OctreeFinishedEvent : fr::Event
 {
-    std::shared_ptr<Octree> octree;
+    Ref<Octree> octree;
 };

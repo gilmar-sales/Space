@@ -16,11 +16,11 @@ struct InstanceDraw
 class RenderSystem final : public fr::System
 {
   public:
-    RenderSystem(const std::shared_ptr<fr::Scene>&         scene,
-                 const std::shared_ptr<fra::Renderer>&     renderer,
-                 const std::shared_ptr<fra::MeshPool>&     meshPool,
-                 const std::shared_ptr<fra::MaterialPool>& materialPool,
-                 const std::shared_ptr<OctreeSystem>&      octreeSystem);
+    RenderSystem(const Ref<fr::Scene>&         scene,
+                 const Ref<fra::Renderer>&     renderer,
+                 const Ref<fra::MeshPool>&     meshPool,
+                 const Ref<fra::MaterialPool>& materialPool,
+                 const Ref<OctreeSystem>&      octreeSystem);
 
     void PostUpdate(float dt) override;
 
@@ -30,10 +30,10 @@ class RenderSystem final : public fr::System
     std::vector<Particle>  mRenderables;
     std::vector<glm::mat4> mMatrices;
 
-    std::shared_ptr<fra::Renderer>     mRenderer;
-    std::shared_ptr<fra::MaterialPool> mMaterialPool;
-    std::shared_ptr<fra::MeshPool>     mMeshPool;
-    std::shared_ptr<OctreeSystem>      mOctreeSystem;
+    Ref<fra::Renderer>     mRenderer;
+    Ref<fra::MaterialPool> mMaterialPool;
+    Ref<fra::MeshPool>     mMeshPool;
+    Ref<OctreeSystem>      mOctreeSystem;
 
-    std::shared_ptr<fra::Buffer> mInstanceMatrixBuffers;
+    Ref<fra::Buffer> mInstanceMatrixBuffers;
 };

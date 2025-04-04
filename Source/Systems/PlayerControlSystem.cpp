@@ -8,8 +8,7 @@
 #include <Events/MouseMoveEvent.hpp>
 
 PlayerControlSystem::PlayerControlSystem(
-    const std::shared_ptr<fr::Scene>&         scene,
-    const std::shared_ptr<fra::EventManager>& eventManger) :
+    const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger) :
     System(scene), mPlayer(), mYawTorque()
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();

@@ -43,9 +43,9 @@ class Octree
     void Query(const Frustum& frustum, std::vector<Particle>& found);
     bool IsInsideFrustum(const Frustum& frustum) const;
 
-    void Draw(const std::shared_ptr<fra::Renderer>& renderer,
-              const std::shared_ptr<fra::MeshPool>& meshPool,
-              const std::vector<std::uint32_t>&     meshIds) const;
+    void Draw(const Ref<fra::Renderer>&         renderer,
+              const Ref<fra::MeshPool>&         meshPool,
+              const std::vector<std::uint32_t>& meshIds) const;
     void PushInstanceData(std::vector<glm::mat4>& instanceData) const;
 
   private:
@@ -59,13 +59,13 @@ class Octree
     float                 mHalfRange;
     std::vector<Particle> mElements;
 
-    std::shared_ptr<Octree> mNearTopLeft;
-    std::shared_ptr<Octree> mNearTopRight;
-    std::shared_ptr<Octree> mNearBotLeft;
-    std::shared_ptr<Octree> mNearBotRight;
+    Ref<Octree> mNearTopLeft;
+    Ref<Octree> mNearTopRight;
+    Ref<Octree> mNearBotLeft;
+    Ref<Octree> mNearBotRight;
 
-    std::shared_ptr<Octree> mFarTopLeft;
-    std::shared_ptr<Octree> mFarTopRight;
-    std::shared_ptr<Octree> mFarBotLeft;
-    std::shared_ptr<Octree> mFarBotRight;
+    Ref<Octree> mFarTopLeft;
+    Ref<Octree> mFarTopRight;
+    Ref<Octree> mFarBotLeft;
+    Ref<Octree> mFarBotRight;
 };

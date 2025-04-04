@@ -6,16 +6,15 @@
 class SpawnSystem final : public fr::System
 {
   public:
-    explicit SpawnSystem(
-        const std::shared_ptr<fr::Scene>&         scene,
-        const std::shared_ptr<fra::MeshPool>&     meshPool,
-        const std::shared_ptr<fra::TexturePool>&  texturePool,
-        const std::shared_ptr<fra::MaterialPool>& materialPool);
+    explicit SpawnSystem(const Ref<fr::Scene>&         scene,
+                         const Ref<fra::MeshPool>&     meshPool,
+                         const Ref<fra::TexturePool>&  texturePool,
+                         const Ref<fra::MaterialPool>& materialPool);
 
   private:
-    std::shared_ptr<fra::MeshPool>     mMeshPool;
-    std::shared_ptr<fra::TexturePool>  mTexturePool;
-    std::shared_ptr<fra::MaterialPool> mMaterialPool;
+    Ref<fra::MeshPool>     mMeshPool;
+    Ref<fra::TexturePool>  mTexturePool;
+    Ref<fra::MaterialPool> mMaterialPool;
 
     std::uint32_t mBlankTexture;
     std::uint32_t mBlankMaterial;

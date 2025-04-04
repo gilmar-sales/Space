@@ -25,11 +25,10 @@ static glm::vec3 randomPosition(int min, int max)
                      randomNumber(min, max));
 }
 
-SpawnSystem::SpawnSystem(
-    const std::shared_ptr<fr::Scene>&         scene,
-    const std::shared_ptr<fra::MeshPool>&     meshPool,
-    const std::shared_ptr<fra::TexturePool>&  texturePool,
-    const std::shared_ptr<fra::MaterialPool>& materialPool) :
+SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
+                         const Ref<fra::MeshPool>&     meshPool,
+                         const Ref<fra::TexturePool>&  texturePool,
+                         const Ref<fra::MaterialPool>& materialPool) :
     System(scene), mMeshPool(meshPool), mTexturePool(texturePool),
     mMaterialPool(materialPool)
 {
