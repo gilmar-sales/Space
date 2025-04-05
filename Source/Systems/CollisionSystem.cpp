@@ -6,7 +6,7 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-void CollisionSystem::Update(float deltaTime)
+void CollisionSystem::FixedUpdate(float deltaTime)
 {
     auto octree = mOctreeSystem->GetOctree();
 

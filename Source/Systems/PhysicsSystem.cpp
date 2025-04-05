@@ -105,7 +105,7 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
             scene->SendEvent(TransformChangeEvent { .entity = entity });
         });
 }
-void PhysicsSystem::Update(float deltaTime)
+void PhysicsSystem::FixedUpdate(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent>(
         [scene = mScene,

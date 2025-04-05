@@ -7,7 +7,7 @@
 #include <Components/SpaceShipControlComponent.hpp>
 #include <Events/ApplyTorqueEvent.hpp>
 
-void MovementSystem::Update(float deltaTime)
+void MovementSystem::FixedUpdate(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent,
                          SpaceShipControlComponent>(
@@ -18,10 +18,11 @@ void MovementSystem::Update(float deltaTime)
             if (spaceShipControl.boost != 0)
             {
                 manager->SendEvent(ApplyForceEvent {
-                    .target     = entity,
-                    .direction  = transform.GetForwardDirection(),
-                    .magnetiude = spaceShipControl.boost * spaceShipControl.boostFactor,
-                    .deltaTime  = deltaTime });
+                    .target    = entity,
+                    .direction = transform.GetForwardDirection(),
+                    .magnetiude =
+                        spaceShipControl.boost * spaceShipControl.boostFactor,
+                    .deltaTime = deltaTime });
             }
 
             if (spaceShipControl.pitchTorque != 0)

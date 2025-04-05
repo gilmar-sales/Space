@@ -13,5 +13,4 @@ class PlayerControlSystem final : public fr::System
 
   private:
     fr::Entity mPlayer;
-    float      mYawTorque;
 };

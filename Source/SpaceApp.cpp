@@ -4,8 +4,6 @@
 
 void SpaceApp::StartUp()
 {
-    mScene->StartProfiling();
-
     SDL_AddGamepadMappingsFromFile("./Resources/gamecontrollerdb.txt");
 
     auto gamepadCount = 0;
@@ -27,5 +25,4 @@ void SpaceApp::Update()
 
 void SpaceApp::ShutDown()
 {
-    mScene->EndProfiling();
 }

@@ -1,6 +1,7 @@
 #include "RenderSystem.hpp"
 
 #include "Components/ModelComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 #include "Components/AlwaysRenderedComponent.hpp"
@@ -8,49 +9,100 @@
 
 RenderSystem::RenderSystem(const Ref<fr::Scene>&         scene,
                            const Ref<fra::Renderer>&     renderer,
+                           const Ref<fra::Window>&       window,
                            const Ref<fra::MeshPool>&     meshPool,
                            const Ref<fra::MaterialPool>& materialPool,
                            const Ref<OctreeSystem>&      octreeSystem) :
-    System(scene), mRenderer(renderer), mMeshPool(meshPool),
+    System(scene), mRenderer(renderer), mWindow(window), mMeshPool(meshPool),
     mMaterialPool(materialPool), mOctreeSystem(octreeSystem), mMatrices({}),
-    mRenderables({})
+    mRenderables({}), mInstanceMatrixBuffers({})
 {
-    mRenderables.reserve(10000);
-    mMatrices.reserve(10000);
+    mPlayer = mScene->FindUnique<PlayerComponent>();
 
-    mInstanceMatrixBuffers =
-        mRenderer->GetBufferBuilder()
-            .SetData(mMatrices.data())
-            .SetSize(sizeof(glm::mat4) * mMatrices.capacity())
-            .SetUsage(fra::BufferUsage::Instance)
-            .Build();
+    mRenderables.resize(mRenderer->GetFrameCount());
+    mMatrices.resize(mRenderer->GetFrameCount());
+    mInstanceMatrixBuffers.resize(mRenderer->GetFrameCount());
+
+    for (int frameIndex = 0; frameIndex < mRenderer->GetFrameCount();
+         ++frameIndex)
+    {
+        mRenderables[frameIndex].reserve(10000);
+        mMatrices[frameIndex].reserve(10000);
+        mInstanceMatrixBuffers[frameIndex] =
+            mRenderer->GetBufferBuilder()
+                .SetData(mMatrices[frameIndex].data())
+                .SetSize(sizeof(glm::mat4) * 10000)
+                .SetUsage(fra::BufferUsage::Instance)
+                .Build();
+    }
 }
 
 void RenderSystem::PostUpdate(float dt)
 {
-    mScene->StartTraceProfiling("Clear Buffers");
-    mRenderables.clear();
-    mMatrices.clear();
-    mScene->EndTraceProfiling();
+    BeginFrame();
 
-    mScene->StartTraceProfiling("Begin Frame");
+    DrawInstanced();
+
+    EndFrame();
+}
+
+void RenderSystem::BeginFrame() const
+{
+
     mRenderer->BeginFrame();
+
+    const auto& transform = mScene->GetComponent<TransformComponent>(mPlayer);
+
+    const auto cameraPosition =
+        transform.position - transform.GetForwardDirection() * 8.0f -
+        transform.GetUpDirection() * 5.0f;
+
+    const auto cameraForward = glm::normalize(
+        transform.position + transform.GetForwardDirection() * 15.0f -
+        cameraPosition);
+
+    auto projectionUniformBuffer = fra::ProjectionUniformBuffer {
+        .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward,
+                            transform.GetUpDirection()),
+        .projection = glm::perspective(
+            glm::radians(75.0f),
+            static_cast<float>(mWindow->GetWidth()) /
+                static_cast<float>(mWindow->GetHeight()),
+            0.1f, mRenderer->GetDrawDistance()),
+        .ambientLight =
+            glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.1f)
+    };
+
+    mRenderer->UpdateProjection(projectionUniformBuffer);
+}
+
+void RenderSystem::DrawInstanced()
+{
+    auto currentFrameIndex = mRenderer->GetCurrentFrameIndex();
+
+    auto& renderables         = mRenderables[currentFrameIndex];
+    auto& matrices            = mMatrices[currentFrameIndex];
+    auto& instaceMatrixBuffer = mInstanceMatrixBuffers[currentFrameIndex];
+
+    mScene->StartTraceProfiling("Clear Buffers");
+    renderables.clear();
+    matrices.clear();
     mScene->EndTraceProfiling();
 
     auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
     mScene->StartTraceProfiling("Create Frustum");
     const auto frustum =
-        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 10000.0f) * view);
+        Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 15000.0f) * view);
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Query renderables");
-    mOctreeSystem->GetOctree()->Query(frustum, mRenderables);
+    mOctreeSystem->GetOctree()->Query(frustum, renderables);
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Sort Renderables");
     std::ranges::sort(
-        mRenderables,
+        renderables,
         [this](const Particle& a, const Particle& b) {
             return mScene->GetComponent<ModelComponent>(a.entity).meshes <
                        mScene->GetComponent<ModelComponent>(b.entity).meshes &&
@@ -65,23 +117,23 @@ void RenderSystem::PostUpdate(float dt)
                 AlwaysRenderedComponent& alwaysRendered,
                 ModelComponent&          model,
                 TransformComponent&      transform) {
-                mRenderables.push_back(
+                renderables.push_back(
                     { .entity = entity, .transform = &transform });
             });
 
-    if (mRenderables.size() > mMatrices.capacity())
-        mMatrices.reserve(mRenderables.size());
+    if (renderables.size() > matrices.capacity())
+        matrices.reserve(renderables.size());
 
     mScene->StartTraceProfiling("Calculate matrizes");
 
-    for (const auto particle : mRenderables)
+    for (const auto particle : renderables)
     {
-        mMatrices.emplace_back(particle.transform->GetModel());
+        matrices.emplace_back(particle.transform->GetModel());
     }
 
     mScene->EndTraceProfiling();
 
-    if (mMatrices.empty())
+    if (matrices.empty())
     {
         mScene->StartTraceProfiling("Render");
         mRenderer->EndFrame();
@@ -90,18 +142,18 @@ void RenderSystem::PostUpdate(float dt)
         return;
     }
 
-    if (mInstanceMatrixBuffers->GetSize() < mMatrices.capacity())
-        mInstanceMatrixBuffers =
+    if (instaceMatrixBuffer->GetSize() < matrices.capacity())
+        instaceMatrixBuffer =
             mRenderer->GetBufferBuilder()
-                .SetData(mMatrices.data())
-                .SetSize(sizeof(glm::mat4) * mMatrices.capacity())
+                .SetData(matrices.data())
+                .SetSize(sizeof(glm::mat4) * matrices.capacity())
                 .SetUsage(fra::BufferUsage::Instance)
                 .Build();
 
-    mInstanceMatrixBuffers->Copy(mMatrices.data(),
-                                 sizeof(glm::mat4) * mMatrices.size());
+    instaceMatrixBuffer->Copy(matrices.data(),
+                              sizeof(glm::mat4) * matrices.size());
 
-    mRenderer->BindBuffer(mInstanceMatrixBuffers);
+    mRenderer->BindBuffer(instaceMatrixBuffer);
 
     auto instanceDraws = std::vector<InstanceDraw>();
 
@@ -113,9 +165,9 @@ void RenderSystem::PostUpdate(float dt)
                        .meshes        = nullptr,
                        .material      = 9 };
 
-    for (int i = 0; i < mRenderables.size(); i++)
+    for (int i = 0; i < renderables.size(); i++)
     {
-        const auto& particle = mRenderables[i];
+        const auto& particle = renderables[i];
         const auto& model =
             mScene->GetComponent<ModelComponent>(particle.entity);
 
@@ -130,7 +182,7 @@ void RenderSystem::PostUpdate(float dt)
             currentInstance.index         = i;
         }
 
-        if (i == mRenderables.size() - 1)
+        if (i == renderables.size() - 1)
         {
             if (!currentInstance.meshes)
             {
@@ -152,21 +204,22 @@ void RenderSystem::PostUpdate(float dt)
     mScene->EndTraceProfiling();
 
     mScene->StartTraceProfiling("Draw instance sequences");
-    for (const auto& draw : instanceDraws)
+    for (const auto& instanceDraw : instanceDraws)
     {
-        mMaterialPool->Bind(draw.material);
+        mMaterialPool->Bind(instanceDraw.material);
 
-        if (draw.meshes != nullptr)
-            for (const auto& meshId : *draw.meshes)
+        if (instanceDraw.meshes != nullptr)
+            for (const auto& meshId : *instanceDraw.meshes)
             {
                 mMeshPool->DrawInstanced(meshId,
-                                         draw.instanceCount,
-                                         draw.index);
+                                         instanceDraw.instanceCount,
+                                         instanceDraw.index);
             }
     }
     mScene->EndTraceProfiling();
+}
 
-    mScene->StartTraceProfiling("Render");
+void RenderSystem::EndFrame() const
+{
     mRenderer->EndFrame();
-    mScene->EndTraceProfiling();
 }

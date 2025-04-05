@@ -14,7 +14,6 @@
 #include "Systems/InputSystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
-#include "Systems/PlayerCameraSystem.hpp"
 #include "Systems/PlayerControlSystem.hpp"
 #include "Systems/RenderSystem.hpp"
 #include "Systems/SpawnSystem.hpp"
@@ -29,11 +28,15 @@ int main(int argc, char const* argv[])
             options.drawDistance = 1000'000.0f;
             options.sampleCount  = 8;
             options.vSync        = false;
+            options.fullscreen   = false;
         });
 
     applicationBuilder.GetServiceCollection()->AddSingleton<fr::Scene>(
         [&](skr::ServiceProvider& serviceProvider) {
             return fr::SceneBuilder(applicationBuilder.GetServiceCollection())
+                .WithOptions([](fr::FreyrOptionsBuilder& options) {
+                    options.SetMaxEntities(512 * 1024);
+                })
                 .AddComponent<ModelComponent>()
                 .AddComponent<TransformComponent>()
                 .AddComponent<SphereColliderComponent>()
@@ -44,7 +47,6 @@ int main(int argc, char const* argv[])
                 .AddSystem<InputSystem>()
                 .AddSystem<OctreeSystem>()
                 .AddSystem<PlayerControlSystem>()
-                .AddSystem<PlayerCameraSystem>()
                 .AddSystem<CollisionSystem>()
                 .AddSystem<MovementSystem>()
                 .AddSystem<PhysicsSystem>()

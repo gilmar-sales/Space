@@ -9,7 +9,7 @@
 
 PlayerControlSystem::PlayerControlSystem(
     const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger) :
-    System(scene), mPlayer(), mYawTorque()
+    System(scene), mPlayer()
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();
 
@@ -20,7 +20,7 @@ PlayerControlSystem::PlayerControlSystem(
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost = 10000.0f;
+                    spaceShipControl.boost = 10'000.0f;
                     break;
                 case fra::KeyCode::A:
                     spaceShipControl.rollTorque = -10000;
@@ -65,7 +65,7 @@ PlayerControlSystem::PlayerControlSystem(
 
             switch (gamepadButtonPressedEvent.button)
             {
-                case fra::GamepadButton::GamepadButtonSouth: {
+                case fra::GamepadButton::GamepadButtonLeftShoulder: {
                     spaceShipControl.boostFactor = 10.0f;
                     break;
                 }
@@ -129,8 +129,7 @@ PlayerControlSystem::PlayerControlSystem(
                 .pitchTorque = mouseMoveEvent.deltaY * 180.0f;
         });
 }
+
 void PlayerControlSystem::PostUpdate(float deltaTime)
 {
-    // mScene->GetComponent<SpaceShipControlComponent>(mPlayer).rollTorque  = 0;
-    // mScene->GetComponent<SpaceShipControlComponent>(mPlayer).pitchTorque = 0;
 }

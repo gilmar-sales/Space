@@ -25,10 +25,11 @@ class CollisionSystem final : public fr::System
 
     ~CollisionSystem() override = default;
 
-    void Update(float deltaTime) override;
+    void FixedUpdate(float deltaTime) override;
 
   private:
     friend class SpaceApp;
+
     fr::SparseSet<fr::Entity> mChangedEntities;
 
     std::vector<std::uint32_t> mSphereModel;
