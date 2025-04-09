@@ -70,7 +70,7 @@ void RenderSystem::BeginFrame() const
                 static_cast<float>(mWindow->GetHeight()),
             0.1f, mRenderer->GetDrawDistance()),
         .ambientLight =
-            glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.1f)
+            glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.5f)
     };
 
     mRenderer->UpdateProjection(projectionUniformBuffer);

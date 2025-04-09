@@ -20,15 +20,15 @@
 
 int main(int argc, char const* argv[])
 {
-    auto applicationBuilder =
-        fra::ApplicationBuilder().WithOptions([](fra::FreyaOptions& options) {
-            options.title        = "Space";
-            options.width        = 1920;
-            options.height       = 1080;
-            options.drawDistance = 1000'000.0f;
-            options.sampleCount  = 8;
-            options.vSync        = false;
-            options.fullscreen   = false;
+    auto applicationBuilder = fra::ApplicationBuilder().WithOptions(
+        [](fra::FreyaOptionsBuilder& options) {
+            options.SetTitle("Space")
+                .SetWidth(1920)
+                .SetHeight(1080)
+                .SetDrawDistance(1000'000.0f)
+                .SetSampleCount(8)
+                .SetVSync(false)
+                .SetFullscreen(false);
         });
 
     applicationBuilder.GetServiceCollection()->AddSingleton<fr::Scene>(
