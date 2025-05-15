@@ -1,6 +1,5 @@
 #pragma once
 
-#include <Freya/Builders/ApplicationBuilder.hpp>
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
