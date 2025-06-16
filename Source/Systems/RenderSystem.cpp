@@ -84,23 +84,23 @@ void RenderSystem::DrawInstanced()
     auto& matrices            = mMatrices[currentFrameIndex];
     auto& instaceMatrixBuffer = mInstanceMatrixBuffers[currentFrameIndex];
 
-    mScene->StartTraceProfiling("Clear Buffers");
+    mScene->BeginTrace("Clear Buffers");
     renderables.clear();
     matrices.clear();
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
     auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
 
-    mScene->StartTraceProfiling("Create Frustum");
+    mScene->BeginTrace("Create Frustum");
     const auto frustum =
         Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 15000.0f) * view);
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
-    mScene->StartTraceProfiling("Query renderables");
+    mScene->BeginTrace("Query renderables");
     mOctreeSystem->GetOctree()->Query(frustum, renderables);
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
-    mScene->StartTraceProfiling("Sort Renderables");
+    mScene->BeginTrace("Sort Renderables");
     std::ranges::sort(
         renderables,
         [this](const Particle& a, const Particle& b) {
@@ -109,7 +109,7 @@ void RenderSystem::DrawInstanced()
                    mScene->GetComponent<ModelComponent>(a.entity).material <
                        mScene->GetComponent<ModelComponent>(b.entity).material;
         });
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
     mScene
         ->ForEach<AlwaysRenderedComponent, ModelComponent, TransformComponent>(
@@ -124,20 +124,20 @@ void RenderSystem::DrawInstanced()
     if (renderables.size() > matrices.capacity())
         matrices.reserve(renderables.size());
 
-    mScene->StartTraceProfiling("Calculate matrizes");
+    mScene->BeginTrace("Calculate matrizes");
 
     for (const auto particle : renderables)
     {
         matrices.emplace_back(particle.transform->GetModel());
     }
 
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
     if (matrices.empty())
     {
-        mScene->StartTraceProfiling("Render");
+        mScene->BeginTrace("Render");
         mRenderer->EndFrame();
-        mScene->EndTraceProfiling();
+        mScene->EndTrace();
 
         return;
     }
@@ -157,7 +157,7 @@ void RenderSystem::DrawInstanced()
 
     auto instanceDraws = std::vector<InstanceDraw>();
 
-    mScene->StartTraceProfiling("Calculate instance sequence");
+    mScene->BeginTrace("Calculate instance sequence");
 
     auto currentInstance =
         InstanceDraw { .index         = 0,
@@ -201,9 +201,9 @@ void RenderSystem::DrawInstanced()
             currentInstance.instanceCount += 1;
         }
     }
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 
-    mScene->StartTraceProfiling("Draw instance sequences");
+    mScene->BeginTrace("Draw instance sequences");
     for (const auto& instanceDraw : instanceDraws)
     {
         mMaterialPool->Bind(instanceDraw.material);
@@ -216,7 +216,7 @@ void RenderSystem::DrawInstanced()
                                          instanceDraw.index);
             }
     }
-    mScene->EndTraceProfiling();
+    mScene->EndTrace();
 }
 
 void RenderSystem::EndFrame() const

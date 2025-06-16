@@ -35,7 +35,7 @@ class InputSystem final : public fr::System
                 {
                     if (!mProfilingStarted)
                     {
-                        mScene->StartProfiling();
+                        mScene->BeginProfiling();
                         mProfilingStarted = true;
                     }
                     else
