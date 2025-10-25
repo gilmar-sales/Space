@@ -1,6 +1,7 @@
 # Space
 
 A game built on the foundations of Norse mythology-inspired C++ libraries.
+![Space in game](./Resources/Images/in-game.png)
 
 ## Overview
 
