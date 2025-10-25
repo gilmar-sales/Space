@@ -6,7 +6,7 @@ include(FetchContent)
 
 FetchContent_Declare(
   freyr
-  GIT_REPOSITORY "git@github.com:gilmar-sales/Freyr.git"
+  GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
   GIT_TAG        "v0.12.4"
 )
 FetchContent_MakeAvailable(freyr)
@@ -19,7 +19,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(freya)
 
 project(
-        SpaceAiWar
+        Space
         LANGUAGES C CXX
 )
 
@@ -27,29 +27,29 @@ cmake_policy(SET CMP0002 NEW)
 
 file(GLOB_RECURSE SPACE_SRC Source/**.cpp Source/**.hpp)
 
-add_executable(SpaceAiWar ${SPACE_SRC})
+add_executable(Space ${SPACE_SRC})
 
-target_compile_features(SpaceAiWar PUBLIC cxx_std_23)
+target_compile_features(Space PUBLIC cxx_std_23)
 
-target_link_libraries(SpaceAiWar freyr::freyr Freya::Freya)
+target_link_libraries(Space freyr::freyr Freya::Freya)
 
-target_include_directories(SpaceAiWar PUBLIC Source)
+target_include_directories(Space PUBLIC Source)
 
-target_precompile_headers(SpaceAiWar PUBLIC
+target_precompile_headers(Space PUBLIC
         <memory>
 )
 if (WIN32)
   if (MSVC)
-  target_compile_options(SpaceAiWar PUBLIC "/bigobj")
+  target_compile_options(Space PUBLIC "/bigobj")
   else()
-  target_compile_options(SpaceAiWar PUBLIC "-Wa,-mbig-obj")
-  target_compile_options(SpaceAiWar PRIVATE "-Os")
+  target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
+  target_compile_options(Space PRIVATE "-Os")
   endif()
 endif (WIN32)
 
 if (MSVC)
-    target_compile_options(SpaceAiWar PUBLIC "/ZI" "/MP")
-    target_link_options(SpaceAiWar PUBLIC "/INCREMENTAL")
+    target_compile_options(Space PUBLIC "/ZI" "/MP")
+    target_link_options(Space PUBLIC "/INCREMENTAL")
 endif ()
 
 file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})
