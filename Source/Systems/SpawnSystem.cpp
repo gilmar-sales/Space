@@ -222,7 +222,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 110.0f })
         .WithDefault(SpaceShipControlComponent { .boost = 10'000.0f })
-        .WithEntities(100'000)
+        .WithEntities(50'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
