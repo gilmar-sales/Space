@@ -3,6 +3,7 @@
 #include <random>
 
 #include "Components/AlwaysRenderedComponent.hpp"
+#include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -198,7 +199,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
                 rigidBody = { .mass        = transform.scale.x * 5000.0f,
                               .isKinematic = true };
             })
-        .WithEntities(50'000)
+        .WithEntities(1'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
@@ -212,6 +213,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
             SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithDefault(RigidBodyComponent { .mass = 110.0f })
         .WithDefault(SpaceShipControlComponent {})
+        .WithDefault(LaserGunComponent{.fireRate = 0.1f})
         .WithEntities(1)
         .Build();
 
@@ -222,11 +224,11 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithDefault(SphereColliderComponent {})
         .WithDefault(RigidBodyComponent { .mass = 110.0f })
         .WithDefault(SpaceShipControlComponent { .boost = 10'000.0f })
-        .WithEntities(50'000)
+        .WithEntities(1'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-100'000, 100'000),
+                transform = { .position = randomPosition(-15'000, 15'000),
                               .rotation = glm::vec3(0),
                               .scale    = glm::vec3(3) };
 

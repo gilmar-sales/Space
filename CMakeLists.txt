@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
   freyr
   GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-  GIT_TAG        "v0.14.2"
+  GIT_TAG        "v0.14.4"
 )
 FetchContent_MakeAvailable(freyr)
 
@@ -27,7 +27,9 @@ cmake_policy(SET CMP0002 NEW)
 
 file(GLOB_RECURSE SPACE_SRC Source/**.cpp Source/**.hpp)
 
-add_executable(Space ${SPACE_SRC})
+add_executable(Space ${SPACE_SRC}
+        Source/Systems/DecaySystem.hpp
+        Source/Components/DecayComponent.hpp)
 
 target_compile_features(Space PUBLIC cxx_std_23)
 

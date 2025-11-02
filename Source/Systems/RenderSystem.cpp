@@ -48,7 +48,6 @@ void RenderSystem::PostUpdate(float dt)
 
 void RenderSystem::BeginFrame() const
 {
-
     mRenderer->BeginFrame();
 
     const auto& transform = mScene->GetComponent<TransformComponent>(mPlayer);
@@ -128,7 +127,9 @@ void RenderSystem::DrawInstanced()
 
     for (const auto particle : renderables)
     {
-        matrices.emplace_back(particle.transform->GetModel());
+        matrices.emplace_back(
+            mScene->GetComponent<TransformComponent>(particle.entity)
+                .GetModel());
     }
 
     mScene->EndTrace();

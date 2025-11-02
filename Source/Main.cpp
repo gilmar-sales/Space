@@ -1,3 +1,4 @@
+#include "Components/LaserGunComponent.hpp"
 #include "SpaceApp.hpp"
 
 #include <Freya/Freya.hpp>
@@ -11,7 +12,9 @@
 #include "Components/TransformComponent.hpp"
 
 #include "Systems/CollisionSystem.hpp"
+#include "Systems/DecaySystem.hpp"
 #include "Systems/InputSystem.hpp"
+#include "Systems/LaserGunSystem.hpp"
 #include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/PlayerControlSystem.hpp"
@@ -33,10 +36,13 @@ int main(int argc, char const* argv[])
                     .AddComponent<RigidBodyComponent>()
                     .AddComponent<PlayerComponent>()
                     .AddComponent<SpaceShipControlComponent>()
+                    .AddComponent<LaserGunComponent>()
                     .AddSystem<SpawnSystem>()
+                    .AddSystem<DecaySystem>()
                     .AddSystem<InputSystem>()
                     .AddSystem<OctreeSystem>()
                     .AddSystem<PlayerControlSystem>()
+                    .AddSystem<LaserGunSystem>()
                     .AddSystem<CollisionSystem>()
                     .AddSystem<MovementSystem>()
                     .AddSystem<PhysicsSystem>()

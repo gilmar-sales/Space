@@ -11,44 +11,19 @@ class OctreeSystem final : public fr::System
 {
   public:
     explicit OctreeSystem(const Ref<fr::Scene>& scene) :
-        System(scene), mOctree(nullptr), mChangedEntities(1000)
+        System(scene), mOctree(nullptr)
     {
-        mScene->AddEventListener<TransformChangeEvent>(
-            [this](const TransformChangeEvent& e) {
-                mChangedEntities.insert(e.entity);
-            });
-
-        auto allocator = std::allocator<Octree>();
-
-        mOctree =
-            std::make_shared<Octree>(glm::vec3(0), 200'000.0f, 6, allocator);
-
-        mScene->ForEach<TransformComponent,
-                        SphereColliderComponent,
-                        RigidBodyComponent>(
-            "Build Octree",
-            [octree = mOctree](const fr::Entity         entity,
-                               TransformComponent&      transform,
-                               SphereColliderComponent& sphereCollider,
-                               RigidBodyComponent&      rigidBody) {
-                rigidBody.octree = octree->Insert(Particle {
-                    .entity         = entity,
-                    .transform      = &transform,
-                    .sphereCollider = &sphereCollider });
-            });
+        BuildOctree();
     }
 
     ~OctreeSystem() override = default;
 
     void PreFixedUpdate(float deltaTime) override;
 
-    Ref<Octree>                      GetOctree() const { return mOctree; }
-    const fr::SparseSet<fr::Entity>& GetChangedEntities() const
-    {
-        return mChangedEntities;
-    }
+    Ref<Octree> GetOctree() const { return mOctree; }
 
   private:
-    Ref<Octree>               mOctree;
-    fr::SparseSet<fr::Entity> mChangedEntities;
+    void BuildOctree();
+
+    Ref<Octree> mOctree;
 };

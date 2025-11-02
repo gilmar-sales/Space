@@ -15,12 +15,8 @@ class CollisionSystem final : public fr::System
                     const Ref<fra::MeshPool>& meshPool,
                     const Ref<OctreeSystem>&  octreeSystem) :
         System(scene), mRenderer(renderer), mMeshPool(meshPool),
-        mOctreeSystem(octreeSystem), mChangedEntities(1000)
+        mOctreeSystem(octreeSystem)
     {
-        mScene->AddEventListener<TransformChangeEvent>(
-            [this](const TransformChangeEvent& e) {
-                mChangedEntities.insert(e.entity);
-            });
     }
 
     ~CollisionSystem() override = default;
@@ -29,8 +25,6 @@ class CollisionSystem final : public fr::System
 
   private:
     friend class SpaceApp;
-
-    fr::SparseSet<fr::Entity> mChangedEntities;
 
     std::vector<std::uint32_t> mSphereModel;
     std::vector<std::uint32_t> mCubeModel;

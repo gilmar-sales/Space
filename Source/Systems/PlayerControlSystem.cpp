@@ -1,5 +1,7 @@
 #include "PlayerControlSystem.hpp"
 
+#include "Components/LaserGunComponent.hpp"
+
 #include <Components/PlayerComponent.hpp>
 
 #include <Components/SpaceShipControlComponent.hpp>
@@ -12,6 +14,30 @@ PlayerControlSystem::PlayerControlSystem(
     System(scene), mPlayer()
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();
+
+    eventManger->Subscribe<fra::MouseButtonPressedEvent>(
+        [this](fra::MouseButtonPressedEvent& event) {
+            switch (event.button)
+            {
+                case fra::MouseButton::Left: {
+                    mScene->GetComponent<LaserGunComponent>(mPlayer).triggered =
+                        true;
+                    break;
+                }
+            };
+        });
+
+    eventManger->Subscribe<fra::MouseButtonReleasedEvent>(
+        [this](fra::MouseButtonReleasedEvent& event) {
+            switch (event.button)
+            {
+                case fra::MouseButton::Left: {
+                    mScene->GetComponent<LaserGunComponent>(mPlayer).triggered =
+                        false;
+                    break;
+                }
+            };
+        });
 
     eventManger->Subscribe<fra::KeyPressedEvent>(
         [this](const fra::KeyPressedEvent& keyPressedEvent) {
@@ -65,10 +91,13 @@ PlayerControlSystem::PlayerControlSystem(
 
             switch (gamepadButtonPressedEvent.button)
             {
-                case fra::GamepadButton::GamepadButtonLeftShoulder: {
+                case fra::GamepadButton::GamepadButtonSouth:
                     spaceShipControl.boostFactor = 10.0f;
                     break;
-                }
+                case fra::GamepadButton::GamepadButtonLeftShoulder:
+                    mScene->GetComponent<LaserGunComponent>(mPlayer).triggered =
+                        true;
+                    break;
                 default: {
                     break;
                 }
@@ -83,10 +112,13 @@ PlayerControlSystem::PlayerControlSystem(
 
             switch (gamepadButtonReleasedEvent.button)
             {
-                case fra::GamepadButton::GamepadButtonSouth: {
+                case fra::GamepadButton::GamepadButtonSouth:
                     spaceShipControl.boostFactor = 1.0f;
                     break;
-                }
+                case fra::GamepadButton::GamepadButtonLeftShoulder:
+                    mScene->GetComponent<LaserGunComponent>(mPlayer).triggered =
+                        false;
+                    break;
                 default: {
                     break;
                 }
