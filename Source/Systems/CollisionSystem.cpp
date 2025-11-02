@@ -17,6 +17,9 @@ void CollisionSystem::FixedUpdate(float deltaTime)
             const fr::Entity entity, TransformComponent& transform,
             SphereColliderComponent& sphereCollider,
             RigidBodyComponent&      rigidBody) {
+            if (rigidBody.isKinematic)
+                return;
+
             auto collisions = std::vector<Particle*>(0);
 
             auto particle = Particle { .entity         = entity,
