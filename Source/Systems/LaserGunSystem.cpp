@@ -8,9 +8,7 @@
 
 void LaserGunSystem::Update(float deltaTime)
 {
-    mScene->ForEachAsync<LaserGunComponent,
-                         TransformComponent,
-                         RigidBodyComponent>(
+    mScene->ForEachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent>(
         [scene          = mScene,
          octreeSystem   = mOctreeSystem,
          bulletMeshes   = &mBulletModel,
@@ -28,40 +26,32 @@ void LaserGunSystem::Update(float deltaTime)
                 }
 
                 laserGun.fireTime = 0.0f;
-                auto bullet       = scene->CreateEntity();
-                scene->AddComponent<BulletComponent>(bullet,
-                                                     { .owner = entity });
-                scene->AddComponent<TransformComponent>(
-                    bullet,
-                    { .position = transform.position +
-                                  transform.GetForwardDirection() * 6.0f,
-                      .rotation = glm::vec3(0.0),
-                      .scale    = glm::vec3(1.0) });
-                scene->AddComponent<SphereColliderComponent>(
-                    bullet,
-                    { .radius = 1.0f });
-                scene->AddComponent<ModelComponent>(
-                    bullet,
-                    { .meshes = bulletMeshes, .material = bulletMaterial });
-                scene->AddComponent(bullet,
-                                    DecayComponent { .timeToLive = 2.0f });
+                scene->CreateEntity(
+                    [scene, octreeSystem](auto bullet) {
+                        scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+                            bullet,
+                            [&](TransformComponent&      transform,
+                                SphereColliderComponent& sphereCollider,
+                                RigidBodyComponent&      rigidBody) {
+                                const auto particle = Particle { .entity         = bullet,
+                                                                 .transform      = &transform,
+                                                                 .sphereCollider = &sphereCollider };
 
-                const auto particle = Particle {
-                    .entity = bullet,
-                    .transform =
-                        &scene->GetComponent<TransformComponent>(bullet),
-                    .sphereCollider =
-                        &scene->GetComponent<SphereColliderComponent>(bullet)
-                };
-
-                auto octree = octreeSystem->GetOctree()->Insert(particle);
-                scene->AddComponent<RigidBodyComponent>(
-                    bullet,
-                    { .mass     = 0.0f,
-                      .velocity = rigidBody.velocity +
-                                  transform.GetForwardDirection() * 2000.f,
-                      .isKinematic = false,
-                      .octree      = octree });
+                                auto octree      = octreeSystem->GetOctree()->Insert(particle);
+                                rigidBody.octree = octree;
+                            });
+                    },
+                    BulletComponent { .owner = entity },
+                    TransformComponent { .position = transform.position + transform.GetForwardDirection() * 6.0f,
+                                         .rotation = glm::vec3(0.0),
+                                         .scale    = glm::vec3(1.0) },
+                    SphereColliderComponent { .radius = 1.0f },
+                    ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
+                    DecayComponent { .timeToLive = 2.0f },
+                    RigidBodyComponent { .mass        = 0.0f,
+                                         .velocity    = rigidBody.velocity + transform.GetForwardDirection() * 2000.f,
+                                         .isKinematic = false,
+                                         .octree      = nullptr });
             }
         });
 }

@@ -5,16 +5,16 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 include(FetchContent)
 
 FetchContent_Declare(
-  freyr
-  GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-  GIT_TAG        "v0.14.5"
+        freyr
+        GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
+        GIT_TAG "v0.15.0"
 )
 FetchContent_MakeAvailable(freyr)
 
 FetchContent_Declare(
-  freya
-  GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-  GIT_TAG        "v0.11.3"
+        freya
+        GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
+        GIT_TAG "v0.11.3"
 )
 FetchContent_MakeAvailable(freya)
 
@@ -41,12 +41,12 @@ target_precompile_headers(Space PUBLIC
         <memory>
 )
 if (WIN32)
-  if (MSVC)
-  target_compile_options(Space PUBLIC "/bigobj")
-  else()
-  target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
-  target_compile_options(Space PRIVATE "-Os")
-  endif()
+    if (MSVC)
+        target_compile_options(Space PUBLIC "/bigobj")
+    else ()
+        target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
+        target_compile_options(Space PRIVATE "-Os")
+    endif ()
 endif (WIN32)
 
 if (MSVC)

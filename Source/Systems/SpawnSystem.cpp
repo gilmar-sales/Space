@@ -97,11 +97,11 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(
+        .WithComponent(
             ModelComponent { .meshes = &mMoonModel, .material = mMoonMaterial })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent {})
+        .WithComponent(TransformComponent {})
+        .WithComponent(SphereColliderComponent {})
+        .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
@@ -121,14 +121,14 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(
+        .WithComponent(
             ModelComponent { .meshes = &mJupiter, .material = mSunMaterial })
-        .WithDefault(TransformComponent { .position = glm::vec3(0),
+        .WithComponent(TransformComponent { .position = glm::vec3(0),
                                           .rotation = glm::vec3(0.0),
                                           .scale    = glm::vec3(200) })
-        .WithDefault(
+        .WithComponent(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
-        .WithDefault(RigidBodyComponent {})
+        .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
@@ -144,52 +144,24 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
                 rigidBody = { .mass        = transform.scale.x * 5000.0f,
                               .isKinematic = true };
             })
-        .WithEntities(10'000)
+        .WithEntities(15'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes   = &mRock1Model,
+        .WithComponent(ModelComponent { .meshes   = &mRock1Model,
                                       .material = mRock1Material })
-        .WithDefault(TransformComponent { .position = glm::vec3(0),
+        .WithComponent(TransformComponent { .position = glm::vec3(0),
                                           .rotation = glm::vec3(0.0),
                                           .scale    = glm::vec3(1) })
-        .WithDefault(
+        .WithComponent(
             SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
-        .WithDefault(RigidBodyComponent {})
+        .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent,
                  RigidBodyComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider,
                RigidBodyComponent&      rigidBody) {
-                transform = { .position = randomPosition(-100'000, 100'000),
-                              .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1, 100)) };
-
-                sphereCollider = { .radius = transform.scale.x,
-                                   .offset = glm::vec3(0) };
-
-                rigidBody = { .mass        = transform.scale.x * 5000.0f,
-                              .isKinematic = true };
-            })
-        .WithEntities(50'000)
-        .Build();
-
-    mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes   = &mRock2Model,
-                                      .material = mRock2Material })
-        .WithDefault(TransformComponent {
-            .position = glm::vec3(0),
-            .rotation = glm::vec3(0.0),
-            .scale    = glm::vec3(randomNumber(1, 100)) })
-        .WithDefault(
-            SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
-        .WithDefault(RigidBodyComponent {})
-        .ForEach<TransformComponent, SphereColliderComponent,
-                 RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform,
-               SphereColliderComponent& sphereCollider,
-               RigidBodyComponent&      rigidBody) {
-                transform = { .position = randomPosition(-100'000, 100'000),
+                transform = { .position = randomPosition(-20'000, 20'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(randomNumber(1, 100)) };
 
@@ -203,27 +175,55 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(PlayerComponent { .hitPoints = 1000 })
-        .WithDefault(ModelComponent { .meshes   = &mPlayerShipModel,
+        .WithComponent(ModelComponent { .meshes   = &mRock2Model,
+                                      .material = mRock2Material })
+        .WithComponent(TransformComponent {
+            .position = glm::vec3(0),
+            .rotation = glm::vec3(0.0),
+            .scale    = glm::vec3(randomNumber(1, 100)) })
+        .WithComponent(
+            SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
+        .WithComponent(RigidBodyComponent {})
+        .ForEach<TransformComponent, SphereColliderComponent,
+                 RigidBodyComponent>(
+            [](auto entity, TransformComponent& transform,
+               SphereColliderComponent& sphereCollider,
+               RigidBodyComponent&      rigidBody) {
+                transform = { .position = randomPosition(-20'000, 20'000),
+                              .rotation = glm::vec3(0.0),
+                              .scale    = glm::vec3(randomNumber(1, 100)) };
+
+                sphereCollider = { .radius = transform.scale.x,
+                                   .offset = glm::vec3(0) };
+
+                rigidBody = { .mass        = transform.scale.x * 5000.0f,
+                              .isKinematic = true };
+            })
+        .WithEntities(1'000)
+        .Build();
+
+    mScene->CreateArchetypeBuilder()
+        .WithComponent(PlayerComponent { .hitPoints = 1000 })
+        .WithComponent(ModelComponent { .meshes   = &mPlayerShipModel,
                                       .material = mPlayerShipMaterial })
-        .WithDefault(TransformComponent { .position = glm::vec3(0),
+        .WithComponent(TransformComponent { .position = glm::vec3(0),
                                           .rotation = glm::vec3(0.0, 0, 0),
                                           .scale    = glm::vec3(3) })
-        .WithDefault(
+        .WithComponent(
             SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
-        .WithDefault(RigidBodyComponent { .mass = 110.0f })
-        .WithDefault(SpaceShipControlComponent {})
-        .WithDefault(LaserGunComponent{.fireRate = 0.1f})
+        .WithComponent(RigidBodyComponent { .mass = 110.0f })
+        .WithComponent(SpaceShipControlComponent {})
+        .WithComponent(LaserGunComponent{.fireRate = 0.1f})
         .WithEntities(1)
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithDefault(ModelComponent { .meshes   = &mEnemyShipModel,
+        .WithComponent(ModelComponent { .meshes   = &mEnemyShipModel,
                                       .material = mEnemyShipMaterial })
-        .WithDefault(TransformComponent {})
-        .WithDefault(SphereColliderComponent {})
-        .WithDefault(RigidBodyComponent { .mass = 110.0f })
-        .WithDefault(SpaceShipControlComponent { .boost = 10'000.0f })
+        .WithComponent(TransformComponent {})
+        .WithComponent(SphereColliderComponent {})
+        .WithComponent(RigidBodyComponent { .mass = 110.0f })
+        .WithComponent(SpaceShipControlComponent { .boost = 10'000.0f })
         .WithEntities(1'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
