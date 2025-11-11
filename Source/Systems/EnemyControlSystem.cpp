@@ -17,10 +17,10 @@ void EnemyControlSystem::Update(float deltaTime)
             [this, deltaTime,
              playerPosition = playerTransform.position](auto entity, TransformComponent& transform, EnemyComponent&) {
                 const glm::vec3 toTarget = glm::normalize(playerPosition - transform.position);
-                const glm::vec3 torque   = glm::cross(transform.GetForwardDirection(), toTarget);
+                const glm::vec3 torque   =  glm::normalize(glm::cross(transform.GetForwardDirection(), toTarget));
 
                 mScene->SendEvent(
-                    ApplyTorqueEvent { .target = entity, .axis = -torque, .magnetiude = 6000.0f, .deltaTime = deltaTime });
+                    ApplyTorqueEvent { .target = entity, .axis = -torque, .magnetiude = 2000.0f, .deltaTime = deltaTime });
             });
     });
 }

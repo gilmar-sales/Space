@@ -91,7 +91,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                     switch (gamepadButtonPressedEvent.button)
                     {
                         case fra::GamepadButton::GamepadButtonSouth:
-                            spaceShipControl.boostFactor = 10.0f;
+                            spaceShipControl.boostFactor = 1.3f;
                             break;
                         case fra::GamepadButton::GamepadButtonLeftShoulder:
                             mScene->TryGetComponents<LaserGunComponent>(mPlayer, [](LaserGunComponent& laserGun) {
@@ -131,16 +131,16 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.axis)
             {
                 case fra::GamepadAxis::GamepadAxisRightTrigger:
-                    spaceShipControl.boost = static_cast<float>(10000.0 * keyPressedEvent.value);
+                    spaceShipControl.boostFactor = static_cast<float>(8'000.0 * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftX:
-                    spaceShipControl.yawTorque = static_cast<float>(10000 * keyPressedEvent.value);
+                    spaceShipControl.yawTorque = static_cast<float>(6000 * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftY:
-                    spaceShipControl.pitchTorque = static_cast<float>(10000 * keyPressedEvent.value);
+                    spaceShipControl.pitchTorque = static_cast<float>(6000 * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisRightX:
-                    spaceShipControl.rollTorque = static_cast<float>(10000 * keyPressedEvent.value);
+                    spaceShipControl.rollTorque = static_cast<float>(6000 * keyPressedEvent.value);
                     break;
                 default:
                     break;

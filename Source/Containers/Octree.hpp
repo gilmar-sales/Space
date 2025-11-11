@@ -8,6 +8,7 @@
 #include "Components/TransformComponent.hpp"
 
 #include "Frustum.hpp"
+#include "LockFreeArray.hpp"
 class Octree;
 
 struct Particle
@@ -25,6 +26,13 @@ struct Particle
 
 class Octree
 {
+    enum class State : uint32_t
+    {
+        Leaf,
+        Subdividing,
+        Branch
+    };
+
   public:
     Octree(glm::vec3                     position,
            float                         halfRange,
@@ -35,9 +43,9 @@ class Octree
     bool    Contains(const Particle& particle) const;
     Octree* Insert(const Particle& particle);
     void    Remove(fr::Entity entity);
-    void    Subdivide();
+    void    TrySubdivide();
 
-    void Query(Particle& particle, std::vector<Particle*>& found);
+    void Query(Particle& particle, std::vector<Particle>& found);
     bool Intersect(const Particle& particle) const;
 
     void Query(const Frustum& frustum, std::vector<Particle>& found);
@@ -54,15 +62,15 @@ class Octree
     std::mutex             mMutex;
     std::allocator<Octree> mAllocator;
 
-    glm::vec3             mPosition;
-    size_t                mCapacity;
-    float                 mHalfRange;
-    std::vector<Particle> mElements;
-
-    Ref<Octree> mNearTopLeft;
-    Ref<Octree> mNearTopRight;
-    Ref<Octree> mNearBotLeft;
-    Ref<Octree> mNearBotRight;
+    glm::vec3               mPosition;
+    size_t                  mCapacity;
+    float                   mHalfRange;
+    LockFreeArray<Particle> mElements;
+    std::atomic<State>      mState;
+    Ref<Octree>             mNearTopLeft;
+    Ref<Octree>             mNearTopRight;
+    Ref<Octree>             mNearBotLeft;
+    Ref<Octree>             mNearBotRight;
 
     Ref<Octree> mFarTopLeft;
     Ref<Octree> mFarTopRight;

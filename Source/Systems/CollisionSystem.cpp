@@ -20,7 +20,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
             if (rigidBody.isKinematic)
                 return;
 
-            auto collisions = std::vector<Particle*>(0);
+            auto collisions = std::vector<Particle>(0);
 
             auto particle = Particle { .entity         = entity,
                                        .transform      = &transform,
@@ -32,7 +32,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
             {
                 manager->SendEvent<CollisionEvent>(CollisionEvent {
                     .target    = entity,
-                    .collisor  = collision->entity,
+                    .collisor  = collision.entity,
                     .deltaTime = deltaTime });
             }
         });
