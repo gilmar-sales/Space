@@ -9,6 +9,7 @@
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>
 
+
 PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger) :
     System(scene), mPlayer()
 {
@@ -47,16 +48,16 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost = 8'000.0f;
+                    spaceShipControl.boost = Boost;
                     break;
                 case fra::KeyCode::A:
-                    spaceShipControl.rollTorque = -10000;
+                    spaceShipControl.rollTorque = -TurnTorque;
                     break;
                 case fra::KeyCode::D:
-                    spaceShipControl.rollTorque = 10000;
+                    spaceShipControl.rollTorque = TurnTorque;
                     break;
                 case fra::KeyCode::LShift:
-                    spaceShipControl.boostFactor = 1.3f;
+                    spaceShipControl.boostFactor = BoostFactor;
                     break;
                 default:
                     break;
@@ -91,7 +92,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                     switch (gamepadButtonPressedEvent.button)
                     {
                         case fra::GamepadButton::GamepadButtonSouth:
-                            spaceShipControl.boostFactor = 1.3f;
+                            spaceShipControl.boostFactor = BoostFactor;
                             break;
                         case fra::GamepadButton::GamepadButtonLeftShoulder:
                             mScene->TryGetComponents<LaserGunComponent>(mPlayer, [](LaserGunComponent& laserGun) {
@@ -131,16 +132,16 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.axis)
             {
                 case fra::GamepadAxis::GamepadAxisRightTrigger:
-                    spaceShipControl.boostFactor = static_cast<float>(8'000.0 * keyPressedEvent.value);
+                    spaceShipControl.boost = static_cast<float>(Boost * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftX:
-                    spaceShipControl.yawTorque = static_cast<float>(6000 * keyPressedEvent.value);
+                    spaceShipControl.yawTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftY:
-                    spaceShipControl.pitchTorque = static_cast<float>(6000 * keyPressedEvent.value);
+                    spaceShipControl.pitchTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisRightX:
-                    spaceShipControl.rollTorque = static_cast<float>(6000 * keyPressedEvent.value);
+                    spaceShipControl.rollTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
                     break;
                 default:
                     break;

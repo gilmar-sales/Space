@@ -69,9 +69,9 @@ void LaserGunSystem::Update(float deltaTime)
         });
 }
 
-void LaserGunSystem::OnCollision(const CollisionEvent& event)
+void LaserGunSystem::OnCollision(const CollisionEvent& event) const
 {
-    mScene->TryGetComponents<BulletComponent>(event.collisor, [&](BulletComponent& bullet) {
+    mScene->TryGetComponents<BulletComponent>(event.collisor, [&](const BulletComponent& bullet) {
         if (event.target == bullet.owner)
             return;
 
