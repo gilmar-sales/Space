@@ -1,6 +1,7 @@
 #include "LaserGunSystem.hpp"
 
 #include "Components/DecayComponent.hpp"
+#include "Components/EnemyComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -26,42 +27,60 @@ void LaserGunSystem::Update(float deltaTime)
                 }
 
                 laserGun.fireTime = 0.0f;
-                scene->CreateEntity(
-                    [scene, octreeSystem](auto bullet) {
-                        scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-                            bullet,
-                            [&](TransformComponent&      transform,
-                                SphereColliderComponent& sphereCollider,
-                                RigidBodyComponent&      rigidBody) {
-                                const auto particle = Particle { .entity         = bullet,
-                                                                 .transform      = &transform,
-                                                                 .sphereCollider = &sphereCollider };
 
-                                auto octree      = octreeSystem->GetOctree()->Insert(particle);
-                                rigidBody.octree = octree;
-                            });
-                    },
-                    BulletComponent { .owner = entity },
-                    TransformComponent { .position = transform.position + transform.GetForwardDirection() * 6.0f,
-                                         .rotation = glm::vec3(0.0),
-                                         .scale    = glm::vec3(1.0) },
-                    SphereColliderComponent { .radius = 1.0f },
-                    ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
-                    DecayComponent { .timeToLive = 2.0f },
-                    RigidBodyComponent { .mass        = 0.0f,
-                                         .velocity    = rigidBody.velocity + transform.GetForwardDirection() * 2000.f,
-                                         .isKinematic = false,
-                                         .octree      = nullptr });
+                auto shoot = [&](glm::vec3 offset) {
+                    scene->CreateEntity(
+                        [scene, octreeSystem](
+                            auto bullet,
+                            BulletComponent&,
+                            TransformComponent&      transform,
+                            SphereColliderComponent& sphereCollider,
+                            ModelComponent&,
+                            DecayComponent&,
+                            RigidBodyComponent& rigidBody) {
+                            const auto particle = Particle { .entity         = bullet,
+                                                             .transform      = &transform,
+                                                             .sphereCollider = &sphereCollider };
+
+                            auto octree      = octreeSystem->GetOctree()->Insert(particle);
+                            rigidBody.octree = octree;
+                        },
+                        BulletComponent { .owner = entity },
+                        TransformComponent { .position = transform.position + offset,
+                                             .rotation = glm::vec3(0.0),
+                                             .scale    = glm::vec3(1.0) },
+                        SphereColliderComponent { .radius = 1.0f },
+                        ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
+                        DecayComponent { .timeToLive = 2.5f },
+                        RigidBodyComponent { .mass     = 0.0f,
+                                             .velocity = rigidBody.velocity + transform.GetForwardDirection() * 1200.f,
+                                             .isKinematic = false,
+                                             .octree      = nullptr });
+                };
+
+                const auto leftOffset = transform.GetUpDirection() * 4.0f + transform.GetForwardDirection() * 5.5f -
+                                        transform.GetRightDirection() * 3.5f;
+                const auto rightOffset = transform.GetUpDirection() * 4.0f + transform.GetForwardDirection() * 5.5f +
+                                         transform.GetRightDirection() * 3.5f;
+
+                shoot(leftOffset);
+                shoot(rightOffset);
             }
         });
 }
 
 void LaserGunSystem::OnCollision(const CollisionEvent& event)
 {
-    auto isBullet = mScene->HasComponent<BulletComponent>(event.collisor);
+    mScene->TryGetComponents<BulletComponent>(event.collisor, [&](BulletComponent& bullet) {
+        if (event.target == bullet.owner)
+            return;
 
-    if (!isBullet)
-        return;
+        if (mScene->HasComponent<BulletComponent>(event.target))
+            return;
 
-    mScene->DestroyEntity(event.collisor);
+        if (mScene->HasComponent<EnemyComponent>(event.target))
+            mScene->DestroyEntity(event.target);
+
+        mScene->DestroyEntity(event.collisor);
+    });
 }

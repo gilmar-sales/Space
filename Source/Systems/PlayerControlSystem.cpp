@@ -23,6 +23,8 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                 });
                 break;
             }
+            default:
+                break;
         };
     });
 
@@ -35,6 +37,8 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                 });
                 break;
             }
+            default:
+                break;
         };
     });
 
@@ -43,7 +47,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost = 10'000.0f;
+                    spaceShipControl.boost = 8'000.0f;
                     break;
                 case fra::KeyCode::A:
                     spaceShipControl.rollTorque = -10000;
@@ -52,7 +56,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                     spaceShipControl.rollTorque = 10000;
                     break;
                 case fra::KeyCode::LShift:
-                    spaceShipControl.boostFactor = 10.0f;
+                    spaceShipControl.boostFactor = 1.3f;
                     break;
                 default:
                     break;

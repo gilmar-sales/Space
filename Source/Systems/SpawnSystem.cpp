@@ -3,6 +3,7 @@
 #include <random>
 
 #include "Components/AlwaysRenderedComponent.hpp"
+#include "Components/EnemyComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
@@ -213,7 +214,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
             SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
         .WithComponent(SpaceShipControlComponent {})
-        .WithComponent(LaserGunComponent{.fireRate = 0.1f})
+        .WithComponent(LaserGunComponent{.fireRate = 0.05f})
         .WithEntities(1)
         .Build();
 
@@ -223,12 +224,13 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(TransformComponent {})
         .WithComponent(SphereColliderComponent {})
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
-        .WithComponent(SpaceShipControlComponent { .boost = 10'000.0f })
-        .WithEntities(1'000)
+        .WithComponent(SpaceShipControlComponent { .boost = 5'000.0f })
+        .WithComponent(EnemyComponent { .hitPoints = 1000 })
+        .WithEntities(2'000)
         .ForEach<TransformComponent, SphereColliderComponent>(
             [](auto entity, TransformComponent& transform,
                SphereColliderComponent& sphereCollider) {
-                transform = { .position = randomPosition(-15'000, 15'000),
+                transform = { .position = randomPosition(-2'000, 2'000),
                               .rotation = glm::vec3(0),
                               .scale    = glm::vec3(3) };
 
