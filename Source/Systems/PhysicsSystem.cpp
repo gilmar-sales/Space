@@ -44,17 +44,14 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
     });
 
     mScene->AddEventListener<ApplyForceEvent>([this](const ApplyForceEvent& applyForceEvent) {
-        if (mScene->HasComponent<RigidBodyComponent>(applyForceEvent.target))
-        {
-            mScene->TryGetComponents<RigidBodyComponent>(applyForceEvent.target, [&](RigidBodyComponent& rigidBody) {
-                const auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
+        mScene->TryGetComponents<RigidBodyComponent>(applyForceEvent.target, [&](RigidBodyComponent& rigidBody) {
+            const auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
 
-                rigidBody.velocity += applyForceEvent.direction * acceleration * applyForceEvent.deltaTime;
+            rigidBody.velocity += applyForceEvent.direction * acceleration * applyForceEvent.deltaTime;
 
-                if (acceleration > 0.01f)
-                    mScene->SendEvent(TransformChangeEvent { .entity = applyForceEvent.target });
-            });
-        }
+            if (acceleration > 0.01f)
+                mScene->SendEvent(TransformChangeEvent { .entity = applyForceEvent.target });
+        });
     });
 
     mScene->AddEventListener<ApplyTorqueEvent>([this](const ApplyTorqueEvent& applyTorqueEvent) {
@@ -85,6 +82,7 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
                 transform.position += rigidBody.velocity * deltaTime;
             }
 
-            rigidBody.velocity *= 1.0f - 0.8f * deltaTime;
+            if (rigidBody.mass > 0)
+                rigidBody.velocity *= 1.0f - 0.8f * deltaTime;
         });
 }

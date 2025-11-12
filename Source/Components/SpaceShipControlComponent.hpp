@@ -3,7 +3,7 @@
 #include <Freyr/Freyr.hpp>
 
 constexpr auto Boost       = 6'000;
-constexpr auto BoostFactor = 1.3f;
+constexpr auto BoostFactor = 3.3f;
 constexpr auto TurnTorque  = 8'000;
 
 struct SpaceShipControlComponent : fr::Component
