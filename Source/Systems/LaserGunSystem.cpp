@@ -4,6 +4,7 @@
 #include "Components/EnemyComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
+#include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
@@ -18,6 +19,11 @@ void LaserGunSystem::Update(float deltaTime)
                     LaserGunComponent&  laserGun,
                     TransformComponent& transform,
                     RigidBodyComponent& rigidBody) {
+            laserGun.energySpent -= laserGun.energyCost * laserGun.energyCost * deltaTime;
+
+            if (laserGun.energySpent < 0.0f)
+                laserGun.energySpent = 0.0f;
+
             if (laserGun.triggered)
             {
                 if (laserGun.fireTime < laserGun.fireRate)
@@ -27,6 +33,13 @@ void LaserGunSystem::Update(float deltaTime)
                 }
 
                 laserGun.fireTime = 0.0f;
+
+                if (laserGun.energySpent + laserGun.energyCost > laserGun.maxEnergy)
+                {
+                    return;
+                }
+
+                laserGun.energySpent += laserGun.energyCost;
 
                 auto shoot = [&](glm::vec3 offset) {
                     scene->CreateEntity(
@@ -56,10 +69,8 @@ void LaserGunSystem::Update(float deltaTime)
                                              .isKinematic = false });
                 };
 
-                const auto leftOffset = transform.GetUpDirection() * 4.0f + transform.GetForwardDirection() * 5.5f -
-                                        transform.GetRightDirection() * 3.5f;
-                const auto rightOffset = transform.GetUpDirection() * 4.0f + transform.GetForwardDirection() * 5.5f +
-                                         transform.GetRightDirection() * 3.5f;
+                const auto leftOffset  = transform.GetForwardDirection() * 5.5f - transform.GetRightDirection() * 3.5f;
+                const auto rightOffset = transform.GetForwardDirection() * 5.5f + transform.GetRightDirection() * 3.5f;
 
                 shoot(leftOffset);
                 shoot(rightOffset);
@@ -70,11 +81,18 @@ void LaserGunSystem::Update(float deltaTime)
 void LaserGunSystem::OnCollision(const CollisionEvent& event) const
 {
     mScene->TryGetComponents<BulletComponent>(event.collisor, [&](const BulletComponent& bullet) {
+        if (mScene->HasComponent<PlayerComponent>(event.target))
+            return;
+
         if (event.target == bullet.owner)
             return;
 
-        if (mScene->HasComponent<BulletComponent>(event.target))
-            return;
+        mScene->TryGetComponents<BulletComponent>(event.target, [&](const BulletComponent& otherBullet) {
+            if (otherBullet.owner == bullet.owner)
+                return;
+
+            mScene->DestroyEntity(event.target);
+        });
 
         if (mScene->HasComponent<EnemyComponent>(event.target))
             mScene->DestroyEntity(event.target);

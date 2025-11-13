@@ -159,7 +159,12 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
         .WithComponent(SpaceShipControlComponent {})
-        .WithComponent(LaserGunComponent { .fireRate = 0.05f })
+        .WithComponent(LaserGunComponent {
+            .fireRate    = 0.05f,
+            .fireTime    = 0,
+            .energyCost  = 5,
+            .energySpent = 0,
+            .maxEnergy   = 100 })
         .WithEntities(1)
         .Build();
 
@@ -171,10 +176,15 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
         .WithComponent(SpaceShipControlComponent { .boost = Boost })
-        .WithComponent(LaserGunComponent { .fireRate = 0.05f })
-        .WithEntities(5'000)
+        .WithComponent(LaserGunComponent {
+            .fireRate    = 0.05f,
+            .fireTime    = 0,
+            .energyCost  = 5,
+            .energySpent = 0,
+            .maxEnergy   = 80 })
+        .WithEntities(10)
         .ForEach<TransformComponent>([](auto, TransformComponent& transform) {
-            transform.position = randomPosition(-2'000, 2'000);
+            transform.position = randomPosition(-1'000, 1'000);
         })
         .Build();
 }

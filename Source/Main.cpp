@@ -28,7 +28,7 @@ int main(int argc, char const* argv[])
                    .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
                        freyr
                            .WithOptions([](fr::FreyrOptionsBuilder& options) {
-                               options.SetMaxEntities(512 * 1024).SetArchetypeChunkCapacity(256);
+                               options.SetMaxEntities(1024 * 1024).SetArchetypeChunkCapacity(1024);
                            })
                            .AddComponent<ModelComponent>()
                            .AddComponent<TransformComponent>()

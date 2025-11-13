@@ -2,12 +2,13 @@
 
 #include <Freyr/Freyr.hpp>
 
-struct  LaserGunComponent : fr::Component
+struct LaserGunComponent : fr::Component
 {
-    bool triggered;
+    bool  triggered;
     float fireRate;
     float fireTime;
     float energyCost;
+    float energySpent;
     float maxEnergy;
 };
 
