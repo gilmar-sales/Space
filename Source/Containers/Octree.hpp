@@ -34,11 +34,17 @@ class Octree
     };
 
   public:
-    Octree(glm::vec3                     position,
-           float                         halfRange,
-           size_t                        capacity,
-           const std::allocator<Octree>& allocator = std::allocator<Octree>());
-    ~Octree() = default;
+    Octree(glm::vec3               position,
+           float                   halfRange,
+           size_t                  capacity,
+           std::allocator<Octree>* allocator = new std::allocator<Octree>(),
+           Octree*                 root      = nullptr);
+
+    ~Octree()
+    {
+        if (mRoot == this)
+            delete mAllocator;
+    }
 
     bool    Contains(const Particle& particle) const;
     Octree* Insert(const Particle& particle);
@@ -59,18 +65,20 @@ class Octree
   private:
     friend struct Particle;
 
-    std::mutex             mMutex;
-    std::allocator<Octree> mAllocator;
+    Octree*                 mRoot;
+    std::allocator<Octree>* mAllocator;
 
-    glm::vec3               mPosition;
-    size_t                  mCapacity;
-    float                   mHalfRange;
+    glm::vec3 mPosition;
+    size_t    mCapacity;
+    float     mHalfRange;
+
     LockFreeArray<Particle> mElements;
     std::atomic<State>      mState;
-    Ref<Octree>             mNearTopLeft;
-    Ref<Octree>             mNearTopRight;
-    Ref<Octree>             mNearBotLeft;
-    Ref<Octree>             mNearBotRight;
+
+    Ref<Octree> mNearTopLeft;
+    Ref<Octree> mNearTopRight;
+    Ref<Octree> mNearBotLeft;
+    Ref<Octree> mNearBotRight;
 
     Ref<Octree> mFarTopLeft;
     Ref<Octree> mFarTopRight;

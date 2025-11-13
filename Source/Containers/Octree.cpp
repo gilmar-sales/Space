@@ -12,9 +12,11 @@ void Octree::Remove(fr::Entity entity)
 }
 
 Octree::Octree(const glm::vec3 position, const float halfRange, const size_t capacity,
-               const std::allocator<Octree>& allocator) :
-    mAllocator(allocator), mPosition(position), mCapacity(capacity), mHalfRange(halfRange)
+               std::allocator<Octree>* allocator, Octree* root) :
+    mAllocator(allocator), mPosition(position), mCapacity(capacity), mHalfRange(halfRange), mRoot(root)
 {
+    if (mRoot == nullptr)
+        mRoot = this;
 }
 
 bool Octree::Contains(const Particle& particle) const
@@ -118,23 +120,23 @@ void Octree::TrySubdivide()
     glm::vec3 nearBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
     glm::vec3 nearBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
 
-    mNearTopLeft = std::allocate_shared<Octree>(mAllocator, nearTopLeftPos, halfRange, mCapacity, mAllocator);
+    mNearTopLeft = std::allocate_shared<Octree>(*mAllocator, nearTopLeftPos, halfRange, mCapacity, mAllocator, mRoot);
 
-    mNearTopRight = std::allocate_shared<Octree>(mAllocator, nearTopRightPos, halfRange, mCapacity, mAllocator);
+    mNearTopRight = std::allocate_shared<Octree>(*mAllocator, nearTopRightPos, halfRange, mCapacity, mAllocator, mRoot);
 
-    mNearBotLeft = std::allocate_shared<Octree>(mAllocator, nearBotLeftPos, halfRange, mCapacity, mAllocator);
+    mNearBotLeft = std::allocate_shared<Octree>(*mAllocator, nearBotLeftPos, halfRange, mCapacity, mAllocator, mRoot);
 
-    mNearBotRight = std::allocate_shared<Octree>(mAllocator, nearBotRightPos, halfRange, mCapacity, mAllocator);
+    mNearBotRight = std::allocate_shared<Octree>(*mAllocator, nearBotRightPos, halfRange, mCapacity, mAllocator, mRoot);
 
     glm::vec3 farTopLeftPos  = { mPosition.x - halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
     glm::vec3 farTopRightPos = { mPosition.x + halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
     glm::vec3 farBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
     glm::vec3 farBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
 
-    mFarTopLeft  = std::allocate_shared<Octree>(mAllocator, farTopLeftPos, halfRange, mCapacity, mAllocator);
-    mFarTopRight = std::allocate_shared<Octree>(mAllocator, farTopRightPos, halfRange, mCapacity, mAllocator);
-    mFarBotLeft  = std::allocate_shared<Octree>(mAllocator, farBotLeftPos, halfRange, mCapacity, mAllocator);
-    mFarBotRight = std::allocate_shared<Octree>(mAllocator, farBotRightPos, halfRange, mCapacity, mAllocator);
+    mFarTopLeft  = std::allocate_shared<Octree>(*mAllocator, farTopLeftPos, halfRange, mCapacity, mAllocator, mRoot);
+    mFarTopRight = std::allocate_shared<Octree>(*mAllocator, farTopRightPos, halfRange, mCapacity, mAllocator, mRoot);
+    mFarBotLeft  = std::allocate_shared<Octree>(*mAllocator, farBotLeftPos, halfRange, mCapacity, mAllocator, mRoot);
+    mFarBotRight = std::allocate_shared<Octree>(*mAllocator, farBotRightPos, halfRange, mCapacity, mAllocator, mRoot);
 
     mState.store(State::Branch, std::memory_order_release);
 }

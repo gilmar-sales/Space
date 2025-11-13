@@ -37,13 +37,12 @@ void LaserGunSystem::Update(float deltaTime)
                             SphereColliderComponent& sphereCollider,
                             ModelComponent&,
                             DecayComponent&,
-                            RigidBodyComponent& rigidBody) {
+                            RigidBodyComponent&) {
                             const auto particle = Particle { .entity         = bullet,
                                                              .transform      = &transform,
                                                              .sphereCollider = &sphereCollider };
 
-                            auto octree      = octreeSystem->GetOctree()->Insert(particle);
-                            rigidBody.octree = octree;
+                            octreeSystem->GetOctree()->Insert(particle);
                         },
                         BulletComponent { .owner = entity },
                         TransformComponent { .position = transform.position + offset,
@@ -54,8 +53,7 @@ void LaserGunSystem::Update(float deltaTime)
                         DecayComponent { .timeToLive = 2.5f },
                         RigidBodyComponent { .mass     = 0.0f,
                                              .velocity = rigidBody.velocity + transform.GetForwardDirection() * 600.f,
-                                             .isKinematic = false,
-                                             .octree      = nullptr });
+                                             .isKinematic = false });
                 };
 
                 const auto leftOffset = transform.GetUpDirection() * 4.0f + transform.GetForwardDirection() * 5.5f -
