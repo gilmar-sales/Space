@@ -182,7 +182,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
             .energyCost  = 5,
             .energySpent = 0,
             .maxEnergy   = 80 })
-        .WithEntities(10)
+        .WithEntities(2000)
         .ForEach<TransformComponent>([](auto, TransformComponent& transform) {
             transform.position = randomPosition(-1'000, 1'000);
         })

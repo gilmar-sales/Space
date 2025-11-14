@@ -108,7 +108,7 @@ void Octree::TrySubdivide()
     State expected = State::Leaf;
 
     if (!mState.compare_exchange_strong(
-            expected, State::Subdividing, std::memory_order_acquire, std::memory_order_release))
+            expected, State::Subdividing, std::memory_order_acquire))
     {
         return;
     }
