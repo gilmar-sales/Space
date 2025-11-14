@@ -17,6 +17,28 @@ Space relies on the following key dependencies:
 
 - **[Skirnir](https://github.com/gilmar-sales/Skirnir)** - An IoC Container using C++ Type Loophole for automatic dependency injection. Manages service lifetimes (Transient, Scoped, Singleton) and provides built-in logging capabilities with the fmt library.
 
+## Compiling (Mac, Linux, Windows)
+1. Install CMake
+   Access the [CMake Download](https://cmake.org/download/) page and select you Operational System version.
+3. Clone
+   ```bash
+   git clone https://github.com/gilmar-sales/Space.git
+   ```
+5. Create the build directory
+   ```bash
+   cd ./Space && mkdir build
+   ```
+7. Configure
+   ```bash
+    cd ./build && cmake ..
+   ```
+9. Compile
+   ```bash
+   # --parallel is optional but speeds the compilation
+    cmake --build . --parallel
+   ```
+   
+
 ## Features
 
 ### From Freyr (ECS)
