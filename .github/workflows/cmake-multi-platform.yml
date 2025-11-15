@@ -23,7 +23,7 @@ jobs:
       #
       # To add more build types (Release, Debug, RelWithDebInfo, etc.) customize the build_type list.
       matrix:
-        os: [ ubuntu-latest, windows-latest ]
+        os: [ ubuntu-latest, windows-latest, macos-latest ]
         build_type: [ Release ]
         c_compiler: [ gcc, clang, cl ]
         include:
@@ -36,6 +36,9 @@ jobs:
           - os: ubuntu-latest
             c_compiler: clang
             cpp_compiler: clang++
+          - os: macos-latest
+            c_compiler: clang
+            cpp_compiler: clang++
         exclude:
           - os: windows-latest
             c_compiler: gcc
@@ -43,9 +46,15 @@ jobs:
             c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
+          - os: macos-latest
+            c_compiler: cl
+          - os: macos-latest
+            c_compiler: gcc
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: 'true'
 
       - if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt update && sudo apt install xorg
@@ -90,20 +99,20 @@ jobs:
         # Execute tests defined by the CMake configuration. Note that --build-config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
         # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
         run: ctest --build-config ${{ matrix.build_type }}
-        
+
       - name: Create zip archive (Linux/macOS)
         if: matrix.os != 'windows-latest'
         run: |
           cd ${{ steps.strings.outputs.build-output-dir }}
           zip -r ../build-${{ matrix.os }}.zip Space Resources/
-      
+
       - name: Create zip archive (Windows)
         if: matrix.os == 'windows-latest'
         shell: pwsh
         
         run: |
           $buildDir = "${{ steps.strings.outputs.build-output-dir }}"
-          $spacePath = Join-Path $buildDir "Space"
+          $spacePath = Join-Path $buildDir "Space.exe"
           $resourcesPath = Join-Path $buildDir "Resources"
           
           $itemsToZip = @()
@@ -117,7 +126,7 @@ jobs:
           if ($itemsToZip.Count -gt 0) {
             Compress-Archive -Path $itemsToZip -DestinationPath "build-${{ matrix.os }}.zip"
           }
-      
+
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
