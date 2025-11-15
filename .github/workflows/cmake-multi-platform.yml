@@ -105,5 +105,6 @@ jobs:
         with:
           name: build-${{ matrix.os }}-${{ matrix.c_compiler }}
           path: |
-            ${{ steps.strings.outputs.build-output-dir }}/Space*
+            ${{ steps.strings.outputs.build-output-dir }}/Space
+            ${{ steps.strings.outputs.build-output-dir }}/Release/Space.exe
             ${{ steps.strings.outputs.build-output-dir }}/Resources/*
