@@ -92,16 +92,31 @@ jobs:
         run: ctest --build-config ${{ matrix.build_type }}
         
       - name: Create zip archive (Linux/macOS)
-        if: matrix.os != 'windows'
+        if: matrix.os != 'windows-latest'
         run: |
           cd ${{ steps.strings.outputs.build-output-dir }}
-          zip -r ../build-${{ matrix.os }}.zip .
+          zip -r ../build-${{ matrix.os }}.zip Space Resources/
       
       - name: Create zip archive (Windows)
-        if: matrix.os != 'windows'
+        if: matrix.os == 'windows-latest'
         shell: pwsh
+        
         run: |
-          Compress-Archive -Path ${{ steps.strings.outputs.build-output-dir }}\* -DestinationPath build-${{ matrix.os }}.zip
+          $buildDir = "${{ steps.strings.outputs.build-output-dir }}"
+          $spacePath = Join-Path $buildDir "Space"
+          $resourcesPath = Join-Path $buildDir "Resources"
+          
+          $itemsToZip = @()
+          if (Test-Path $spacePath) {
+            $itemsToZip += $spacePath
+          }
+          if (Test-Path $resourcesPath) {
+            $itemsToZip += $resourcesPath
+          }
+          
+          if ($itemsToZip.Count -gt 0) {
+            Compress-Archive -Path $itemsToZip -DestinationPath "build-${{ matrix.os }}.zip"
+          }
       
       - name: Upload artifact
         uses: actions/upload-artifact@v4
