@@ -14,7 +14,7 @@ FetchContent_MakeAvailable(freyr)
 FetchContent_Declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.11.3"
+        GIT_TAG "v0.11.4"
 )
 FetchContent_MakeAvailable(freya)
 
