@@ -12,18 +12,30 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-static int randomNumber(const int min, const int max)
+template <typename T>
+static T randomNumber(const T min, const T max)
 {
-    std::random_device            r;
-    std::default_random_engine    e1(r());
-    std::uniform_int_distribution uniform_dist(min, max);
+    if constexpr (std::is_floating_point_v<T>)
+    {
+        std::random_device                r;
+        std::default_random_engine        e1(r());
+        std::uniform_real_distribution<T> uniform_dist(min, max);
 
-    return uniform_dist(e1);
+        return uniform_dist(e1);
+    }
+    else
+    {
+        std::random_device               r;
+        std::default_random_engine       e1(r());
+        std::uniform_int_distribution<T> uniform_dist(min, max);
+
+        return uniform_dist(e1);
+    }
 }
 
-static glm::vec3 randomPosition(int min, int max)
+static glm::vec3 randomPosition(float min, float max)
 {
-    return glm::vec3(randomNumber(min, max), randomNumber(min, max), randomNumber(min, max));
+    return { randomNumber(min, max), randomNumber(min, max), randomNumber(min, max) };
 }
 
 SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
@@ -101,7 +113,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
                RigidBodyComponent& rigidBody) {
                 transform = { .position = randomPosition(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(200, 1000)) };
+                              .scale    = glm::vec3(randomNumber(200.0f, 1000.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -121,7 +133,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
                RigidBodyComponent& rigidBody) {
                 transform = { .position = randomPosition(-20'000, 20'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1, 100)) };
+                              .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -134,7 +146,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(ModelComponent { .meshes = &mRock2Model, .material = mRock2Material })
         .WithComponent(TransformComponent { .position = glm::vec3(0),
                                             .rotation = glm::vec3(0.0),
-                                            .scale    = glm::vec3(randomNumber(1, 100)) })
+                                            .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) })
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
@@ -142,7 +154,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
                RigidBodyComponent& rigidBody) {
                 transform = { .position = randomPosition(-20'000, 20'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1, 100)) };
+                              .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -159,12 +171,8 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
         .WithComponent(SpaceShipControlComponent {})
-        .WithComponent(LaserGunComponent {
-            .fireRate    = 0.05f,
-            .fireTime    = 0,
-            .energyCost  = 5,
-            .energySpent = 0,
-            .maxEnergy   = 100 })
+        .WithComponent(
+            LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 100 })
         .WithEntities(1)
         .Build();
 
@@ -176,13 +184,9 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent { .mass = 110.0f })
         .WithComponent(SpaceShipControlComponent { .boost = Boost })
-        .WithComponent(LaserGunComponent {
-            .fireRate    = 0.05f,
-            .fireTime    = 0,
-            .energyCost  = 5,
-            .energySpent = 0,
-            .maxEnergy   = 80 })
-        .WithEntities(2000)
+        .WithComponent(
+            LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
+        .WithEntities(5000)
         .ForEach<TransformComponent>([](auto, TransformComponent& transform) {
             transform.position = randomPosition(-1'000, 1'000);
         })
