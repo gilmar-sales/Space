@@ -108,3 +108,4 @@ jobs:
             ${{ steps.strings.outputs.build-output-dir }}/Space
             ${{ steps.strings.outputs.build-output-dir }}/Release/Space.exe
             ${{ steps.strings.outputs.build-output-dir }}/Resources/*
+            ${{ github.workspace }}/VULKAN_SDK/lib/*
