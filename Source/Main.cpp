@@ -24,43 +24,44 @@
 
 int main(int argc, char const* argv[])
 {
-    auto app = skr::ApplicationBuilder()
-                   .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
-                       freyr
-                           .WithOptions([](fr::FreyrOptionsBuilder& options) {
-                               options.SetMaxEntities(1024 * 1024).SetArchetypeChunkCapacity(1024);
-                           })
-                           .AddComponent<ModelComponent>()
-                           .AddComponent<TransformComponent>()
-                           .AddComponent<SphereColliderComponent>()
-                           .AddComponent<RigidBodyComponent>()
-                           .AddComponent<PlayerComponent>()
-                           .AddComponent<SpaceShipControlComponent>()
-                           .AddComponent<LaserGunComponent>()
-                           .AddSystem<SpawnSystem>()
-                           .AddSystem<DecaySystem>()
-                           .AddSystem<InputSystem>()
-                           .AddSystem<OctreeSystem>()
-                           .AddSystem<PlayerControlSystem>()
-                           .AddSystem<EnemyControlSystem>()
-                           .AddSystem<LaserGunSystem>()
-                           .AddSystem<CollisionSystem>()
-                           .AddSystem<MovementSystem>()
-                           .AddSystem<PhysicsSystem>()
-                           .AddSystem<RenderSystem>();
-                   })
-                   .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {
-                       freya.WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {
-                           freyaOptions.SetTitle("Space")
-                               .SetWidth(1920)
-                               .SetHeight(1080)
-                               .SetDrawDistance(1000'000.0f)
-                               .SetSampleCount(8)
-                               .SetVSync(false)
-                               .SetFullscreen(false);
-                       });
-                   })
-                   .Build<SpaceApp>();
+    auto app =
+        skr::ApplicationBuilder()
+            .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
+                freyr
+                    .WithOptions([](fr::FreyrOptionsBuilder& options) {
+                        options.SetMaxEntities(1024 * 1024).SetArchetypeChunkCapacity(2 * 1024).SetThreadCount(8);
+                    })
+                    .AddComponent<ModelComponent>()
+                    .AddComponent<TransformComponent>()
+                    .AddComponent<SphereColliderComponent>()
+                    .AddComponent<RigidBodyComponent>()
+                    .AddComponent<PlayerComponent>()
+                    .AddComponent<SpaceShipControlComponent>()
+                    .AddComponent<LaserGunComponent>()
+                    .AddSystem<SpawnSystem>()
+                    .AddSystem<DecaySystem>()
+                    .AddSystem<InputSystem>()
+                    .AddSystem<OctreeSystem>()
+                    .AddSystem<PlayerControlSystem>()
+                    .AddSystem<EnemyControlSystem>()
+                    .AddSystem<LaserGunSystem>()
+                    .AddSystem<CollisionSystem>()
+                    .AddSystem<MovementSystem>()
+                    .AddSystem<PhysicsSystem>()
+                    .AddSystem<RenderSystem>();
+            })
+            .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {
+                freya.WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {
+                    freyaOptions.SetTitle("Space")
+                        .SetWidth(1920)
+                        .SetHeight(1080)
+                        .SetDrawDistance(1000'000.0f)
+                        .SetSampleCount(8)
+                        .SetVSync(false)
+                        .SetFullscreen(false);
+                });
+            })
+            .Build<SpaceApp>();
 
     app->Run();
 

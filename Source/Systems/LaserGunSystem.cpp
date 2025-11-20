@@ -94,7 +94,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
             mScene->DestroyEntity(event.target);
         });
 
-        if (mScene->HasComponent<EnemyComponent>(event.target))
+        if (mScene->HasComponent<EnemyComponent>(event.target) && mScene->HasComponent<PlayerComponent>(bullet.owner))
             mScene->DestroyEntity(event.target);
 
         mScene->DestroyEntity(event.collisor);

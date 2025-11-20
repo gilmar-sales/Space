@@ -4,8 +4,8 @@
 
 class DecaySystem : public fr::System
 {
-    public:
-    DecaySystem(const Ref<fr::Scene>&     scene)  : fr::System(scene) {}
+  public:
+    DecaySystem(const Ref<fr::Scene>& scene) : fr::System(scene) {}
 
-    void PreUpdate(float deltaTime) override;
+    void PreFixedUpdate(float deltaTime) override;
 };

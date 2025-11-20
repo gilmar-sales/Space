@@ -4,7 +4,6 @@
 #include "Components/PlayerComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-#include "Components/AlwaysRenderedComponent.hpp"
 #include "InputSystem.hpp"
 
 #include <ranges>
@@ -52,10 +51,10 @@ void RenderSystem::BeginFrame() const
 
     mScene->TryGetComponents<TransformComponent>(mPlayer, [&](TransformComponent& transform) {
         const auto cameraPosition =
-            transform.position - transform.GetForwardDirection() * 8.0f - transform.GetUpDirection() * 5.0f;
+            transform.position - transform.GetForwardDirection() * 12.0f - transform.GetUpDirection() * 5.0f;
 
         const auto cameraForward =
-            glm::normalize(transform.position + transform.GetForwardDirection() * 15.0f - cameraPosition);
+            glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);
 
         auto projectionUniformBuffer = fra::ProjectionUniformBuffer {
             .view       = glm::lookAt(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection()),
@@ -71,7 +70,7 @@ void RenderSystem::BeginFrame() const
 
 void RenderSystem::DrawInstanced()
 {
-    auto currentFrameIndex = mRenderer->GetCurrentFrameIndex();
+    const auto currentFrameIndex = mRenderer->GetCurrentFrameIndex();
 
     auto& renderables         = mRenderables[currentFrameIndex];
     auto& matrices            = mMatrices[currentFrameIndex];
@@ -104,12 +103,6 @@ void RenderSystem::DrawInstanced()
     });
     mScene->EndTrace();
 
-    mScene->ForEach<AlwaysRenderedComponent, ModelComponent, TransformComponent>(
-        [&](auto                     entity,
-            AlwaysRenderedComponent& alwaysRendered,
-            ModelComponent&          model,
-            TransformComponent& transform) { renderables.push_back({ .entity = entity, .transform = &transform }); });
-
     if (renderables.size() > matrices.capacity())
         matrices.reserve(renderables.size());
 
@@ -128,7 +121,7 @@ void RenderSystem::DrawInstanced()
     auto i = 0;
     for (auto& particle : validRenderables)
     {
-        mScene->TryGetComponents<ModelComponent>(particle.entity, [&](ModelComponent& model) {
+        mScene->TryGetComponents<ModelComponent>(particle.entity, [&](const ModelComponent& model) {
             if (currentInstance.meshes &&
                 (currentInstance.meshes != model.meshes || currentInstance.material != model.material))
             {

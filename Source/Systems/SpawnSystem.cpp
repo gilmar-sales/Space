@@ -2,7 +2,6 @@
 
 #include <random>
 
-#include "Components/AlwaysRenderedComponent.hpp"
 #include "Components/EnemyComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
@@ -91,7 +90,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-100'000, 100'000),
+                transform = { .position = randomPosition(-200'000, 200'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(randomNumber(50, 100)) };
 
@@ -111,7 +110,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-100'000, 100'000),
+                transform = { .position = randomPosition(-200'000, 200'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(randomNumber(200.0f, 1000.0f)) };
 
@@ -186,7 +185,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(SpaceShipControlComponent { .boost = Boost })
         .WithComponent(
             LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
-        .WithEntities(5000)
+        .WithEntities(3000)
         .ForEach<TransformComponent>([](auto, TransformComponent& transform) {
             transform.position = randomPosition(-1'000, 1'000);
         })
