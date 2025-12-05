@@ -54,7 +54,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          lfs: 'true'
+          lfs: ${{ github.ref_name == 'release' }}
 
       - if: ${{ matrix.os == 'ubuntu-latest' }}
         run: sudo apt update && sudo apt install xorg
