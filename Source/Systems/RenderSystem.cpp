@@ -110,18 +110,18 @@ void RenderSystem::DrawInstanced()
 
     mScene->BeginTrace("Calculate instance sequence");
 
-    auto validRenderables = std::views::filter(renderables, [&](auto& particle) {
+    renderables = std::ranges::to<std::vector>(std::views::filter(renderables, [&](auto& particle) {
         return mScene->TryGetComponents<TransformComponent>(particle.entity, [&](TransformComponent& transform) {
             matrices.emplace_back(transform.GetModel());
         });
-    });
+    }));
 
     auto currentInstance = InstanceDraw { .index = 0, .instanceCount = 0, .meshes = nullptr, .material = 9 };
 
     auto i = 0;
-    for (auto& particle : validRenderables)
+    for (auto& renderable : renderables)
     {
-        mScene->TryGetComponents<ModelComponent>(particle.entity, [&](const ModelComponent& model) {
+        mScene->TryGetComponents<ModelComponent>(renderable.entity, [&](const ModelComponent& model) {
             if (currentInstance.meshes &&
                 (currentInstance.meshes != model.meshes || currentInstance.material != model.material))
             {
@@ -157,10 +157,6 @@ void RenderSystem::DrawInstanced()
 
     if (matrices.empty())
     {
-        mScene->BeginTrace("Render");
-        mRenderer->EndFrame();
-        mScene->EndTrace();
-
         return;
     }
 
@@ -192,5 +188,7 @@ void RenderSystem::DrawInstanced()
 
 void RenderSystem::EndFrame() const
 {
+    mScene->BeginTrace("Render");
     mRenderer->EndFrame();
+    mScene->EndTrace();
 }
