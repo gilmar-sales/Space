@@ -7,6 +7,8 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
+#include <Components/PlayerComponent.hpp>
+
 #include <AssetManager.hpp>
 #include <Random.hpp>
 
@@ -19,6 +21,7 @@ class LaserGunSystem : public fr::System
                    const Ref<Random>&       random) :
         System(scene), mOctreeSystem(octreeSystem), mAssetManager(assetManager), mRandom(random)
     {
+        mPlayer = mScene->FindUnique<PlayerComponent>();
         mCollisionListener =
             mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent event) { OnCollision(event); });
     }
@@ -28,6 +31,7 @@ class LaserGunSystem : public fr::System
     void OnCollision(const CollisionEvent& event) const;
 
   private:
+    fr::Entity              mPlayer;
     Ref<fr::ListenerHandle> mCollisionListener;
     Ref<OctreeSystem>       mOctreeSystem;
     Ref<AssetManager>       mAssetManager;

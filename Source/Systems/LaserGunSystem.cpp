@@ -67,7 +67,7 @@ void LaserGunSystem::Update(float deltaTime)
                         DecayComponent { .timeToLive = 2.f },
                         RigidBodyComponent {
                             .mass     = 0.0f,
-                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 1200.f,
+                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 3000.f,
                         });
                 };
 
@@ -83,7 +83,7 @@ void LaserGunSystem::Update(float deltaTime)
 void LaserGunSystem::OnCollision(const CollisionEvent& event) const
 {
     mScene->TryGetComponents<BulletComponent>(event.collisor, [&](const BulletComponent& bullet) {
-        if (mScene->HasComponent<PlayerComponent>(event.target))
+        if (event.target == mPlayer || event.collisor == mPlayer)
             return;
 
         if (!mScene->TryGetComponents<BulletComponent>(event.target, [&](const BulletComponent& otherBullet) {
@@ -98,37 +98,41 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
 
                 if (targetHealth.hitPoints <= 0.0f)
                 {
-                    mScene->TryGetComponents<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
-                        event.target,
-                        [&](const TransformComponent& transform,
-                            const RigidBodyComponent& rigidBody,
-                            SphereColliderComponent&  sphereCollider) {
-                            if (rigidBody.mass < 10.0f)
-                                return;
+                    if (!mScene->HasComponent<EnemyComponent>(event.target))
+                        mScene->TryGetComponents<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+                            event.target,
+                            [&](const TransformComponent& transform,
+                                const RigidBodyComponent& rigidBody,
+                                SphereColliderComponent&  sphereCollider) {
+                                if (rigidBody.mass < 1000.0f)
+                                    return;
 
-                            const auto count = sphereCollider.radius;
-                            mScene->CreateArchetypeBuilder()
-                                .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetRock1Model(),
-                                                                .material = mAssetManager->GetRock1Material() })
-                                .WithComponent(
-                                    TransformComponent { .position = transform.position, .rotation = glm::vec3(0.0) })
-                                .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
-                                .WithComponent(
-                                    RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
-                                .WithComponent(HealthComponent { .hitPoints = 1000 / count })
-                                .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
-                                    [&, radius = sphereCollider.radius](auto,
-                                                                        TransformComponent&      transform,
-                                                                        RigidBodyComponent&      rigidBody,
-                                                                        SphereColliderComponent& sphereCollider) {
-                                        transform.position = mRandom->PositionFrom(transform.position, -radius, radius);
-                                        transform.scale    = glm::vec3(mRandom->Float(5.0f, 20.0f));
-                                        rigidBody.velocity = mRandom->Position(-radius, radius);
-                                        sphereCollider.radius = transform.scale.x;
-                                    })
-                                .WithEntities(count)
-                                .Build();
-                        });
+                                const auto count   = sphereCollider.radius;
+                                const auto maxSize = sphereCollider.radius / 10.0f;
+
+                                mScene->CreateArchetypeBuilder()
+                                    .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetRock1Model(),
+                                                                    .material = mAssetManager->GetRock1Material() })
+                                    .WithComponent(TransformComponent { .position = transform.position,
+                                                                        .rotation = glm::vec3(0.0) })
+                                    .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
+                                    .WithComponent(
+                                        RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
+                                    .WithComponent(HealthComponent { .hitPoints = 1000 / count })
+                                    .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+                                        [&, radius = sphereCollider.radius](auto,
+                                                                            TransformComponent&      transform,
+                                                                            RigidBodyComponent&      rigidBody,
+                                                                            SphereColliderComponent& sphereCollider) {
+                                            transform.position =
+                                                mRandom->PositionFrom(transform.position, -radius, radius);
+                                            transform.scale       = glm::vec3(mRandom->Float(1.0f, maxSize));
+                                            rigidBody.velocity    = mRandom->Position(-rigidBody.mass, rigidBody.mass);
+                                            sphereCollider.radius = transform.scale.x;
+                                        })
+                                    .WithEntities(count)
+                                    .Build();
+                            });
                     mScene->DestroyEntity(event.target);
                 }
             });

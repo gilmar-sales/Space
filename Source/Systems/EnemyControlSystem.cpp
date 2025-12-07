@@ -4,6 +4,7 @@
 #include "Components/LaserGunComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
+#include "Components/SpaceShipControlComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 EnemyControlSystem::EnemyControlSystem(const Ref<fr::Scene>& scene) : System(scene)
@@ -14,9 +15,10 @@ EnemyControlSystem::EnemyControlSystem(const Ref<fr::Scene>& scene) : System(sce
 void EnemyControlSystem::Update(float deltaTime)
 {
     mScene->TryGetComponents<TransformComponent>(mPlayer, [this, deltaTime](TransformComponent& playerTransform) {
-        mScene->ForEachAsync<TransformComponent, EnemyComponent, LaserGunComponent>(
+        mScene->ForEachAsync<TransformComponent, EnemyComponent, LaserGunComponent, SpaceShipControlComponent>(
             [this, deltaTime, playerPosition = playerTransform.position](
-                auto entity, TransformComponent& transform, EnemyComponent&, LaserGunComponent& laserGun) {
+                auto entity, TransformComponent& transform, EnemyComponent&, LaserGunComponent& laserGun,
+                SpaceShipControlComponent& spaceShipControl) {
                 const auto distanceVector = playerPosition - transform.position;
 
                 const auto toTarget = glm::normalize(distanceVector);
@@ -25,7 +27,13 @@ void EnemyControlSystem::Update(float deltaTime)
 
                 const auto angleThreshold = glm::cos(glm::radians(90 * 0.5f));
 
-                laserGun.triggered = glm::length(distanceVector) < 150 && dotProduct > angleThreshold;
+                auto length = glm::length(distanceVector);
+
+                auto isNearby = length < 150;
+
+                laserGun.triggered = isNearby && dotProduct > angleThreshold;
+
+                spaceShipControl.boost = !isNearby ? Boost : 0.0f;
 
                 const glm::vec3 torque = glm::normalize(glm::cross(transform.GetForwardDirection(), toTarget));
 
