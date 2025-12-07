@@ -65,9 +65,10 @@ void LaserGunSystem::Update(float deltaTime)
                         SphereColliderComponent { .radius = 1.0f },
                         ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
                         DecayComponent { .timeToLive = 2.f },
-                        RigidBodyComponent { .mass     = 0.0f,
-                                             .velocity = rigidBody.velocity + transform.GetForwardDirection() * 1200.f,
-                                             .isKinematic = false });
+                        RigidBodyComponent {
+                            .mass     = 0.0f,
+                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 1200.f,
+                        });
                 };
 
                 const auto leftOffset  = transform.GetForwardDirection() * 7.5f - transform.GetRightDirection() * 3.5f;
@@ -113,7 +114,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     TransformComponent { .position = transform.position, .rotation = glm::vec3(0.0) })
                                 .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
                                 .WithComponent(
-                                    RigidBodyComponent { .mass = rigidBody.mass / count, .isKinematic = true })
+                                    RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
                                 .WithComponent(HealthComponent { .hitPoints = 1000 / count })
                                 .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
                                     [&, radius = sphereCollider.radius](auto,

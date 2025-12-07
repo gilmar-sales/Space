@@ -3,56 +3,33 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-#include "Events/ApplyForceEvent.hpp"
 #include <Components/SpaceShipControlComponent.hpp>
-#include <Events/ApplyTorqueEvent.hpp>
 
 void MovementSystem::FixedUpdate(float deltaTime)
 {
-    mScene->ForEachAsync<TransformComponent, RigidBodyComponent,
-                         SpaceShipControlComponent>(
-        [manager = mScene, deltaTime = deltaTime](
-            const fr::Entity entity, const TransformComponent& transform,
-            RigidBodyComponent&              rigidBody,
-            const SpaceShipControlComponent& spaceShipControl) {
+    mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
+        [manager   = mScene,
+         deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
+                                SpaceShipControlComponent& spaceShipControl) {
             if (spaceShipControl.boost != 0)
             {
-                manager->SendEvent(ApplyForceEvent {
-                    .target    = entity,
-                    .direction = transform.GetForwardDirection(),
-                    .magnetiude =
-                        spaceShipControl.boost * spaceShipControl.boostFactor,
-                    .deltaTime = deltaTime });
+                rigidBody.ApplyForce(transform.GetForwardDirection(),
+                                     spaceShipControl.boost * spaceShipControl.boostFactor, deltaTime);
             }
 
             if (spaceShipControl.pitchTorque != 0)
             {
-                manager->SendEvent<ApplyTorqueEvent>(ApplyTorqueEvent {
-                    .target     = entity,
-                    .axis       = transform.GetRightDirection(),
-                    .magnetiude = spaceShipControl.pitchTorque,
-                    .deltaTime  = deltaTime,
-                });
+                transform.Rotate(transform.GetRightDirection(), spaceShipControl.pitchTorque, deltaTime);
             }
 
             if (spaceShipControl.yawTorque != 0)
             {
-                manager->SendEvent<ApplyTorqueEvent>(ApplyTorqueEvent {
-                    .target     = entity,
-                    .axis       = transform.GetUpDirection(),
-                    .magnetiude = spaceShipControl.yawTorque,
-                    .deltaTime  = deltaTime,
-                });
+                transform.Rotate(transform.GetUpDirection(), spaceShipControl.yawTorque, deltaTime);
             }
 
             if (spaceShipControl.rollTorque != 0)
             {
-                manager->SendEvent<ApplyTorqueEvent>(ApplyTorqueEvent {
-                    .target     = entity,
-                    .axis       = transform.GetForwardDirection(),
-                    .magnetiude = spaceShipControl.rollTorque,
-                    .deltaTime  = deltaTime,
-                });
+                transform.Rotate(transform.GetForwardDirection(), spaceShipControl.rollTorque, deltaTime);
             }
         });
 }

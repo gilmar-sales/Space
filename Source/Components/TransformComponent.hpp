@@ -13,15 +13,9 @@ struct TransformComponent : fr::Component
     glm::quat rotation;
     glm::vec3 scale;
 
-    glm::vec3 GetForwardDirection() const
-    {
-        return glm::vec3(0, 0, 1) * rotation;
-    }
+    glm::vec3 GetForwardDirection() const { return glm::vec3(0, 0, 1) * rotation; }
 
-    glm::vec3 GetRightDirection() const
-    {
-        return glm::vec3(1, 0, 0) * rotation;
-    }
+    glm::vec3 GetRightDirection() const { return glm::vec3(1, 0, 0) * rotation; }
 
     glm::vec3 GetUpDirection() const { return glm::vec3(0, 1, 0) * rotation; }
 
@@ -32,5 +26,12 @@ struct TransformComponent : fr::Component
         const auto scaleM     = glm::scale(glm::mat4(1), scale);
 
         return translateM * rotateM * scaleM;
+    }
+
+    void Rotate(const glm::vec3& axis, float angle, float deltaTime)
+    {
+        const auto angularAcceleration = glm::radians(angle * deltaTime);
+
+        rotation *= glm::angleAxis(angularAcceleration, axis);
     }
 };

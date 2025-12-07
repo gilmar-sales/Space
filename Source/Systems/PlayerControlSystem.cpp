@@ -9,7 +9,6 @@
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>
 
-
 PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger) :
     System(scene), mPlayer()
 {
@@ -151,8 +150,8 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this](const fra::MouseMoveEvent& mouseMoveEvent) {
         mScene->TryGetComponents<SpaceShipControlComponent>(mPlayer, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.yawTorque   = mouseMoveEvent.deltaX * 180.0f;
-            spaceShipControl.pitchTorque = mouseMoveEvent.deltaY * 180.0f;
+            spaceShipControl.yawTorque   = mouseMoveEvent.deltaX * TurnTorque;
+            spaceShipControl.pitchTorque = mouseMoveEvent.deltaY * TurnTorque;
         });
     });
 }

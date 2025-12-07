@@ -3,8 +3,8 @@
 #include "Components/EnemyComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/PlayerComponent.hpp"
+#include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
-#include "Events/ApplyTorqueEvent.hpp"
 
 EnemyControlSystem::EnemyControlSystem(const Ref<fr::Scene>& scene) : System(scene)
 {
@@ -19,7 +19,7 @@ void EnemyControlSystem::Update(float deltaTime)
                 auto entity, TransformComponent& transform, EnemyComponent&, LaserGunComponent& laserGun) {
                 const auto distanceVector = playerPosition - transform.position;
 
-                const auto toTarget       = glm::normalize(distanceVector);
+                const auto toTarget = glm::normalize(distanceVector);
 
                 const auto dotProduct = glm::dot(transform.GetForwardDirection(), toTarget);
 
@@ -29,12 +29,7 @@ void EnemyControlSystem::Update(float deltaTime)
 
                 const glm::vec3 torque = glm::normalize(glm::cross(transform.GetForwardDirection(), toTarget));
 
-
-                mScene->SendEvent(ApplyTorqueEvent {
-                    .target     = entity,
-                    .axis       = -torque,
-                    .magnetiude = 2000.0f,
-                    .deltaTime  = deltaTime });
+                transform.Rotate(-torque, 30.0f, deltaTime);
             });
     });
 }

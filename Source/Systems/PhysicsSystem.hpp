@@ -10,4 +10,7 @@ class PhysicsSystem final : public fr::System
     ~PhysicsSystem() override = default;
 
     void FixedUpdate(float deltaTime) override;
+
+  private:
+    Ref<fr::ListenerHandle> mCollisionListener;
 };

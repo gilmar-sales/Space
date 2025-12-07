@@ -19,7 +19,8 @@ class LaserGunSystem : public fr::System
                    const Ref<Random>&       random) :
         System(scene), mOctreeSystem(octreeSystem), mAssetManager(assetManager), mRandom(random)
     {
-        mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent event) { OnCollision(event); });
+        mCollisionListener =
+            mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent event) { OnCollision(event); });
     }
 
     void Update(float deltaTime) override;
@@ -27,7 +28,8 @@ class LaserGunSystem : public fr::System
     void OnCollision(const CollisionEvent& event) const;
 
   private:
-    Ref<OctreeSystem> mOctreeSystem;
-    Ref<AssetManager> mAssetManager;
-    Ref<Random>       mRandom;
+    Ref<fr::ListenerHandle> mCollisionListener;
+    Ref<OctreeSystem>       mOctreeSystem;
+    Ref<AssetManager>       mAssetManager;
+    Ref<Random>             mRandom;
 };

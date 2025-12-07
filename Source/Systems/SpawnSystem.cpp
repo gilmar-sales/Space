@@ -31,7 +31,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f, .isKinematic = true };
+                rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(10'000)
         .Build();
@@ -53,7 +53,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f, .isKinematic = true };
+                rigidBody = { .isKinematic = true, .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(15'000)
         .Build();
@@ -75,7 +75,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f, .isKinematic = true };
+                rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(1'000)
         .Build();
@@ -98,7 +98,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f, .isKinematic = true };
+                rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(1'000)
         .Build();
