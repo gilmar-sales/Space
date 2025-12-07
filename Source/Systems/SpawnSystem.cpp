@@ -25,7 +25,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
-                transform = { .position = mRandom->Position(-200'000, 200'000),
+                transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(mRandom->Float(50, 100)) };
 
@@ -33,7 +33,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
-        .WithEntities(10'000)
+        .WithEntities(30'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
@@ -47,7 +47,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
-                transform = { .position = mRandom->Position(-200'000, 200'000),
+                transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(mRandom->Float(200.0f, 1000.0f)) };
 
@@ -69,7 +69,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
-                transform = { .position = mRandom->Position(-20'000, 20'000),
+                transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(mRandom->Float(1.0f, 100.0f)) };
 
@@ -77,7 +77,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
-        .WithEntities(1'000)
+        .WithEntities(10'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
@@ -92,7 +92,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
-                transform = { .position = mRandom->Position(-20'000, 20'000),
+                transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
                               .scale    = glm::vec3(mRandom->Float(1.0f, 100.0f)) };
 
@@ -100,7 +100,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 rigidBody = { .mass = transform.scale.x * 5000.0f };
             })
-        .WithEntities(1'000)
+        .WithEntities(10'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
