@@ -4,5 +4,4 @@
 
 struct PlayerComponent : fr::Component
 {
-    unsigned hitPoints;
 };

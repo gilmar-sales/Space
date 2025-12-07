@@ -1,7 +1,5 @@
 #include "PhysicsSystem.hpp"
 
-#include "Events/TransformChangeEvent.hpp"
-
 #include <Components/RigidBodyComponent.hpp>
 #include <Components/SphereColliderComponent.hpp>
 #include <Components/TransformComponent.hpp>
@@ -13,31 +11,39 @@
 PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
 {
     mScene->AddEventListener<CollisionEvent>([scene = mScene](const CollisionEvent collisionEvent) {
-        scene->TryGetComponents<TransformComponent, SphereColliderComponent>(
+        scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             collisionEvent.target,
-            [&](TransformComponent& targetTransform, SphereColliderComponent& targetCollider) {
-                scene->TryGetComponents<TransformComponent, SphereColliderComponent>(
+            [&](TransformComponent& targetTransform, SphereColliderComponent& targetCollider,
+                RigidBodyComponent& targetRigidBody) {
+                scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
                     collisionEvent.collisor,
-                    [&](TransformComponent& collisorTransform, SphereColliderComponent& collisorCollider) {
+                    [&](TransformComponent& collisorTransform, SphereColliderComponent& collisorCollider,
+                        RigidBodyComponent& collisorRigidBody) {
                         const auto distance = glm::distance(targetTransform.position, collisorTransform.position);
 
-                        const auto force = (targetCollider.radius + collisorCollider.radius - distance) / 2;
+                        const auto totalForce = (targetCollider.radius + collisorCollider.radius - distance);
+
+                        const auto targetForce =
+                            totalForce * (collisorRigidBody.mass / (targetRigidBody.mass + collisorRigidBody.mass));
+
+                        const auto collisorForce =
+                            totalForce * (targetRigidBody.mass / (targetRigidBody.mass + collisorRigidBody.mass));
 
                         const auto direction = normalize(targetTransform.position - collisorTransform.position);
 
-                        targetTransform.position += direction * force;
-                        collisorTransform.position += -direction * force;
+                        targetTransform.position += direction * targetForce;
+                        collisorTransform.position += -direction * collisorForce;
 
                         scene->SendEvent(ApplyForceEvent {
                             .target     = collisionEvent.target,
                             .direction  = glm::normalize(targetTransform.position - collisorTransform.position),
-                            .magnetiude = force,
+                            .magnetiude = targetForce,
                             .deltaTime  = collisionEvent.deltaTime });
 
                         scene->SendEvent(ApplyForceEvent {
                             .target     = collisionEvent.collisor,
                             .direction  = glm::normalize(collisorTransform.position - targetTransform.position),
-                            .magnetiude = force,
+                            .magnetiude = collisorForce,
                             .deltaTime  = collisionEvent.deltaTime });
                     });
             });
@@ -48,9 +54,6 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
             const auto acceleration = applyForceEvent.magnetiude / rigidBody.mass;
 
             rigidBody.velocity += applyForceEvent.direction * acceleration * applyForceEvent.deltaTime;
-
-            if (acceleration > 0.01f)
-                mScene->SendEvent(TransformChangeEvent { .entity = applyForceEvent.target });
         });
     });
 
@@ -61,26 +64,15 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene) : System(scene)
                     glm::radians(applyTorqueEvent.magnetiude / rigidBody.mass * applyTorqueEvent.deltaTime);
 
                 transform.rotation *= glm::angleAxis(angularAcceleration, applyTorqueEvent.axis);
-
-                if (angularAcceleration > 0.01f)
-                    mScene->SendEvent(TransformChangeEvent { .entity = applyTorqueEvent.target });
             });
     });
-
-    mScene->ForEach<TransformComponent, RigidBodyComponent>(
-        [scene = mScene](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody) {
-            scene->SendEvent(TransformChangeEvent { .entity = entity });
-        });
 }
+
 void PhysicsSystem::FixedUpdate(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent>(
         [scene = mScene, deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody) {
-            if (glm::length(rigidBody.velocity) > 0.01f)
-            {
-                scene->SendEvent(TransformChangeEvent { .entity = entity });
-                transform.position += rigidBody.velocity * deltaTime;
-            }
+            transform.position += rigidBody.velocity * deltaTime;
 
             if (rigidBody.mass > 0)
                 rigidBody.velocity *= 1.0f - 0.8f * deltaTime;

@@ -4,5 +4,4 @@
 
 struct EnemyComponent : fr::Component
 {
-    unsigned hitPoints;
 };

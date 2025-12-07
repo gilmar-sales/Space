@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Events/TransformChangeEvent.hpp"
-
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
@@ -14,8 +12,7 @@ class CollisionSystem final : public fr::System
                     const Ref<fra::Renderer>& renderer,
                     const Ref<fra::MeshPool>& meshPool,
                     const Ref<OctreeSystem>&  octreeSystem) :
-        System(scene), mRenderer(renderer), mMeshPool(meshPool),
-        mOctreeSystem(octreeSystem)
+        System(scene), mRenderer(renderer), mMeshPool(meshPool), mOctreeSystem(octreeSystem)
     {
     }
 

@@ -4,6 +4,8 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
+#include "Components/EnemyComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
@@ -22,9 +24,11 @@
 #include "Systems/RenderSystem.hpp"
 #include "Systems/SpawnSystem.hpp"
 
+#include "Random.hpp"
+
 int main(int argc, char const* argv[])
 {
-    auto app =
+    auto builder =
         skr::ApplicationBuilder()
             .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
                 freyr
@@ -35,6 +39,8 @@ int main(int argc, char const* argv[])
                     .AddComponent<TransformComponent>()
                     .AddComponent<SphereColliderComponent>()
                     .AddComponent<RigidBodyComponent>()
+                    .AddComponent<HealthComponent>()
+                    .AddComponent<EnemyComponent>()
                     .AddComponent<PlayerComponent>()
                     .AddComponent<SpaceShipControlComponent>()
                     .AddComponent<LaserGunComponent>()
@@ -60,8 +66,12 @@ int main(int argc, char const* argv[])
                         .SetVSync(false)
                         .SetFullscreen(false);
                 });
-            })
-            .Build<SpaceApp>();
+            });
+
+    builder.GetServiceCollection().AddSingleton<AssetManager>();
+    builder.GetServiceCollection().AddTransient<Random>();
+
+    auto app = builder.Build<SpaceApp>();
 
     app->Run();
 

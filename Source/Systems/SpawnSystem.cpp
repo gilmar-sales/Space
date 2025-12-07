@@ -3,6 +3,7 @@
 #include <random>
 
 #include "Components/EnemyComponent.hpp"
+#include "Components/HealthComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
@@ -11,88 +12,22 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-template <typename T>
-static T randomNumber(const T min, const T max)
+SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& assetManager,
+                         const Ref<Random>& random) : System(scene), mAssetManager(assetManager), mRandom(random)
 {
-    if constexpr (std::is_floating_point_v<T>)
-    {
-        std::random_device                r;
-        std::default_random_engine        e1(r());
-        std::uniform_real_distribution<T> uniform_dist(min, max);
-
-        return uniform_dist(e1);
-    }
-    else
-    {
-        std::random_device               r;
-        std::default_random_engine       e1(r());
-        std::uniform_int_distribution<T> uniform_dist(min, max);
-
-        return uniform_dist(e1);
-    }
-}
-
-static glm::vec3 randomPosition(float min, float max)
-{
-    return { randomNumber(min, max), randomNumber(min, max), randomNumber(min, max) };
-}
-
-SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
-                         const Ref<fra::MeshPool>&     meshPool,
-                         const Ref<fra::TexturePool>&  texturePool,
-                         const Ref<fra::MaterialPool>& materialPool) :
-    System(scene), mMeshPool(meshPool), mTexturePool(texturePool), mMaterialPool(materialPool)
-{
-    mBlankTexture  = mTexturePool->CreateTextureFromFile("./Resources/Textures/blank_texture.png");
-    mBlankMaterial = mMaterialPool->Create({ mBlankTexture, mBlankTexture, mBlankTexture });
-
-    mPlayerShipModel    = mMeshPool->CreateMeshFromFile("./Resources/Models/player_ship.fbx");
-    mPlayerShipMaterial = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship.jpg"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_normal.jpg"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_roughness.jpg") });
-
-    mEnemyShipModel    = mMeshPool->CreateMeshFromFile("./Resources/Models/enemy_ship.fbx");
-    mEnemyShipMaterial = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship.png"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_normal.png"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_roughness.png") });
-
-    mMoonModel    = mMeshPool->CreateMeshFromFile("./Resources/Models/moon.fbx");
-    mMoonMaterial = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/moon.jpg"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/moon_normal.png"), mBlankTexture });
-
-    mJupiter     = mMeshPool->CreateMeshFromFile("./Resources/Models/sun.fbx");
-    mSunMaterial = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/jupiter.png"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/jupiter_normal.png"), mBlankTexture });
-
-    mRock1Model    = mMeshPool->CreateMeshFromFile("./Resources/Models/rock_01.fbx");
-    mRock1Material = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_01.tga"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_01_normal.tga"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_01_roughness.tga") });
-
-    mRock2Model    = mMeshPool->CreateMeshFromFile("./Resources/Models/rock_02.fbx");
-    mRock2Material = mMaterialPool->Create(
-        { mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_02.tga"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_02_normal.tga"),
-          mTexturePool->CreateTextureFromFile("./Resources/Textures/rock_02_roughness.tga") });
-
-    mCheckpointModel = mMeshPool->CreateMeshFromFile("./Resources/Models/checkpoint.fbx");
-
     mScene->CreateArchetypeBuilder()
-        .WithComponent(ModelComponent { .meshes = &mMoonModel, .material = mMoonMaterial })
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(
+            ModelComponent { .meshes = &mAssetManager->GetMoonModel(), .material = mAssetManager->GetMoonMaterial() })
         .WithComponent(TransformComponent {})
         .WithComponent(SphereColliderComponent {})
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
-               RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-200'000, 200'000),
+            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+                   RigidBodyComponent& rigidBody) {
+                transform = { .position = mRandom->Position(-200'000, 200'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(50, 100)) };
+                              .scale    = glm::vec3(mRandom->Float(50, 100)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -102,17 +37,19 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(ModelComponent { .meshes = &mJupiter, .material = mSunMaterial })
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetJupiterModel(),
+                                        .material = mAssetManager->GetJupiterMaterial() })
         .WithComponent(
             TransformComponent { .position = glm::vec3(0), .rotation = glm::vec3(0.0), .scale = glm::vec3(200) })
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
-               RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-200'000, 200'000),
+            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+                   RigidBodyComponent& rigidBody) {
+                transform = { .position = mRandom->Position(-200'000, 200'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(200.0f, 1000.0f)) };
+                              .scale    = glm::vec3(mRandom->Float(200.0f, 1000.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -122,17 +59,19 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(ModelComponent { .meshes = &mRock1Model, .material = mRock1Material })
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(
+            ModelComponent { .meshes = &mAssetManager->GetRock1Model(), .material = mAssetManager->GetRock1Material() })
         .WithComponent(
             TransformComponent { .position = glm::vec3(0), .rotation = glm::vec3(0.0), .scale = glm::vec3(1) })
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
-               RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-20'000, 20'000),
+            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+                   RigidBodyComponent& rigidBody) {
+                transform = { .position = mRandom->Position(-20'000, 20'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) };
+                              .scale    = glm::vec3(mRandom->Float(1.0f, 100.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -142,18 +81,20 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(ModelComponent { .meshes = &mRock2Model, .material = mRock2Material })
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(
+            ModelComponent { .meshes = &mAssetManager->GetRock2Model(), .material = mAssetManager->GetRock2Material() })
         .WithComponent(TransformComponent { .position = glm::vec3(0),
                                             .rotation = glm::vec3(0.0),
-                                            .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) })
+                                            .scale    = glm::vec3(mRandom->Float(1.0f, 100.0f)) })
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
-               RigidBodyComponent& rigidBody) {
-                transform = { .position = randomPosition(-20'000, 20'000),
+            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+                   RigidBodyComponent& rigidBody) {
+                transform = { .position = mRandom->Position(-20'000, 20'000),
                               .rotation = glm::vec3(0.0),
-                              .scale    = glm::vec3(randomNumber(1.0f, 100.0f)) };
+                              .scale    = glm::vec3(mRandom->Float(1.0f, 100.0f)) };
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
@@ -163,8 +104,10 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(PlayerComponent { .hitPoints = 1000 })
-        .WithComponent(ModelComponent { .meshes = &mPlayerShipModel, .material = mPlayerShipMaterial })
+        .WithComponent(PlayerComponent {})
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetPlayerShipModel(),
+                                        .material = mAssetManager->GetPlayerShipMaterial() })
         .WithComponent(
             TransformComponent { .position = glm::vec3(0), .rotation = glm::vec3(0.0, 0, 0), .scale = glm::vec3(3) })
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
@@ -176,8 +119,10 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(EnemyComponent { .hitPoints = 1000 })
-        .WithComponent(ModelComponent { .meshes = &mEnemyShipModel, .material = mEnemyShipMaterial })
+        .WithComponent(EnemyComponent {})
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetEnemyShipModel(),
+                                        .material = mAssetManager->GetEnemyShipMaterial() })
         .WithComponent(
             TransformComponent { .position = glm::vec3(0), .rotation = glm::vec3(0.0, 0, 0), .scale = glm::vec3(3) })
         .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
@@ -186,8 +131,8 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>&         scene,
         .WithComponent(
             LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
         .WithEntities(3000)
-        .ForEach<TransformComponent>([](auto, TransformComponent& transform) {
-            transform.position = randomPosition(-1'000, 1'000);
+        .ForEach<TransformComponent>([this](auto, TransformComponent& transform) {
+            transform.position = mRandom->Position(-1'000, 1'000);
         })
         .Build();
 }
