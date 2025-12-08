@@ -49,7 +49,7 @@ void RenderSystem::BeginFrame() const
 {
     mRenderer->BeginFrame();
 
-    mScene->TryGetComponents<TransformComponent>(mPlayer, [&](TransformComponent& transform) {
+    mScene->TryGetComponents<TransformComponent>(mPlayer, [&](const TransformComponent& transform) {
         const auto cameraPosition =
             transform.position - transform.GetForwardDirection() * 12.0f - transform.GetUpDirection() * 5.0f;
 
@@ -92,11 +92,19 @@ void RenderSystem::DrawInstanced()
     mScene->EndTrace();
 
     mScene->BeginTrace("Sort Renderables");
+
     std::ranges::sort(renderables, [this](const Particle& a, const Particle& b) {
         auto greater = false;
-        mScene->TryGetComponents<ModelComponent>(a.entity, [&](ModelComponent& aModel) {
-            mScene->TryGetComponents<ModelComponent>(b.entity, [&](ModelComponent& bModel) {
-                greater = aModel.meshes < bModel.meshes && aModel.material < bModel.material;
+        mScene->TryGetComponents<ModelComponent>(a.entity, [&](const ModelComponent& aModel) {
+            mScene->TryGetComponents<ModelComponent>(b.entity, [&](const ModelComponent& bModel) {
+                if (aModel.meshes != bModel.meshes)
+                {
+                    greater = aModel.meshes < bModel.meshes;
+                }
+                else
+                {
+                    greater = aModel.material < bModel.material;
+                }
             });
         });
         return greater;
@@ -111,7 +119,7 @@ void RenderSystem::DrawInstanced()
     mScene->BeginTrace("Calculate instance sequence");
 
     renderables = std::ranges::to<std::vector>(std::views::filter(renderables, [&](auto& particle) {
-        return mScene->TryGetComponents<TransformComponent>(particle.entity, [&](TransformComponent& transform) {
+        return mScene->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent& transform) {
             matrices.emplace_back(transform.GetModel());
         });
     }));
