@@ -36,7 +36,6 @@ class Octree
   public:
     Octree(glm::vec3       position,
            float           halfRange,
-           size_t          capacity,
            ArenaAllocator* allocator = new ArenaAllocator(),
            Octree*         root      = nullptr);
 
@@ -68,7 +67,7 @@ class Octree
     size_t    mCapacity;
     float     mHalfRange;
 
-    LockFreeArray<Particle> mElements;
+    LockFreeArray<Particle, 6> mElements;
     std::atomic<State>      mState;
 
     Octree* mNearTopLeft;

@@ -101,20 +101,8 @@ class ArenaAllocator
         bool expected = false;
         if (expanding.compare_exchange_strong(expected, true, std::memory_order_acquire, std::memory_order_relaxed))
         {
-            try
-            {
-                auto new_block = std::make_unique<ArenaBlock>(block_size);
-
-                blocks.push_back(std::move(new_block));
-
-                num_blocks.fetch_add(1, std::memory_order_release);
-            }
-            catch (...)
-            {
-                expanding.store(false, std::memory_order_release);
-                throw;
-            }
-
+            blocks.emplace_back(std::make_unique<ArenaBlock>(block_size));
+            num_blocks.fetch_add(1, std::memory_order_release);
             expanding.store(false, std::memory_order_release);
         }
         else

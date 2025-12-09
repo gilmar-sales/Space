@@ -11,9 +11,8 @@ void Octree::Remove(fr::Entity entity)
     }
 }
 
-Octree::Octree(const glm::vec3 position, const float halfRange, const size_t capacity,
-               ArenaAllocator* allocator, Octree* root) :
-    mAllocator(allocator), mPosition(position), mCapacity(capacity), mHalfRange(halfRange), mRoot(root)
+Octree::Octree(const glm::vec3 position, const float halfRange, ArenaAllocator* allocator, Octree* root) :
+    mAllocator(allocator), mPosition(position), mHalfRange(halfRange), mRoot(root)
 {
     if (mRoot == nullptr)
         mRoot = this;
@@ -113,20 +112,20 @@ void Octree::TrySubdivide()
     glm::vec3 nearBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
     glm::vec3 nearBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z - halfRange };
 
-    mNearTopLeft = mAllocator->construct<Octree>(nearTopLeftPos, halfRange, mCapacity, mAllocator, mRoot);
-    mNearTopRight = mAllocator->construct<Octree>(nearTopRightPos, halfRange, mCapacity, mAllocator, mRoot);
-    mNearBotLeft = mAllocator->construct<Octree>(nearBotLeftPos, halfRange, mCapacity, mAllocator, mRoot);
-    mNearBotRight = mAllocator->construct<Octree>(nearBotRightPos, halfRange, mCapacity, mAllocator, mRoot);
+    mNearTopLeft  = mAllocator->construct<Octree>(nearTopLeftPos, halfRange, mAllocator, mRoot);
+    mNearTopRight = mAllocator->construct<Octree>(nearTopRightPos, halfRange, mAllocator, mRoot);
+    mNearBotLeft  = mAllocator->construct<Octree>(nearBotLeftPos, halfRange, mAllocator, mRoot);
+    mNearBotRight = mAllocator->construct<Octree>(nearBotRightPos, halfRange, mAllocator, mRoot);
 
     glm::vec3 farTopLeftPos  = { mPosition.x - halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
     glm::vec3 farTopRightPos = { mPosition.x + halfRange, mPosition.y - halfRange, mPosition.z + halfRange };
     glm::vec3 farBotLeftPos  = { mPosition.x - halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
     glm::vec3 farBotRightPos = { mPosition.x + halfRange, mPosition.y + halfRange, mPosition.z + halfRange };
 
-    mFarTopLeft  = mAllocator->construct<Octree>(farTopLeftPos, halfRange, mCapacity, mAllocator, mRoot);
-    mFarTopRight = mAllocator->construct<Octree>(farTopRightPos, halfRange, mCapacity, mAllocator, mRoot);
-    mFarBotLeft  = mAllocator->construct<Octree>(farBotLeftPos, halfRange, mCapacity, mAllocator, mRoot);
-    mFarBotRight = mAllocator->construct<Octree>(farBotRightPos, halfRange, mCapacity, mAllocator, mRoot);
+    mFarTopLeft  = mAllocator->construct<Octree>(farTopLeftPos, halfRange, mAllocator, mRoot);
+    mFarTopRight = mAllocator->construct<Octree>(farTopRightPos, halfRange, mAllocator, mRoot);
+    mFarBotLeft  = mAllocator->construct<Octree>(farBotLeftPos, halfRange, mAllocator, mRoot);
+    mFarBotRight = mAllocator->construct<Octree>(farBotRightPos, halfRange, mAllocator, mRoot);
 
     mState.store(State::Branch, std::memory_order_release);
 }

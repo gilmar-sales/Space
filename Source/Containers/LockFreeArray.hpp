@@ -3,17 +3,29 @@
 #include <array>
 #include <atomic>
 #include <optional>
+#include <type_traits>
 
-template <typename T>
+template <typename T, size_t MAX_SIZE>
 class LockFreeArray
 {
   private:
-    static constexpr size_t MAX_SIZE = 4;
-
-    struct Node
+    struct alignas(std::max(alignof(T), alignof(std::atomic<bool>))) Node
     {
-        std::atomic<T*> data;
-        Node() : data(nullptr) {}
+        std::atomic<bool> occupied;
+        alignas(T) unsigned char storage[sizeof(T)];
+
+        Node() : occupied(false) {}
+
+        ~Node()
+        {
+            if (occupied.load(std::memory_order_acquire))
+            {
+                get_ptr()->~T();
+            }
+        }
+
+        T*       get_ptr() { return reinterpret_cast<T*>(storage); }
+        const T* get_ptr() const { return reinterpret_cast<const T*>(storage); }
     };
 
     std::array<Node, MAX_SIZE> slots;
@@ -24,37 +36,32 @@ class LockFreeArray
 
     ~LockFreeArray()
     {
-        for (size_t i = 0; i < MAX_SIZE; ++i)
-        {
-            T* ptr = slots[i].data.load(std::memory_order_acquire);
-            if (ptr != nullptr)
-            {
-                delete ptr;
-            }
-        }
+        // Nodes handle their own destruction
     }
 
     bool push(const T& value)
     {
-
-        if (const size_t current_count = count.load(std::memory_order_acquire); current_count >= MAX_SIZE)
+        if (count.load(std::memory_order_acquire) >= MAX_SIZE)
         {
             return false;
         }
 
         for (size_t i = 0; i < MAX_SIZE; ++i)
         {
-            T* expected  = nullptr;
-            T* new_value = new T(value);
+            bool expected = false;
 
-            if (slots[i].data.compare_exchange_strong(
-                    expected, new_value, std::memory_order_release, std::memory_order_acquire))
+            if (slots[i].occupied.compare_exchange_strong(
+                    expected, true, std::memory_order_acquire, std::memory_order_acquire))
             {
+                // We've claimed this slot, now construct the object in place
+                new (slots[i].get_ptr()) T(value);
+
+                // Ensure construction is visible before marking as truly occupied
+                std::atomic_thread_fence(std::memory_order_release);
+
                 count.fetch_add(1, std::memory_order_release);
                 return true;
             }
-
-            delete new_value;
         }
 
         return false;
@@ -67,16 +74,14 @@ class LockFreeArray
             return std::nullopt;
         }
 
-        T* ptr = slots[index].data.load(std::memory_order_acquire);
-        if (ptr == nullptr)
+        if (!slots[index].occupied.load(std::memory_order_acquire))
         {
             return std::nullopt;
         }
 
-        return *ptr;
+        return *slots[index].get_ptr();
     }
 
-    // Try to remove an element at index, returns true if successful
     bool remove(size_t index)
     {
         if (index >= MAX_SIZE)
@@ -84,16 +89,17 @@ class LockFreeArray
             return false;
         }
 
-        T* expected = slots[index].data.load(std::memory_order_acquire);
-        if (expected == nullptr)
-        {
-            return false;
-        }
+        bool expected = true;
 
-        if (slots[index].data.compare_exchange_strong(
-                expected, nullptr, std::memory_order_release, std::memory_order_acquire))
+        if (slots[index].occupied.compare_exchange_strong(
+                expected, false, std::memory_order_acquire, std::memory_order_acquire))
         {
-            delete expected;
+            // We've claimed the slot for removal
+            slots[index].get_ptr()->~T();
+
+            // Ensure destruction is complete before updating count
+            std::atomic_thread_fence(std::memory_order_release);
+
             count.fetch_sub(1, std::memory_order_release);
             return true;
         }
