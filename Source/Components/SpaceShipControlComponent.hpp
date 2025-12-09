@@ -2,15 +2,15 @@
 
 #include <Freyr/Freyr.hpp>
 
-constexpr auto Boost       = 30'000;
+constexpr auto Boost       = 2'000;
 constexpr auto BoostFactor = 3.3f;
 constexpr auto TurnTorque  = 90.0f;
 
 struct SpaceShipControlComponent : fr::Component
 {
     float boostFactor = 1.0f;
-    float boost;
-    float rollTorque;
-    float pitchTorque;
-    float yawTorque;
+    float boost = 0.0f;
+    float rollTorque = 0.0f;
+    float pitchTorque = 0.0f;
+    float yawTorque = 0.0f;
 };

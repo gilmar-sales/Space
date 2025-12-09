@@ -8,7 +8,7 @@ void OctreeSystem::PreFixedUpdate(float deltaTime)
 void OctreeSystem::BuildOctree()
 {
     mAllocator->reset();
-    mOctree = mAllocator->construct<Octree>(glm::vec3(0), 200'000.0f, 6);
+    mOctree = mAllocator->construct<Octree>(glm::vec3(0), 200'000.0f, 6, mAllocator);
 
     mScene->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         "Build Octree",

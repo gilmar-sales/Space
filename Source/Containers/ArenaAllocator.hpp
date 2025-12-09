@@ -5,15 +5,7 @@
 #include <memory>
 #include <vector>
 
-constexpr size_t CACHE_LINE_SIZE  = 64;
 constexpr size_t ARENA_BLOCK_SIZE = 64 * 1024;
-constexpr size_t OCTREE_MAX_DEPTH = 16;
-
-template <typename T>
-struct alignas(CACHE_LINE_SIZE) CacheAligned
-{
-    T value;
-};
 
 class ArenaAllocator
 {
@@ -35,7 +27,7 @@ class ArenaAllocator
 
   public:
     explicit ArenaAllocator(const size_t initial_block_size = ARENA_BLOCK_SIZE) :
-        current_block_idx(0), block_size(initial_block_size)
+        current_block_idx(0), num_blocks(1), block_size(initial_block_size), expanding(false)
     {
         blocks.push_back(std::make_unique<ArenaBlock>(block_size));
     }

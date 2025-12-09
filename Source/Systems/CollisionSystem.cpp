@@ -12,7 +12,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
 
     mScene->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         "Calculate collisions",
-        [this, octree = octree, manager = mScene,
+        [this, octree = octree,
          deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
                                 SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
             if (rigidBody.isKinematic)
@@ -26,7 +26,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
 
             for (const auto collision : collisions)
             {
-                manager->SendEvent<CollisionEvent>(
+                mScene->SendEvent<CollisionEvent>(
                     CollisionEvent { .target = collision.entity, .collisor = entity, .deltaTime = deltaTime });
             }
         });
