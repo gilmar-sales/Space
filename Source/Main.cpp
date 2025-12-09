@@ -33,7 +33,7 @@ int main(int argc, char const* argv[])
             .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
                 freyr
                     .WithOptions([](fr::FreyrOptionsBuilder& options) {
-                        options.WithMaxEntities(1024 * 1024).WithFixedDeltaTime(1.0f / 30.0f).WithArchetypeChunkCapacity(2 * 1024).WithThreadCount(10);
+                        options.WithMaxEntities(1024 * 1024).WithFixedDeltaTime(1.0f / 60.0f).WithArchetypeChunkCapacity(2 * 1024).WithThreadCount(10);
                     })
                     .AddComponent<ModelComponent>()
                     .AddComponent<TransformComponent>()
