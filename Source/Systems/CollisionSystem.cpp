@@ -20,7 +20,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
 
             auto collisions = std::vector<Particle>(0);
 
-            auto particle = Particle { .entity = entity, .transform = &transform, .sphereCollider = &sphereCollider };
+            auto particle = Particle { .entity = entity, .transform = transform, .sphereCollider = sphereCollider };
 
             octree->Query(particle, collisions);
 

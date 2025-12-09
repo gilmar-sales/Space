@@ -13,14 +13,14 @@
 
 struct Particle
 {
-    fr::Entity               entity;
-    TransformComponent*      transform;
-    SphereColliderComponent* sphereCollider;
+    fr::Entity              entity;
+    TransformComponent      transform;
+    SphereColliderComponent sphereCollider;
 
     [[nodiscard]] bool Intersect(const Particle& other) const
     {
-        return glm::distance(transform->position, other.transform->position) <=
-               sphereCollider->radius + other.sphereCollider->radius;
+        return glm::distance(transform.position, other.transform.position) <=
+               sphereCollider.radius + other.sphereCollider.radius;
     }
 };
 
@@ -68,7 +68,7 @@ class Octree
     float     mHalfRange;
 
     LockFreeArray<Particle, 6> mElements;
-    std::atomic<State>      mState;
+    std::atomic<State>         mState;
 
     Octree* mNearTopLeft;
     Octree* mNearTopRight;

@@ -51,7 +51,7 @@ void RenderSystem::BeginFrame() const
 
     mScene->TryGetComponents<TransformComponent>(mPlayer, [&](const TransformComponent& transform) {
         const auto cameraPosition =
-            transform.position - transform.GetForwardDirection() * 12.0f - transform.GetUpDirection() * 5.0f;
+            transform.position - transform.GetForwardDirection() * 15.0f - transform.GetUpDirection() * 5.0f;
 
         const auto cameraForward =
             glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);

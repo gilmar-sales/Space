@@ -16,6 +16,6 @@ void OctreeSystem::BuildOctree()
                            TransformComponent&      transform,
                            SphereColliderComponent& sphereCollider,
                            RigidBodyComponent&) {
-            octree->Insert(Particle { .entity = entity, .transform = &transform, .sphereCollider = &sphereCollider });
+            octree->Insert(Particle { .entity = entity, .transform = transform, .sphereCollider = sphereCollider });
         });
 }

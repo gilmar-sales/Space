@@ -47,14 +47,14 @@ void LaserGunSystem::Update(float deltaTime)
                         [scene, octreeSystem](
                             auto bullet,
                             BulletComponent&,
-                            TransformComponent&      transform,
-                            SphereColliderComponent& sphereCollider,
+                            const TransformComponent&      transform,
+                            const SphereColliderComponent& sphereCollider,
                             ModelComponent&,
                             DecayComponent&,
                             RigidBodyComponent&) {
                             const auto particle = Particle { .entity         = bullet,
-                                                             .transform      = &transform,
-                                                             .sphereCollider = &sphereCollider };
+                                                             .transform      = transform,
+                                                             .sphereCollider = sphereCollider };
 
                             octreeSystem->GetOctree()->Insert(particle);
                         },
@@ -119,16 +119,18 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
                                     .WithComponent(
                                         RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
-                                    .WithComponent(HealthComponent { .hitPoints = rigidBody.mass / count })
+                                    .WithComponent(HealthComponent { .hitPoints = targetHealth.hitPoints / count })
                                     .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
-                                        [this, velocity = rigidBody.mass / count, radius = sphereCollider.radius, maxSize](
-                                            auto,
-                                            TransformComponent&      rockTransform,
-                                            RigidBodyComponent&      rockRigidBody,
-                                            SphereColliderComponent& rockSphereCollider) {
+                                        [this,
+                                         velocity = rigidBody.mass / count,
+                                         radius   = sphereCollider.radius,
+                                         maxSize](auto,
+                                                  TransformComponent&      rockTransform,
+                                                  RigidBodyComponent&      rockRigidBody,
+                                                  SphereColliderComponent& rockSphereCollider) {
                                             rockTransform.position =
                                                 mRandom->PositionFrom(rockTransform.position, -radius, radius);
-                                            rockTransform.scale    = glm::vec3(mRandom->Float(1.0f, maxSize));
+                                            rockTransform.scale       = glm::vec3(mRandom->Float(1.0f, maxSize));
                                             rockRigidBody.velocity    = mRandom->Position(-velocity, velocity);
                                             rockSphereCollider.radius = rockTransform.scale.x;
                                         })
