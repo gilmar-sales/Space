@@ -64,15 +64,19 @@ void LaserGunSystem::Update(float deltaTime)
                                              .scale    = glm::vec3(1.0) },
                         SphereColliderComponent { .radius = 1.0f },
                         ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
-                        DecayComponent { .timeToLive = 2.f },
+                        DecayComponent { .timeToLive = 3.5f },
                         RigidBodyComponent {
                             .mass     = 0.0f,
-                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 1000.f,
+                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 800.f,
                         });
                 };
 
-                const auto leftOffset  = transform.GetForwardDirection() * 7.5f - transform.GetRightDirection() * 3.5f;
-                const auto rightOffset = transform.GetForwardDirection() * 7.5f + transform.GetRightDirection() * 3.5f;
+                const auto forwarOffset = transform.GetForwardDirection() * 9.5f;
+                const auto sideOffset   = transform.GetRightDirection() * 3.5f;
+                const auto upOffset     = transform.GetUpDirection() * 1.5f;
+
+                const auto leftOffset  = forwarOffset - sideOffset + upOffset;
+                const auto rightOffset = forwarOffset + sideOffset + upOffset;
 
                 shoot(leftOffset);
                 shoot(rightOffset);
@@ -107,7 +111,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                 if (rigidBody.mass < 1000.0f)
                                     return;
 
-                                const auto count   = sphereCollider.radius;
+                                const auto count   = rigidBody.mass / sphereCollider.radius / 2;
                                 const auto maxSize = sphereCollider.radius / 10.0f;
 
                                 mScene->CreateArchetypeBuilder()
@@ -120,17 +124,18 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                         RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
                                     .WithComponent(HealthComponent { .hitPoints = 1000 / count })
                                     .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
-                                        [&, radius = sphereCollider.radius](auto,
-                                                                            TransformComponent&      transform,
-                                                                            RigidBodyComponent&      rigidBody,
-                                                                            SphereColliderComponent& sphereCollider) {
-                                            transform.position =
+                                        [&, radius = sphereCollider.radius](
+                                            auto,
+                                            TransformComponent&      rockTransform,
+                                            RigidBodyComponent&      rockRigidBody,
+                                            SphereColliderComponent& rockSphereCollider) {
+                                            rockTransform.position =
                                                 mRandom->PositionFrom(transform.position, -radius, radius);
-                                            transform.scale       = glm::vec3(mRandom->Float(1.0f, maxSize));
-                                            rigidBody.velocity    = mRandom->Position(-rigidBody.mass, rigidBody.mass);
-                                            sphereCollider.radius = transform.scale.x;
+                                            rockTransform.scale    = glm::vec3(mRandom->Float(1.0f, maxSize));
+                                            rockRigidBody.velocity = mRandom->Position(-rigidBody.mass, rigidBody.mass);
+                                            rockSphereCollider.radius = transform.scale.x;
                                         })
-                                    .WithEntities(count)
+                                    .WithEntities(static_cast<fr::Entity>(count))
                                     .Build();
                             });
                     mScene->DestroyEntity(event.target);

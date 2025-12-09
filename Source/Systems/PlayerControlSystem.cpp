@@ -150,8 +150,8 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this](const fra::MouseMoveEvent& mouseMoveEvent) {
         mScene->TryGetComponents<SpaceShipControlComponent>(mPlayer, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.yawTorque   = mouseMoveEvent.deltaX * TurnTorque;
-            spaceShipControl.pitchTorque = mouseMoveEvent.deltaY * TurnTorque;
+            spaceShipControl.yawTorque   = mouseMoveEvent.deltaX * 0.1f * TurnTorque;
+            spaceShipControl.pitchTorque = mouseMoveEvent.deltaY * 0.1f * TurnTorque;
         });
     });
 }
