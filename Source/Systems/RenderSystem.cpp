@@ -25,12 +25,12 @@ RenderSystem::RenderSystem(const Ref<fr::Scene>&         scene,
 
     for (int frameIndex = 0; frameIndex < mRenderer->GetFrameCount(); ++frameIndex)
     {
-        mRenderables[frameIndex].reserve(10000);
-        mMatrices[frameIndex].reserve(10000);
+        mRenderables[frameIndex].reserve(30000);
+        mMatrices[frameIndex].reserve(30000);
         mInstanceMatrixBuffers[frameIndex] =
             mRenderer->GetBufferBuilder()
                 .SetData(mMatrices[frameIndex].data())
-                .SetSize(sizeof(glm::mat4) * 10000)
+                .SetSize(sizeof(glm::mat4) * 30000)
                 .SetUsage(fra::BufferUsage::Instance)
                 .Build();
     }
@@ -118,11 +118,11 @@ void RenderSystem::DrawInstanced()
 
     mScene->BeginTrace("Calculate instance sequence");
 
-    renderables = std::ranges::to<std::vector>(std::views::filter(renderables, [&](auto& particle) {
-        return mScene->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent& transform) {
+    std::ranges::remove_if(renderables, [&](auto& particle) {
+        return !mScene->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent& transform) {
             matrices.emplace_back(transform.GetModel());
         });
-    }));
+    });
 
     auto currentInstance = InstanceDraw { .index = 0, .instanceCount = 0, .meshes = nullptr, .material = 9 };
 

@@ -7,9 +7,9 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
+#include "ArenaAllocator.hpp"
 #include "Frustum.hpp"
 #include "LockFreeArray.hpp"
-class Octree;
 
 struct Particle
 {
@@ -34,17 +34,13 @@ class Octree
     };
 
   public:
-    Octree(glm::vec3               position,
-           float                   halfRange,
-           size_t                  capacity,
-           std::allocator<Octree>* allocator = new std::allocator<Octree>(),
-           Octree*                 root      = nullptr);
+    Octree(glm::vec3       position,
+           float           halfRange,
+           size_t          capacity,
+           ArenaAllocator* allocator = new ArenaAllocator(),
+           Octree*         root      = nullptr);
 
-    ~Octree()
-    {
-        if (mRoot == this)
-            delete mAllocator;
-    }
+    ~Octree() {}
 
     bool    Contains(const Particle& particle) const;
     Octree* Insert(const Particle& particle);
@@ -65,8 +61,8 @@ class Octree
   private:
     friend struct Particle;
 
-    Octree*                 mRoot;
-    std::allocator<Octree>* mAllocator;
+    Octree*         mRoot;
+    ArenaAllocator* mAllocator;
 
     glm::vec3 mPosition;
     size_t    mCapacity;
@@ -75,13 +71,13 @@ class Octree
     LockFreeArray<Particle> mElements;
     std::atomic<State>      mState;
 
-    Ref<Octree> mNearTopLeft;
-    Ref<Octree> mNearTopRight;
-    Ref<Octree> mNearBotLeft;
-    Ref<Octree> mNearBotRight;
+    Octree* mNearTopLeft;
+    Octree* mNearTopRight;
+    Octree* mNearBotLeft;
+    Octree* mNearBotRight;
 
-    Ref<Octree> mFarTopLeft;
-    Ref<Octree> mFarTopRight;
-    Ref<Octree> mFarBotLeft;
-    Ref<Octree> mFarBotRight;
+    Octree* mFarTopLeft;
+    Octree* mFarTopRight;
+    Octree* mFarBotLeft;
+    Octree* mFarBotRight;
 };
