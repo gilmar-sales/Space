@@ -48,9 +48,4 @@ if (WIN32)
     endif ()
 endif (WIN32)
 
-if (MSVC)
-    target_compile_options(Space PUBLIC "/ZI" "/MP")
-    target_link_options(Space PUBLIC "/INCREMENTAL")
-endif ()
-
 file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})

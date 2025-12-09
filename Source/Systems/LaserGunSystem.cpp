@@ -108,10 +108,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                             [&](const TransformComponent& transform,
                                 const RigidBodyComponent& rigidBody,
                                 SphereColliderComponent&  sphereCollider) {
-                                if (rigidBody.mass < 1000.0f)
-                                    return;
-
-                                const auto count   = rigidBody.mass / sphereCollider.radius / 2;
+                                const auto count   = sphereCollider.radius;
                                 const auto maxSize = sphereCollider.radius / 10.0f;
 
                                 mScene->CreateArchetypeBuilder()
@@ -122,18 +119,18 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
                                     .WithComponent(
                                         RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
-                                    .WithComponent(HealthComponent { .hitPoints = 1000 / count })
+                                    .WithComponent(HealthComponent { .hitPoints = rigidBody.mass / count })
                                     .ForEach<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
-                                        [&, radius = sphereCollider.radius](
+                                        [this, velocity = rigidBody.mass / count, radius = sphereCollider.radius, maxSize](
                                             auto,
                                             TransformComponent&      rockTransform,
                                             RigidBodyComponent&      rockRigidBody,
                                             SphereColliderComponent& rockSphereCollider) {
                                             rockTransform.position =
-                                                mRandom->PositionFrom(transform.position, -radius, radius);
+                                                mRandom->PositionFrom(rockTransform.position, -radius, radius);
                                             rockTransform.scale    = glm::vec3(mRandom->Float(1.0f, maxSize));
-                                            rockRigidBody.velocity = mRandom->Position(-rigidBody.mass, rigidBody.mass);
-                                            rockSphereCollider.radius = transform.scale.x;
+                                            rockRigidBody.velocity    = mRandom->Position(-velocity, velocity);
+                                            rockSphereCollider.radius = rockTransform.scale.x;
                                         })
                                     .WithEntities(static_cast<fr::Entity>(count))
                                     .Build();
