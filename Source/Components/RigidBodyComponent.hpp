@@ -8,9 +8,10 @@
 
 struct RigidBodyComponent : fr::Component
 {
-    bool      isKinematic = false;
-    float     mass        = 1.0f;
-    glm::vec3 velocity    = glm::vec3(0.0f);
+    bool      isKinematic     = false;
+    bool      kinematicIfStop = false;
+    float     mass            = 1.0f;
+    glm::vec3 velocity        = glm::vec3(0.0f);
 
     void ApplyForce(const glm::vec3& direction, float magnitude, float dt)
     {

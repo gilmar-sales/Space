@@ -34,10 +34,7 @@ class LockFreeArray
   public:
     LockFreeArray() : count(0) {}
 
-    ~LockFreeArray()
-    {
-        // Nodes handle their own destruction
-    }
+    ~LockFreeArray() {}
 
     bool push(const T& value)
     {

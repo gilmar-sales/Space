@@ -88,7 +88,7 @@ void RenderSystem::DrawInstanced()
     mScene->EndTrace();
 
     mScene->BeginTrace("Query renderables");
-    mOctreeSystem->GetOctree()->Query(frustum, renderables);
+    mOctreeSystem->Query(frustum, renderables);
     mScene->EndTrace();
 
     mScene->BeginTrace("Sort Renderables");

@@ -8,13 +8,11 @@
 
 void CollisionSystem::FixedUpdate(float deltaTime)
 {
-    auto octree = mOctreeSystem->GetOctree();
 
     mScene->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         "Calculate collisions",
-        [this, octree = octree,
-         deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
-                                SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
+        [this, deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
+                                      SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
             if (rigidBody.isKinematic)
                 return;
 
@@ -22,7 +20,7 @@ void CollisionSystem::FixedUpdate(float deltaTime)
 
             auto particle = Particle { .entity = entity, .transform = transform, .sphereCollider = sphereCollider };
 
-            octree->Query(particle, collisions);
+            mOctreeSystem->Query(particle, collisions);
 
             for (const auto collision : collisions)
             {

@@ -31,7 +31,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f };
+                rigidBody = { .isKinematic = true, .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(30'000)
         .Build();
@@ -75,9 +75,9 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f };
+                rigidBody = { .isKinematic = true, .mass = transform.scale.x * 5000.0f };
             })
-        .WithEntities(10'000)
+        .WithEntities(15'000)
         .Build();
 
     mScene->CreateArchetypeBuilder()
@@ -98,7 +98,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
                 sphereCollider = { .radius = transform.scale.x, .offset = glm::vec3(0) };
 
-                rigidBody = { .mass = transform.scale.x * 5000.0f };
+                rigidBody = { .isKinematic = true, .mass = transform.scale.x * 5000.0f };
             })
         .WithEntities(10'000)
         .Build();
@@ -132,7 +132,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
             LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
         .WithEntities(3000)
         .ForEach<TransformComponent>([this](auto, TransformComponent& transform) {
-            transform.position = mRandom->Position(-1'000, 1'000);
+            transform.position = mRandom->Position(-10'000, 10'000);
         })
         .Build();
 }

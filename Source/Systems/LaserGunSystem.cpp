@@ -55,7 +55,7 @@ void LaserGunSystem::Update(float deltaTime)
                             const auto particle =
                                 Particle { .entity = bullet, .transform = transform, .sphereCollider = sphereCollider };
 
-                            octreeSystem->GetOctree()->Insert(particle);
+                            octreeSystem->Insert(particle);
                         },
                         BulletComponent { .owner = entity },
                         TransformComponent { .position = transform.position + offset,
@@ -63,10 +63,10 @@ void LaserGunSystem::Update(float deltaTime)
                                              .scale    = glm::vec3(1.0) },
                         SphereColliderComponent { .radius = 1.0f },
                         ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
-                        DecayComponent { .timeToLive = 3.5f },
+                        DecayComponent { .timeToLive = 4.5f },
                         RigidBodyComponent {
                             .mass     = 0.0f,
-                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 800.f,
+                            .velocity = rigidBody.velocity + transform.GetForwardDirection() * 500.f,
                         });
                 };
 
@@ -116,8 +116,9 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     .WithComponent(TransformComponent { .position = transform.position,
                                                                         .rotation = glm::vec3(0.0) })
                                     .WithComponent(SphereColliderComponent { .radius = 1.0f, .offset = glm::vec3(0) })
-                                    .WithComponent(
-                                        RigidBodyComponent { .isKinematic = false, .mass = rigidBody.mass / count })
+                                    .WithComponent(RigidBodyComponent { .isKinematic     = false,
+                                                                        .kinematicIfStop = true,
+                                                                        .mass            = rigidBody.mass / count })
                                     .WithComponent(HealthComponent { .hitPoints = targetHealth.hitPoints / count })
                                     .ForEach<TransformComponent,
                                              RigidBodyComponent,
@@ -136,6 +137,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                                 model.meshes   = &mAssetManager->GetRock2Model();
                                                 model.material = mAssetManager->GetRock2Material();
                                             }
+
                                             rockTransform.position =
                                                 mRandom->PositionFrom(rockTransform.position, -radius, radius);
                                             rockTransform.scale       = glm::vec3(mRandom->Float(1.0f, maxSize));
@@ -145,6 +147,8 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     .WithEntities(static_cast<fr::Entity>(count))
                                     .Build();
                             });
+                    mOctreeSystem->Remove(event.target);
+
                     mScene->DestroyEntity(event.target);
                 }
             });
