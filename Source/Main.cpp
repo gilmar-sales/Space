@@ -36,7 +36,7 @@ int main(int argc, char const* argv[])
                         options.WithMaxEntities(1024 * 1024)
                             .WithFixedDeltaTime(1.0f / 50.0f)
                             .WithArchetypeChunkCapacity(2 * 1024)
-                            .WithThreadCount(10);
+                            .WithThreadCount(13);
                     })
                     .AddComponent<ModelComponent>()
                     .AddComponent<TransformComponent>()
@@ -54,9 +54,9 @@ int main(int argc, char const* argv[])
                     .AddSystem<PlayerControlSystem>()
                     .AddSystem<EnemyControlSystem>()
                     .AddSystem<LaserGunSystem>()
-                    .AddSystem<CollisionSystem>()
                     .AddSystem<MovementSystem>()
                     .AddSystem<PhysicsSystem>()
+                    .AddSystem<CollisionSystem>()
                     .AddSystem<RenderSystem>();
             })
             .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {

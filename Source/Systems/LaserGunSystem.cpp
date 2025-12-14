@@ -65,7 +65,7 @@ void LaserGunSystem::Update(float deltaTime)
                         ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
                         DecayComponent { .timeToLive = 4.5f },
                         RigidBodyComponent {
-                            .mass     = 0.0f,
+                            .mass     = 0.001f,
                             .velocity = rigidBody.velocity + transform.GetForwardDirection() * 500.f,
                         });
                 };

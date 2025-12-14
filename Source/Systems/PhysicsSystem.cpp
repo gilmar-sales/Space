@@ -18,7 +18,8 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
                         collisionEvent.collisor,
                         [&](TransformComponent& collisorTransform, const SphereColliderComponent& collisorCollider,
                             RigidBodyComponent& collisorRigidBody) {
-                            const auto distance = glm::distance(targetTransform.position, collisorTransform.position);
+                            const auto delta    = targetTransform.position - collisorTransform.position;
+                            const auto distance = glm::length(delta);
 
                             const auto totalForce = (targetCollider.radius + collisorCollider.radius - distance);
 
@@ -28,9 +29,12 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
 
                             const auto collisorForce = totalForce * (targetRigidBody.mass / totalMass);
 
-                            const auto direction = normalize(targetTransform.position - collisorTransform.position);
+                            const auto direction = delta / distance;
 
+                            targetTransform.position += direction * targetForce;
                             targetRigidBody.ApplyForce(direction, targetForce, collisionEvent.deltaTime);
+
+                            collisorTransform.position -= direction * collisorForce;
                             collisorRigidBody.ApplyForce(-direction, collisorForce, collisionEvent.deltaTime);
                         });
                 });
@@ -56,9 +60,9 @@ void PhysicsSystem::FixedUpdate(float deltaTime)
 
             transform.position += rigidBody.velocity * deltaTime;
 
-            if (rigidBody.mass > 0)
+            if (rigidBody.mass > 0.001f)
             {
-                rigidBody.velocity *= glm::pow(1.0f - 0.8f, deltaTime);
+                rigidBody.velocity *= 1.0f - 0.8f * deltaTime;
             }
         });
 }
