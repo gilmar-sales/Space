@@ -150,7 +150,7 @@ void Octree::Query(Particle& particle, std::vector<Particle>& found)
         }
     }
 
-    if (mNearTopLeft)
+    if (mState.load() == State::Branch)
     {
         mNearTopLeft->Query(particle, found);
         mNearTopRight->Query(particle, found);
@@ -206,7 +206,7 @@ void Octree::Query(const Frustum& frustum, std::vector<Particle>& found)
         }
     }
 
-    if (mNearTopLeft)
+    if (mState.load() == State::Branch)
     {
         mNearTopLeft->Query(frustum, found);
         mNearTopRight->Query(frustum, found);
