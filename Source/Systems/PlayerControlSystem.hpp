@@ -6,8 +6,7 @@
 class PlayerControlSystem final : public fr::System
 {
   public:
-    PlayerControlSystem(const Ref<fr::Scene>&         scene,
-                        const Ref<fra::EventManager>& eventManger);
+    PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger);
 
     void PostUpdate(float deltaTime) override;
 

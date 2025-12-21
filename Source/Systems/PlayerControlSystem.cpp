@@ -1,10 +1,9 @@
 #include "PlayerControlSystem.hpp"
 
 #include "Components/LaserGunComponent.hpp"
-
 #include <Components/PlayerComponent.hpp>
-
 #include <Components/SpaceShipControlComponent.hpp>
+
 #include <Events/KeyDownEvent.hpp>
 #include <Events/KeyUpEvent.hpp>
 #include <Events/MouseMoveEvent.hpp>

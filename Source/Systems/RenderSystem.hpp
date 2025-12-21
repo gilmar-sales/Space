@@ -21,7 +21,8 @@ class RenderSystem final : public fr::System
                  const Ref<fra::Window>&       window,
                  const Ref<fra::MeshPool>&     meshPool,
                  const Ref<fra::MaterialPool>& materialPool,
-                 const Ref<OctreeSystem>&      octreeSystem);
+                 const Ref<OctreeSystem>&      octreeSystem,
+                 const Ref<fr::TaskManager>&   taskManager);
 
     void PostUpdate(float dt) override;
 
@@ -43,4 +44,5 @@ class RenderSystem final : public fr::System
     Ref<fra::MaterialPool> mMaterialPool;
     Ref<fra::MeshPool>     mMeshPool;
     Ref<OctreeSystem>      mOctreeSystem;
+    Ref<fr::TaskManager>   mTaskManager;
 };

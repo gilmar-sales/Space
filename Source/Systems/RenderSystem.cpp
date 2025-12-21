@@ -8,14 +8,12 @@
 
 #include <ranges>
 
-RenderSystem::RenderSystem(const Ref<fr::Scene>&         scene,
-                           const Ref<fra::Renderer>&     renderer,
-                           const Ref<fra::Window>&       window,
-                           const Ref<fra::MeshPool>&     meshPool,
-                           const Ref<fra::MaterialPool>& materialPool,
-                           const Ref<OctreeSystem>&      octreeSystem) :
+RenderSystem::RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer,
+                           const Ref<fra::Window>& window, const Ref<fra::MeshPool>& meshPool,
+                           const Ref<fra::MaterialPool>& materialPool, const Ref<OctreeSystem>& octreeSystem,
+                           const Ref<fr::TaskManager>& taskManager) :
     System(scene), mRenderer(renderer), mWindow(window), mMeshPool(meshPool), mMaterialPool(materialPool),
-    mOctreeSystem(octreeSystem), mMatrices({}), mRenderables({}), mInstanceMatrixBuffers({})
+    mOctreeSystem(octreeSystem), mTaskManager(taskManager), mMatrices({}), mRenderables({}), mInstanceMatrixBuffers({})
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();
 
@@ -47,6 +45,8 @@ void RenderSystem::PostUpdate(float dt)
 
 void RenderSystem::BeginFrame() const
 {
+    mTaskManager->WaitForAllTasks();
+    mTaskManager->StopWorkers();
     mRenderer->BeginFrame();
 
     mScene->TryGetComponents<TransformComponent>(mPlayer, [&](const TransformComponent& transform) {
