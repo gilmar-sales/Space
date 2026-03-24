@@ -16,13 +16,10 @@ struct InstanceDraw
 class RenderSystem final : public fr::System
 {
   public:
-    RenderSystem(const Ref<fr::Scene>&         scene,
-                 const Ref<fra::Renderer>&     renderer,
-                 const Ref<fra::Window>&       window,
-                 const Ref<fra::MeshPool>&     meshPool,
-                 const Ref<fra::MaterialPool>& materialPool,
-                 const Ref<OctreeSystem>&      octreeSystem,
-                 const Ref<fr::TaskManager>&   taskManager);
+    RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer, const Ref<fra::Window>& window,
+                 const Ref<fra::MeshPool>& meshPool, const Ref<fra::MaterialPool>& materialPool,
+                 const Ref<OctreeSystem>& octreeSystem, const Ref<fr::TaskManager>& taskManager,
+                 const Ref<fra::EventManager>& eventManager);
 
     void PostUpdate(float dt) override;
 
@@ -45,4 +42,5 @@ class RenderSystem final : public fr::System
     Ref<fra::MeshPool>     mMeshPool;
     Ref<OctreeSystem>      mOctreeSystem;
     Ref<fr::TaskManager>   mTaskManager;
+    bool                   mEnabled;
 };

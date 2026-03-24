@@ -34,7 +34,7 @@ class InputSystem final : public fr::System
                 mWindow->SetFullscreen(!mWindow->IsFullscreen());
             }
 
-            if (event.key == fra::KeyCode::F6)
+            if (event.key == fra::KeyCode::F1)
             {
                 if (!mProfilingStarted)
                 {

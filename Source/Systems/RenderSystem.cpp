@@ -11,9 +11,9 @@
 RenderSystem::RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer,
                            const Ref<fra::Window>& window, const Ref<fra::MeshPool>& meshPool,
                            const Ref<fra::MaterialPool>& materialPool, const Ref<OctreeSystem>& octreeSystem,
-                           const Ref<fr::TaskManager>& taskManager) :
-    System(scene), mRenderer(renderer), mWindow(window), mMeshPool(meshPool), mMaterialPool(materialPool),
-    mOctreeSystem(octreeSystem), mTaskManager(taskManager), mMatrices({}), mRenderables({}), mInstanceMatrixBuffers({})
+                           const Ref<fr::TaskManager>& taskManager, const Ref<fra::EventManager>& eventManager) :
+    System(scene), mRenderables({}), mMatrices({}), mInstanceMatrixBuffers({}), mRenderer(renderer), mWindow(window),
+    mMaterialPool(materialPool), mMeshPool(meshPool), mOctreeSystem(octreeSystem), mTaskManager(taskManager), mEnabled(true)
 {
     mPlayer = mScene->FindUnique<PlayerComponent>();
 
@@ -32,10 +32,20 @@ RenderSystem::RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>
                 .SetUsage(fra::BufferUsage::Instance)
                 .Build();
     }
+
+    eventManager->Subscribe<fra::KeyPressedEvent>([this](const fra::KeyPressedEvent& event) {
+        if (event.key != fra::KeyCode::F2)
+            return;
+
+        mEnabled = !mEnabled;
+    });
 }
 
 void RenderSystem::PostUpdate(float dt)
 {
+    if (!mEnabled)
+        return;
+
     BeginFrame();
 
     DrawInstanced();
@@ -118,12 +128,12 @@ void RenderSystem::DrawInstanced()
 
     mScene->BeginTrace("Calculate instance sequence");
 
-    std::ranges::remove_if(renderables, [&](auto& particle) {
+    auto result = std::ranges::remove_if(renderables, [&](auto& particle) {
         return !mScene->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent& transform) {
             matrices.emplace_back(transform.GetModel());
         });
     });
-
+    renderables.erase(result.begin(), result.end());
     auto currentInstance = InstanceDraw { .index = 0, .instanceCount = 0, .meshes = nullptr, .material = 9 };
 
     auto i = 0;
