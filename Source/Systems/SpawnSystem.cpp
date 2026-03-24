@@ -130,7 +130,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SpaceShipControlComponent { .boost = Boost })
         .WithComponent(
             LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
-        .WithEntities(1'500)
+        .WithEntities(5'000)
         .ForEach<TransformComponent>([this](auto, TransformComponent& transform) {
             transform.position = mRandom->Position(-1'000, 1'000);
         })

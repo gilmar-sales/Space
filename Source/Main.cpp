@@ -35,8 +35,9 @@ int main(int argc, char const* argv[])
                     .WithOptions([](fr::FreyrOptionsBuilder& options) {
                         options.WithMaxEntities(1024 * 1024)
                             .WithFixedDeltaTime(1.0f / 50.0f)
-                            .WithArchetypeChunkCapacity(2 * 1024)
-                            .WithThreadCount(13);
+                            .WithArchetypeChunkCapacity(512)
+                            .WithThreadCount(14)
+                            .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkOriented);
                     })
                     .AddComponent<ModelComponent>()
                     .AddComponent<TransformComponent>()
