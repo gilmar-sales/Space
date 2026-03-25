@@ -7,7 +7,7 @@ include(FetchContent)
 FetchContent_Declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "chunk-oriented-execution"
+        GIT_TAG "v0.21.0"
 )
 FetchContent_MakeAvailable(freyr)
 

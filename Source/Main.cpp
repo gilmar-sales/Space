@@ -37,7 +37,7 @@ int main(int argc, char const* argv[])
                             .WithFixedDeltaTime(1.0f / 50.0f)
                             .WithArchetypeChunkCapacity(512)
                             .WithThreadCount(14)
-                            .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkOriented);
+                            .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkAffinity);
                     })
                     .AddComponent<ModelComponent>()
                     .AddComponent<TransformComponent>()
