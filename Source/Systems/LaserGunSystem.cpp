@@ -99,6 +99,9 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
             mScene->TryGetComponents<HealthComponent>(event.target, [&](HealthComponent& targetHealth) {
                 targetHealth.hitPoints -= 50.0f;
 
+                if (mScene->HasComponent<EnemyComponent>(bullet.owner))
+                    return;
+
                 if (targetHealth.hitPoints <= 0.0f)
                 {
                     if (!mScene->HasComponent<EnemyComponent>(event.target))
@@ -147,8 +150,8 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                                     .WithEntities(static_cast<fr::Entity>(count))
                                     .Build();
                             });
-                    mOctreeSystem->Remove(event.target);
 
+                    mOctreeSystem->Remove(event.target);
                     mScene->DestroyEntity(event.target);
                 }
             });

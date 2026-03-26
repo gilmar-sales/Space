@@ -8,9 +8,10 @@ constexpr auto TurnTorque  = 90.0f;
 
 struct SpaceShipControlComponent : fr::Component
 {
-    float boostFactor = 1.0f;
-    float boost       = 0.0f;
-    float rollTorque  = 0.0f;
-    float pitchTorque = 0.0f;
-    float yawTorque   = 0.0f;
+    float boostFactor    = 1.0f;
+    float boost          = 0.0f;
+    float rollTorque     = 0.0f;
+    float pitchTorque    = 0.0f;
+    float yawTorque      = 0.0f;
+    bool  volatileTorque = false;
 };

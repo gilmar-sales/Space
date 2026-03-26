@@ -127,6 +127,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::GamepadAxisMotionEvent>([this](const fra::GamepadAxisMotionEvent& keyPressedEvent) {
         mScene->TryGetComponents<SpaceShipControlComponent>(mPlayer, [&](SpaceShipControlComponent& spaceShipControl) {
+            spaceShipControl.volatileTorque = false;
             switch (keyPressedEvent.axis)
             {
                 case fra::GamepadAxis::GamepadAxisRightTrigger:
@@ -149,8 +150,9 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this](const fra::MouseMoveEvent& mouseMoveEvent) {
         mScene->TryGetComponents<SpaceShipControlComponent>(mPlayer, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.yawTorque   = mouseMoveEvent.deltaX * 0.1f * TurnTorque;
-            spaceShipControl.pitchTorque = mouseMoveEvent.deltaY * 0.1f * TurnTorque;
+            spaceShipControl.yawTorque      = mouseMoveEvent.deltaX * 0.1f * TurnTorque;
+            spaceShipControl.pitchTorque    = mouseMoveEvent.deltaY * 0.1f * TurnTorque;
+            spaceShipControl.volatileTorque = true;
         });
     });
 }

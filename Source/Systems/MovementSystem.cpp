@@ -8,8 +8,7 @@
 void MovementSystem::FixedUpdate(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
-        [manager   = mScene,
-         deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
+        [deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
                                 SpaceShipControlComponent& spaceShipControl) {
             if (spaceShipControl.boost != 0)
             {
@@ -17,19 +16,25 @@ void MovementSystem::FixedUpdate(float deltaTime)
                                      spaceShipControl.boost * spaceShipControl.boostFactor, deltaTime);
             }
 
-            if (spaceShipControl.pitchTorque != 0)
+            if (spaceShipControl.pitchTorque != 0.0f)
             {
                 transform.Rotate(transform.GetRightDirection(), spaceShipControl.pitchTorque, deltaTime);
             }
 
-            if (spaceShipControl.yawTorque != 0)
+            if (spaceShipControl.yawTorque != 0.0f)
             {
                 transform.Rotate(transform.GetUpDirection(), spaceShipControl.yawTorque, deltaTime);
             }
 
-            if (spaceShipControl.rollTorque != 0)
+            if (spaceShipControl.rollTorque != 0.0f)
             {
                 transform.Rotate(transform.GetForwardDirection(), spaceShipControl.rollTorque, deltaTime);
+            }
+
+            if (spaceShipControl.volatileTorque)
+            {
+                spaceShipControl.yawTorque   = 0.0f;
+                spaceShipControl.pitchTorque = 0.0f;
             }
         });
 }
