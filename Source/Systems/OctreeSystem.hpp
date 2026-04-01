@@ -41,7 +41,7 @@ class OctreeSystem final : public fr::System
     {
         if (mKinematicOctree != nullptr)
         {
-            Entry entry = { .entity = particle.entity, .node = mKinematicOctree->Insert(particle) };
+            const Entry entry = { .entity = particle.entity, .node = mKinematicOctree->Insert(particle) };
             mEntries.insert(entry);
         }
     }
@@ -66,7 +66,7 @@ class OctreeSystem final : public fr::System
         fr::Entity entity;
         Octree*    node;
 
-        operator size_t() { return entity; }
+        operator size_t() const { return entity; }
     };
 
     fr::SparseSet<Entry> mEntries;
