@@ -56,7 +56,6 @@ void RenderSystem::PostUpdate(float dt)
 void RenderSystem::BeginFrame() const
 {
     mTaskManager->WaitForAllTasks();
-    mTaskManager->StopWorkers();
     mRenderer->BeginFrame();
 
     mScene->TryGetComponents<TransformComponent>(mPlayer, [&](const TransformComponent& transform) {
