@@ -7,7 +7,7 @@ include(FetchContent)
 fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.23.9"
+        GIT_TAG "v0.23.10"
 )
 fetchcontent_makeavailable(freyr)
 

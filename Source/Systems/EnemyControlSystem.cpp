@@ -17,7 +17,6 @@ void EnemyControlSystem::Update(float deltaTime)
     mScene->TryGetComponents<TransformComponent>(mPlayer, [this, deltaTime](TransformComponent& playerTransform) {
         mScene->ForEachAsync<TransformComponent, EnemyComponent, LaserGunComponent, SpaceShipControlComponent>(
             [deltaTime, playerPosition = playerTransform.position](
-                auto                entity,
                 TransformComponent& transform,
                 EnemyComponent&,
                 LaserGunComponent&         laserGun,

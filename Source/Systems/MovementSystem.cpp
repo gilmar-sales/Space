@@ -8,7 +8,8 @@
 void MovementSystem::FixedUpdate(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
-        [deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
+        [deltaTime = deltaTime](TransformComponent&        transform,
+                                RigidBodyComponent&        rigidBody,
                                 SpaceShipControlComponent& spaceShipControl) {
             if (spaceShipControl.boost != 0)
             {
