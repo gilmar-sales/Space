@@ -16,8 +16,11 @@ void EnemyControlSystem::Update(float deltaTime)
 {
     mScene->TryGetComponents<TransformComponent>(mPlayer, [this, deltaTime](TransformComponent& playerTransform) {
         mScene->ForEachAsync<TransformComponent, EnemyComponent, LaserGunComponent, SpaceShipControlComponent>(
-            [this, deltaTime, playerPosition = playerTransform.position](
-                auto entity, TransformComponent& transform, EnemyComponent&, LaserGunComponent& laserGun,
+            [deltaTime, playerPosition = playerTransform.position](
+                auto                entity,
+                TransformComponent& transform,
+                EnemyComponent&,
+                LaserGunComponent&         laserGun,
                 SpaceShipControlComponent& spaceShipControl) {
                 const auto distanceVector = playerPosition - transform.position;
 
@@ -27,9 +30,9 @@ void EnemyControlSystem::Update(float deltaTime)
 
                 const auto angleThreshold = glm::cos(glm::radians(90 * 0.5f));
 
-                auto length = glm::length(distanceVector);
+                const auto length = glm::length(distanceVector);
 
-                auto isNearby = length < 150;
+                const auto isNearby = length < 350.0f;
 
                 laserGun.triggered = isNearby && dotProduct > angleThreshold;
 

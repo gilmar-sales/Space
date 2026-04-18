@@ -32,10 +32,15 @@ class ArenaAllocator
         blocks.push_back(std::make_unique<ArenaBlock>(block_size));
     }
 
+    static constexpr size_t align_size(size_t size, size_t alignment)
+    {
+        return (size + alignment - 1) & ~(alignment - 1);
+    }
+
     // Allocate memory with proper alignment
     void* allocate(size_t size, size_t alignment = alignof(std::max_align_t))
     {
-        size_t aligned_size = (size + alignment - 1) & ~(alignment - 1);
+        size_t aligned_size = align_size(size, alignment);
 
         while (true)
         {
@@ -57,7 +62,7 @@ class ArenaAllocator
 
             size_t old_offset = block->offset.load(std::memory_order_relaxed);
 
-            size_t aligned_offset = (old_offset + alignment - 1) & ~(alignment - 1);
+            size_t aligned_offset = align_size(old_offset, alignment);
             size_t new_offset     = aligned_offset + aligned_size;
 
             if (new_offset > block->size)

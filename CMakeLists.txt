@@ -4,19 +4,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 include(FetchContent)
 
-FetchContent_Declare(
+fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.23.6"
+        GIT_TAG "v0.23.9"
 )
-FetchContent_MakeAvailable(freyr)
+fetchcontent_makeavailable(freyr)
 
-FetchContent_Declare(
+fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
         GIT_TAG "v0.11.9"
 )
-FetchContent_MakeAvailable(freya)
+fetchcontent_makeavailable(freya)
 
 project(
         Space
