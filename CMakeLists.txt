@@ -9,14 +9,14 @@ fetchcontent_declare(
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
         GIT_TAG "v0.24.0"
 )
-fetchcontent_makeavailable(freyr)
 
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
         GIT_TAG "v0.11.9"
 )
-fetchcontent_makeavailable(freya)
+
+fetchcontent_makeavailable(freyr freya)
 
 project(
         Space
