@@ -219,6 +219,73 @@ void Octree::Query(const Frustum& frustum, std::vector<Particle>& found)
     }
 }
 
+std::optional<Particle> Octree::FindFirst(Particle&                                   particle,
+                                          const std::function<bool(const Particle&)>& predicate) const
+{
+    if (!Intersect(particle))
+    {
+        return std::nullopt;
+    }
+
+    for (auto i = 0; i < mElements.size(); i++)
+    {
+        auto other = mElements.get(i);
+
+        if (!other.has_value() || particle.entity == other->entity)
+            continue;
+
+        if (particle.Intersect(*other) && predicate(*other))
+        {
+            return std::make_optional(*other);
+        }
+    }
+
+    if (mState.load() == State::Branch)
+    {
+        auto found = mNearTopLeft->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mNearTopRight->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mNearBotLeft->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mNearBotRight->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mFarTopLeft->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mFarTopRight->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mFarBotLeft->FindFirst(particle, (predicate));
+
+        if (found.has_value())
+            return found;
+
+        found = mFarBotRight->FindFirst(particle, std::forward<decltype(predicate)>(predicate));
+
+        if (found.has_value())
+            return found;
+    }
+
+    return std::nullopt;
+}
+
 void Octree::PushInstanceData(std::vector<glm::mat4>& instanceData) const
 {
     auto modelMatrix = glm::mat4(1);

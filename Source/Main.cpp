@@ -3,7 +3,6 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
-#include "Components/EnemyComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
@@ -11,11 +10,12 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SpaceShipControlComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
+#include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
+#include "Systems/AIControlSystem.hpp"
 #include "Systems/CollisionSystem.hpp"
 #include "Systems/DecaySystem.hpp"
-#include "Systems/EnemyControlSystem.hpp"
 #include "Systems/InputSystem.hpp"
 #include "Systems/LaserGunSystem.hpp"
 #include "Systems/MovementSystem.hpp"
@@ -44,7 +44,7 @@ int main(int argc, char const* argv[])
                     .WithComponent<SphereColliderComponent>()
                     .WithComponent<RigidBodyComponent>()
                     .WithComponent<HealthComponent>()
-                    .WithComponent<EnemyComponent>()
+                    .WithComponent<SquadComponent>()
                     .WithComponent<PlayerComponent>()
                     .WithComponent<SpaceShipControlComponent>()
                     .WithComponent<LaserGunComponent>()
@@ -53,7 +53,6 @@ int main(int argc, char const* argv[])
                             .WithSystem<SpawnSystem>()
                             .WithSystem<InputSystem>()
                             .WithSystem<PlayerControlSystem>()
-                            .WithSystem<EnemyControlSystem>()
                             .WithSystem<LaserGunSystem>()
                             .WithSystem<RenderSystem>();
                     })
@@ -65,6 +64,11 @@ int main(int argc, char const* argv[])
                             .WithSystem<PhysicsSystem>()
                             .WithSystem<CollisionSystem>()
                             .WithSystem<DecaySystem>();
+                    })
+                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
+                        pipeline.WithName("AI")
+                        .WithRate(0.2f)
+                        .WithSystem<AIControlSystem>();
                     });
             })
             .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {

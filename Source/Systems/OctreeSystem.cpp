@@ -46,7 +46,7 @@ void OctreeSystem::BuildOctree()
         });
 }
 
-void OctreeSystem::Query(Particle& particle, std::vector<Particle>& found)
+void OctreeSystem::Query(Particle& particle, std::vector<Particle>& found) const
 {
     if (mKinematicOctree != nullptr)
         mKinematicOctree->Query(particle, found);

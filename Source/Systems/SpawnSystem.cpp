@@ -1,8 +1,9 @@
 #include "SpawnSystem.hpp"
 
+#include "Components/AIControlledComponent.hpp"
+
 #include <random>
 
-#include "Components/EnemyComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
@@ -10,7 +11,12 @@
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SpaceShipControlComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
+#include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
+
+constexpr auto SPAWN_RANGE = 1'000.0f;
+
+constexpr auto SQUAD_SIZE = 500;
 
 SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& assetManager,
                          const Ref<Random>& random) : System(scene), mAssetManager(assetManager), mRandom(random)
@@ -23,7 +29,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SphereColliderComponent {})
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+            [this](TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
                 transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
@@ -45,7 +51,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+            [this](TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
                 transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
@@ -67,7 +73,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+            [this](TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
                 transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
@@ -90,7 +96,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SphereColliderComponent { .radius = 10, .offset = glm::vec3(0) })
         .WithComponent(RigidBodyComponent {})
         .ForEach<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-            [this](auto entity, TransformComponent& transform, SphereColliderComponent& sphereCollider,
+            [this](TransformComponent& transform, SphereColliderComponent& sphereCollider,
                    RigidBodyComponent& rigidBody) {
                 transform = { .position = mRandom->Position(-100'000, 100'000),
                               .rotation = glm::vec3(0.0),
@@ -105,6 +111,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
 
     mScene->CreateArchetypeBuilder()
         .WithComponent(PlayerComponent {})
+        .WithComponent(SquadComponent { .squad = Squad::Ally })
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetPlayerShipModel(),
                                         .material = mAssetManager->GetPlayerShipMaterial() })
@@ -119,7 +126,8 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .Build();
 
     mScene->CreateArchetypeBuilder()
-        .WithComponent(EnemyComponent {})
+        .WithComponent(SquadComponent { .squad = Squad::Enemy })
+        .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetEnemyShipModel(),
                                         .material = mAssetManager->GetEnemyShipMaterial() })
@@ -130,9 +138,28 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithComponent(SpaceShipControlComponent { .boost = Boost })
         .WithComponent(
             LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
-        .WithEntities(5'000)
+        .WithEntities(SQUAD_SIZE)
         .ForEach<TransformComponent>([this](auto, TransformComponent& transform) {
-            transform.position = mRandom->Position(-1'000, 1'000);
+            transform.position = mRandom->Position(-SPAWN_RANGE, SPAWN_RANGE);
+        })
+        .Build();
+
+    mScene->CreateArchetypeBuilder()
+        .WithComponent(SquadComponent { .squad = Squad::Ally })
+        .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
+        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetPlayerShipModel(),
+                                        .material = mAssetManager->GetPlayerShipMaterial() })
+        .WithComponent(
+            TransformComponent { .position = glm::vec3(0), .rotation = glm::vec3(0.0, 0, 0), .scale = glm::vec3(3) })
+        .WithComponent(SphereColliderComponent { .radius = 3, .offset = glm::vec3(0) })
+        .WithComponent(RigidBodyComponent { .mass = 110.0f })
+        .WithComponent(SpaceShipControlComponent { .boost = Boost })
+        .WithComponent(
+            LaserGunComponent { .fireRate = 0.05f, .fireTime = 0, .energyCost = 5, .energySpent = 0, .maxEnergy = 80 })
+        .WithEntities(SQUAD_SIZE-1)
+        .ForEach<TransformComponent>([this](auto, TransformComponent& transform) {
+            transform.position = mRandom->Position(-SPAWN_RANGE, SPAWN_RANGE);
         })
         .Build();
 }

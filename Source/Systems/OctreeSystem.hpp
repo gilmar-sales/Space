@@ -20,15 +20,23 @@ class OctreeSystem final : public fr::System
 
     void PreUpdate(float deltaTime) override;
 
-    void Query(Particle& particle, std::vector<Particle>& found);
+    void Query(Particle& particle, std::vector<Particle>& found) const;
 
-    void Query(const Frustum& frustum, std::vector<Particle>& found)
+    void Query(const Frustum& frustum, std::vector<Particle>& found) const
     {
         if (mKinematicOctree != nullptr)
             mKinematicOctree->Query(frustum, found);
 
         if (mOctree != nullptr)
             mOctree->Query(frustum, found);
+    }
+
+    std::optional<Particle> FindFirst(Particle& particle, std::function<bool(const Particle&)> predicate) const
+    {
+        if (mOctree != nullptr)
+            return mOctree->FindFirst(particle, std::forward<decltype(predicate)>(predicate));
+
+        return std::nullopt;
     }
 
     void Insert(const Particle& particle)

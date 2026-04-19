@@ -47,9 +47,11 @@ class Octree
     void    TrySubdivide();
 
     void Query(Particle& particle, std::vector<Particle>& found);
-    bool Intersect(const Particle& particle) const;
-
     void Query(const Frustum& frustum, std::vector<Particle>& found);
+
+    std::optional<Particle> FindFirst(Particle& particle, const std::function<bool(const Particle&)>& predicate) const;
+
+    bool Intersect(const Particle& particle) const;
     bool IsInsideFrustum(const Frustum& frustum) const;
 
     void Draw(const Ref<fra::Renderer>&         renderer,
