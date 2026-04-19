@@ -5,7 +5,7 @@
 
 #include <Components/SpaceShipControlComponent.hpp>
 
-void MovementSystem::FixedUpdate(float deltaTime)
+void MovementSystem::Update(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
         [deltaTime = deltaTime](TransformComponent&        transform,

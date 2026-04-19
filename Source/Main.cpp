@@ -5,11 +5,11 @@
 
 #include "Components/EnemyComponent.hpp"
 #include "Components/HealthComponent.hpp"
+#include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SpaceShipControlComponent.hpp"
-#include "Components/LaserGunComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
@@ -48,17 +48,24 @@ int main(int argc, char const* argv[])
                     .WithComponent<PlayerComponent>()
                     .WithComponent<SpaceShipControlComponent>()
                     .WithComponent<LaserGunComponent>()
-                    .WithSystem<SpawnSystem>()
-                    .WithSystem<DecaySystem>()
-                    .WithSystem<InputSystem>()
-                    .WithSystem<OctreeSystem>()
-                    .WithSystem<PlayerControlSystem>()
-                    .WithSystem<EnemyControlSystem>()
-                    .WithSystem<LaserGunSystem>()
-                    .WithSystem<MovementSystem>()
-                    .WithSystem<PhysicsSystem>()
-                    .WithSystem<CollisionSystem>()
-                    .WithSystem<RenderSystem>();
+                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
+                        pipeline.WithName("Main")
+                            .WithSystem<SpawnSystem>()
+                            .WithSystem<InputSystem>()
+                            .WithSystem<PlayerControlSystem>()
+                            .WithSystem<EnemyControlSystem>()
+                            .WithSystem<LaserGunSystem>()
+                            .WithSystem<RenderSystem>();
+                    })
+                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
+                        pipeline.WithName("Fixed")
+                            .WithRate(0.02f)
+                            .WithSystem<OctreeSystem>()
+                            .WithSystem<MovementSystem>()
+                            .WithSystem<PhysicsSystem>()
+                            .WithSystem<CollisionSystem>()
+                            .WithSystem<DecaySystem>();
+                    });
             })
             .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {
                 freya.WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {

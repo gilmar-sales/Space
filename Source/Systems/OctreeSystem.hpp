@@ -18,7 +18,7 @@ class OctreeSystem final : public fr::System
 
     ~OctreeSystem() override = default;
 
-    void PreFixedUpdate(float deltaTime) override;
+    void PreUpdate(float deltaTime) override;
 
     void Query(Particle& particle, std::vector<Particle>& found);
 

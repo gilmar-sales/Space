@@ -9,5 +9,5 @@ class MovementSystem final : public fr::System
 
     ~MovementSystem() override = default;
 
-    void FixedUpdate(float deltaTime) override;
+    void Update(float deltaTime) override;
 };

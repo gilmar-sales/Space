@@ -1,6 +1,6 @@
 #include "OctreeSystem.hpp"
 
-void OctreeSystem::PreFixedUpdate(float deltaTime)
+void OctreeSystem::PreUpdate(float deltaTime)
 {
     BuildOctree();
 }

@@ -11,7 +11,7 @@ class PhysicsSystem final : public fr::System
 
     ~PhysicsSystem() override = default;
 
-    void FixedUpdate(float deltaTime) override;
+    void Update(float deltaTime) override;
 
   private:
     Ref<OctreeSystem>       mOctreeSystem;

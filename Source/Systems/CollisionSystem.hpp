@@ -18,7 +18,7 @@ class CollisionSystem final : public fr::System
 
     ~CollisionSystem() override = default;
 
-    void FixedUpdate(float deltaTime) override;
+    void Update(float deltaTime) override;
 
   private:
     friend class SpaceApp;

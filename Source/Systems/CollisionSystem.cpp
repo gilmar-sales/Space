@@ -6,7 +6,7 @@
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-void CollisionSystem::FixedUpdate(float deltaTime)
+void CollisionSystem::Update(float deltaTime)
 {
 
     mScene->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(

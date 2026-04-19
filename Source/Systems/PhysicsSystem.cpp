@@ -41,7 +41,7 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
         });
 }
 
-void PhysicsSystem::FixedUpdate(float deltaTime)
+void PhysicsSystem::Update(float deltaTime)
 {
     mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
         [this, deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
