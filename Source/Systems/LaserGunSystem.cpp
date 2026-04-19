@@ -156,9 +156,13 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
                 }
             });
 
-            if (mScene->HasComponent<EnemyComponent>(event.target) &&
-                mScene->HasComponent<PlayerComponent>(bullet.owner))
-                mScene->DestroyEntity(event.target);
+            if (mScene->HasComponent<PlayerComponent>(bullet.owner)) {
+                mScene->TryGetComponents<ModelComponent>(event.target, [&](ModelComponent& model) {
+                    model.meshes = &mAssetManager->GetPlayerShipModel();
+                    model.material = mAssetManager->GetPlayerShipMaterial();
+                    mScene->RemoveComponent<EnemyComponent>(event.target);
+                });
+            }
 
             if (event.target != bullet.owner)
                 mScene->DestroyEntity(event.collisor);

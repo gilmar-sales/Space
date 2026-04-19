@@ -33,7 +33,7 @@ void EnemyControlSystem::Update(float deltaTime)
 
                 const auto isNearby = length < 350.0f;
 
-                laserGun.triggered = isNearby && dotProduct > angleThreshold;
+                // laserGun.triggered = isNearby && dotProduct > angleThreshold;
 
                 spaceShipControl.boost = !isNearby ? Boost : 0.0f;
 

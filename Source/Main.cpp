@@ -1,4 +1,3 @@
-#include "Components/LaserGunComponent.hpp"
 #include "SpaceApp.hpp"
 
 #include <Freya/Freya.hpp>
@@ -10,6 +9,7 @@
 #include "Components/PlayerComponent.hpp"
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/SpaceShipControlComponent.hpp"
+#include "Components/LaserGunComponent.hpp"
 #include "Components/SphereColliderComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
@@ -35,7 +35,7 @@ int main(int argc, char const* argv[])
                     .WithOptions([](fr::FreyrOptionsBuilder& options) {
                         options.WithMaxEntities(1024 * 1024)
                             .WithFixedDeltaTime(1.0f / 50.0f)
-                            .WithArchetypeChunkCapacity(512)
+                            .WithArchetypeChunkCapacity(128)
                             .WithThreadCount(std::thread::hardware_concurrency())
                             .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkAffinity);
                     })
