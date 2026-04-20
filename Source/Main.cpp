@@ -34,7 +34,6 @@ int main(int argc, char const* argv[])
                 freyr
                     .WithOptions([](fr::FreyrOptionsBuilder& options) {
                         options.WithMaxEntities(1024 * 1024)
-                            .WithFixedDeltaTime(1.0f / 50.0f)
                             .WithArchetypeChunkCapacity(128)
                             .WithThreadCount(std::thread::hardware_concurrency())
                             .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkAffinity);
@@ -58,7 +57,7 @@ int main(int argc, char const* argv[])
                     })
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
                         pipeline.WithName("Fixed")
-                            .WithRate(0.02f)
+                            .WithRate(60.0f)
                             .WithSystem<OctreeSystem>()
                             .WithSystem<MovementSystem>()
                             .WithSystem<PhysicsSystem>()
@@ -67,7 +66,7 @@ int main(int argc, char const* argv[])
                     })
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
                         pipeline.WithName("AI")
-                        .WithRate(0.2f)
+                        .WithRate(5.0f)
                         .WithSystem<AIControlSystem>();
                     });
             })
