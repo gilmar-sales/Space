@@ -11,11 +11,12 @@
 RenderSystem::RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer,
                            const Ref<fra::Window>& window, const Ref<fra::MeshPool>& meshPool,
                            const Ref<fra::MaterialPool>& materialPool, const Ref<OctreeSystem>& octreeSystem,
-                           const Ref<fr::TaskManager>& taskManager, const Ref<fra::EventManager>& eventManager) :
+                           const Ref<fr::ThreadPool>& taskManager, const Ref<fra::EventManager>& eventManager) :
     System(scene), mRenderables({}), mMatrices({}), mInstanceMatrixBuffers({}), mRenderer(renderer), mWindow(window),
-    mMaterialPool(materialPool), mMeshPool(meshPool), mOctreeSystem(octreeSystem), mTaskManager(taskManager), mEnabled(true)
+    mMaterialPool(materialPool), mMeshPool(meshPool), mOctreeSystem(octreeSystem), mThreadPool(taskManager),
+    mEnabled(true)
 {
-    mPlayer = mScene->FindUnique<PlayerComponent>();
+    mPlayer = mScene->CreateQuery()->FindUnique<PlayerComponent>();
 
     mRenderables.resize(mRenderer->GetFrameCount());
     mMatrices.resize(mRenderer->GetFrameCount());
@@ -55,26 +56,28 @@ void RenderSystem::PostUpdate(float dt)
 
 void RenderSystem::BeginFrame() const
 {
-    mTaskManager->WaitForAllTasks();
+    mThreadPool->WaitForAllTasks();
     mRenderer->BeginFrame();
 
-    mScene->TryGetComponents<TransformComponent>(mPlayer, [&](const TransformComponent& transform) {
-        const auto cameraPosition =
-            transform.position - transform.GetForwardDirection() * 15.0f - transform.GetUpDirection() * 5.0f;
+    if (mPlayer.has_value())
+        mScene->TryGetComponents<TransformComponent>(mPlayer.value(), [&](const TransformComponent& transform) {
+            const auto cameraPosition =
+                transform.position - transform.GetForwardDirection() * 15.0f - transform.GetUpDirection() * 5.0f;
 
-        const auto cameraForward =
-            glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);
+            const auto cameraForward =
+                glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);
 
-        auto projectionUniformBuffer = fra::ProjectionUniformBuffer {
-            .view       = glm::lookAt(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection()),
-            .projection = glm::perspective(
-                glm::radians(75.0f), static_cast<float>(mWindow->GetWidth()) / static_cast<float>(mWindow->GetHeight()),
-                0.1f, mRenderer->GetDrawDistance()),
-            .ambientLight = glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.5f)
-        };
+            auto projectionUniformBuffer = fra::ProjectionUniformBuffer {
+                .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection()),
+                .projection =
+                    glm::perspective(glm::radians(75.0f),
+                                     static_cast<float>(mWindow->GetWidth()) / static_cast<float>(mWindow->GetHeight()),
+                                     0.1f, mRenderer->GetDrawDistance()),
+                .ambientLight = glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.5f)
+            };
 
-        mRenderer->UpdateProjection(projectionUniformBuffer);
-    });
+            mRenderer->UpdateProjection(projectionUniformBuffer);
+        });
 }
 
 void RenderSystem::DrawInstanced()

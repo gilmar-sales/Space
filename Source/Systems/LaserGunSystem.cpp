@@ -11,15 +11,15 @@
 
 void LaserGunSystem::Update(float deltaTime)
 {
-    mScene->ForEachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent>(
-        [scene          = mScene,
+    mScene->CreateQuery()->EachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent>(
+        [this,
          octreeSystem   = mOctreeSystem,
          bulletMeshes   = &mAssetManager->GetBulletModel(),
          bulletMaterial = mAssetManager->GetBulletMaterial(),
          deltaTime](auto                entity,
                     LaserGunComponent&  laserGun,
-                    TransformComponent& transform,
-                    RigidBodyComponent& rigidBody) {
+                    const TransformComponent& transform,
+                    const RigidBodyComponent& rigidBody) {
             laserGun.energySpent -= laserGun.energyCost * laserGun.energyCost * deltaTime;
 
             if (laserGun.energySpent < 0.0f)
@@ -43,8 +43,8 @@ void LaserGunSystem::Update(float deltaTime)
                 laserGun.energySpent += laserGun.energyCost;
 
                 auto shoot = [&](glm::vec3 offset) {
-                    scene->CreateEntity(
-                        [scene, octreeSystem](
+                    mScene->CreateEntity(
+                        [this, octreeSystem](
                             auto bullet,
                             BulletComponent&,
                             const TransformComponent&      transform,

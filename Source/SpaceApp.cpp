@@ -1,7 +1,5 @@
 #include "SpaceApp.hpp"
 
-#include "Freyr/Core/Scene.hpp"
-
 void SpaceApp::StartUp()
 {
     SDL_AddGamepadMappingsFromFile("./Resources/gamecontrollerdb.txt");

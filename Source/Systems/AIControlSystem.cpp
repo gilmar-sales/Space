@@ -13,27 +13,28 @@ AIControlSystem::AIControlSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSy
 
 void AIControlSystem::Update(float deltaTime)
 {
-    mScene->ForEachAsync<AIControlledComponent, TransformComponent, SquadComponent, LaserGunComponent,
-                         SpaceShipControlComponent>(
-        [this,
-         deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
-                    SquadComponent& squad, LaserGunComponent& laserGun, SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.boost       = Boost;
-            spaceShipControl.boostFactor = 1.0f;
-            switch (aiControlled.behaviour)
-            {
-                case Behaviour::Patrol:
-                    Patrol(entity, aiControlled, squad, transform);
-                    break;
-                case Behaviour::Chase:
-                    Chase(aiControlled, squad, deltaTime, transform, laserGun);
-                    break;
-                case Behaviour::Flee:
-                    Flee(aiControlled, deltaTime);
-                    spaceShipControl.boostFactor = BoostFactor;
-                    break;
-            }
-        });
+    mScene->CreateQuery()
+        ->EachAsync<AIControlledComponent, TransformComponent, SquadComponent, LaserGunComponent,
+                    SpaceShipControlComponent>(
+            [this, deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
+                              SquadComponent& squad, LaserGunComponent& laserGun,
+                              SpaceShipControlComponent& spaceShipControl) {
+                spaceShipControl.boost       = Boost;
+                spaceShipControl.boostFactor = 1.0f;
+                switch (aiControlled.behaviour)
+                {
+                    case Behaviour::Patrol:
+                        Patrol(entity, aiControlled, squad, transform);
+                        break;
+                    case Behaviour::Chase:
+                        Chase(aiControlled, squad, deltaTime, transform, laserGun);
+                        break;
+                    case Behaviour::Flee:
+                        Flee(aiControlled, deltaTime);
+                        spaceShipControl.boostFactor = BoostFactor;
+                        break;
+                }
+            });
 }
 
 void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControlled, SquadComponent& squad,

@@ -33,10 +33,9 @@ int main(int argc, char const* argv[])
             .AddExtension<fr::FreyrExtension>([](Ref<fr::FreyrExtension> freyr) {
                 freyr
                     ->WithOptions([](fr::FreyrOptionsBuilder& options) {
-                        options.WithMaxEntities(1024 * 1024)
+                        options
                             .WithArchetypeChunkCapacity(128)
-                            .WithThreadCount(std::thread::hardware_concurrency())
-                            .WithExecutionStrategy(fr::FreyrExecutionStategy::ChunkAffinity);
+                            .WithThreadCount(std::thread::hardware_concurrency());
                     })
                     .WithComponent<ModelComponent>()
                     .WithComponent<TransformComponent>()

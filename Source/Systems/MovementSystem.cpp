@@ -7,7 +7,7 @@
 
 void MovementSystem::Update(float deltaTime)
 {
-    mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
+    mScene->CreateQuery()->EachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
         [deltaTime = deltaTime](TransformComponent&        transform,
                                 RigidBodyComponent&        rigidBody,
                                 SpaceShipControlComponent& spaceShipControl) {

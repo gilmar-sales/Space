@@ -9,8 +9,7 @@
 void CollisionSystem::Update(float deltaTime)
 {
 
-    mScene->ForEachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-        "Calculate collisions",
+    mScene->CreateQuery()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         [this, deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
                                       SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
             if (rigidBody.isKinematic)

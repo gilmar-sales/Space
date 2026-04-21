@@ -4,12 +4,12 @@
 
 void DecaySystem::PreUpdate(float deltaTime)
 {
-    mScene->ForEachAsync<DecayComponent>([deltaTime, scene = mScene](auto entity, DecayComponent& decay) {
+    mScene->CreateQuery()->EachAsync<DecayComponent>([this, deltaTime](auto entity, DecayComponent& decay) {
         decay.timeToLive -= deltaTime;
 
         if (decay.timeToLive <= 0)
         {
-            scene->DestroyEntity(entity);
+            mScene->DestroyEntity(entity);
         }
     });
 }

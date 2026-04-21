@@ -9,12 +9,12 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
     System(scene), mOctreeSystem(octreeSystem)
 {
     mCollisionListener =
-        mScene->AddEventListener<CollisionEvent>([scene = mScene](const CollisionEvent collisionEvent) {
-            scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+        mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent collisionEvent) {
+            mScene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
                 collisionEvent.target,
                 [&](TransformComponent& targetTransform, const SphereColliderComponent& targetCollider,
                     RigidBodyComponent& targetRigidBody) {
-                    scene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+                    mScene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
                         collisionEvent.collisor,
                         [&](TransformComponent& collisorTransform, const SphereColliderComponent& collisorCollider,
                             RigidBodyComponent& collisorRigidBody) {
@@ -43,7 +43,7 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
 
 void PhysicsSystem::Update(float deltaTime)
 {
-    mScene->ForEachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+    mScene->CreateQuery()->EachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
         [this, deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
                           SphereColliderComponent& sphereCollider) {
             if (rigidBody.isKinematic)

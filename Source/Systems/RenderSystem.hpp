@@ -18,7 +18,7 @@ class RenderSystem final : public fr::System
   public:
     RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer, const Ref<fra::Window>& window,
                  const Ref<fra::MeshPool>& meshPool, const Ref<fra::MaterialPool>& materialPool,
-                 const Ref<OctreeSystem>& octreeSystem, const Ref<fr::TaskManager>& taskManager,
+                 const Ref<OctreeSystem>& octreeSystem, const Ref<fr::ThreadPool>& threadPool,
                  const Ref<fra::EventManager>& eventManager);
 
     void PostUpdate(float dt) override;
@@ -30,7 +30,7 @@ class RenderSystem final : public fr::System
 
     friend class SpaceApp;
 
-    fr::Entity mPlayer;
+    std::optional<fr::Entity> mPlayer;
 
     std::vector<std::vector<Particle>>  mRenderables;
     std::vector<std::vector<glm::mat4>> mMatrices;
@@ -41,6 +41,6 @@ class RenderSystem final : public fr::System
     Ref<fra::MaterialPool> mMaterialPool;
     Ref<fra::MeshPool>     mMeshPool;
     Ref<OctreeSystem>      mOctreeSystem;
-    Ref<fr::TaskManager>   mTaskManager;
+    Ref<fr::ThreadPool>    mThreadPool;
     bool                   mEnabled;
 };
