@@ -7,13 +7,13 @@ include(FetchContent)
 fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.25.4"
+        GIT_TAG "v0.25.6"
 )
 
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.11.9"
+        GIT_TAG "v0.11.14"
 )
 
 fetchcontent_makeavailable(freyr freya)
@@ -40,12 +40,12 @@ target_precompile_headers(Space PUBLIC
         <memory>
 )
 if (WIN32)
-    if (MSVC)
-        target_compile_options(Space PUBLIC "/bigobj")
-    else ()
-        target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
-        target_compile_options(Space PRIVATE "-Os")
-    endif ()
+  if (MSVC)
+    target_compile_options(Space PUBLIC "/bigobj")
+  else ()
+    target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
+    target_compile_options(Space PRIVATE "-Os")
+  endif ()
 endif (WIN32)
 
 file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})

@@ -30,9 +30,9 @@ int main(int argc, char const* argv[])
 {
     auto builder =
         skr::ApplicationBuilder()
-            .AddExtension<fr::FreyrExtension>([](fr::FreyrExtension& freyr) {
+            .AddExtension<fr::FreyrExtension>([](Ref<fr::FreyrExtension> freyr) {
                 freyr
-                    .WithOptions([](fr::FreyrOptionsBuilder& options) {
+                    ->WithOptions([](fr::FreyrOptionsBuilder& options) {
                         options.WithMaxEntities(1024 * 1024)
                             .WithArchetypeChunkCapacity(128)
                             .WithThreadCount(std::thread::hardware_concurrency())
@@ -65,13 +65,11 @@ int main(int argc, char const* argv[])
                             .WithSystem<DecaySystem>();
                     })
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
-                        pipeline.WithName("AI")
-                        .WithRate(5.0f)
-                        .WithSystem<AIControlSystem>();
+                        pipeline.WithName("AI").WithRate(5.0f).WithSystem<AIControlSystem>();
                     });
             })
-            .AddExtension<fra::FreyaExtension>([](fra::FreyaExtension& freya) {
-                freya.WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {
+            .AddExtension<fra::FreyaExtension>([](Ref<fra::FreyaExtension> freya) {
+                freya->WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {
                     freyaOptions.SetTitle("Space")
                         .SetWidth(1920)
                         .SetHeight(1080)
@@ -82,8 +80,8 @@ int main(int argc, char const* argv[])
                 });
             });
 
-    builder.GetServiceCollection().AddSingleton<AssetManager>();
-    builder.GetServiceCollection().AddTransient<Random>();
+    builder.GetServiceCollection()->AddSingleton<AssetManager>();
+    builder.GetServiceCollection()->AddTransient<Random>();
 
     auto app = builder.Build<SpaceApp>();
 
