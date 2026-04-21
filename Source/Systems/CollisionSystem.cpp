@@ -8,7 +8,6 @@
 
 void CollisionSystem::Update(float deltaTime)
 {
-
     mScene->CreateQuery()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         [this, deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
                                       SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {

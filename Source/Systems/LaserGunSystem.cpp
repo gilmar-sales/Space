@@ -12,14 +12,10 @@
 void LaserGunSystem::Update(float deltaTime)
 {
     mScene->CreateQuery()->EachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent>(
-        [this,
-         octreeSystem   = mOctreeSystem,
-         bulletMeshes   = &mAssetManager->GetBulletModel(),
-         bulletMaterial = mAssetManager->GetBulletMaterial(),
-         deltaTime](auto                entity,
-                    LaserGunComponent&  laserGun,
-                    const TransformComponent& transform,
-                    const RigidBodyComponent& rigidBody) {
+        [this, deltaTime](auto                entity,
+                          LaserGunComponent&  laserGun,
+                          TransformComponent& transform,
+                          RigidBodyComponent& rigidBody) {
             laserGun.energySpent -= laserGun.energyCost * laserGun.energyCost * deltaTime;
 
             if (laserGun.energySpent < 0.0f)
@@ -44,25 +40,25 @@ void LaserGunSystem::Update(float deltaTime)
 
                 auto shoot = [&](glm::vec3 offset) {
                     mScene->CreateEntity(
-                        [this, octreeSystem](
-                            auto bullet,
-                            BulletComponent&,
-                            const TransformComponent&      transform,
-                            const SphereColliderComponent& sphereCollider,
-                            ModelComponent&,
-                            DecayComponent&,
-                            RigidBodyComponent&) {
+                        [this](auto bullet,
+                               BulletComponent&,
+                               const TransformComponent&      transform,
+                               const SphereColliderComponent& sphereCollider,
+                               ModelComponent&,
+                               DecayComponent&,
+                               RigidBodyComponent&) {
                             const auto particle =
                                 Particle { .entity = bullet, .transform = transform, .sphereCollider = sphereCollider };
 
-                            octreeSystem->Insert(particle);
+                            mOctreeSystem->Insert(particle);
                         },
                         BulletComponent { .owner = entity },
                         TransformComponent { .position = transform.position + offset,
                                              .rotation = glm::vec3(0.0),
                                              .scale    = glm::vec3(1.0) },
                         SphereColliderComponent { .radius = 1.0f },
-                        ModelComponent { .meshes = bulletMeshes, .material = bulletMaterial },
+                        ModelComponent { .meshes   = &mAssetManager->GetBulletModel(),
+                                         .material = mAssetManager->GetBulletMaterial() },
                         DecayComponent { .timeToLive = 3.0f },
                         RigidBodyComponent {
                             .mass     = 0.0001f,

@@ -60,7 +60,7 @@ void RenderSystem::BeginFrame() const
     mRenderer->BeginFrame();
 
     if (mPlayer.has_value())
-        mScene->TryGetComponents<TransformComponent>(mPlayer.value(), [&](const TransformComponent& transform) {
+        mScene->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent& transform) {
             const auto cameraPosition =
                 transform.position - transform.GetForwardDirection() * 15.0f - transform.GetUpDirection() * 5.0f;
 

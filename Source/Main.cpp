@@ -55,9 +55,9 @@ int main(int argc, char const* argv[])
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
                         pipeline.WithName("Fixed")
                             .WithRate(60.0f)
+                            .WithSystem<OctreeSystem>()
                             .WithSystem<SpaceShipSystem>()
                             .WithSystem<PhysicsSystem>()
-                            .WithSystem<OctreeSystem>()
                             .WithSystem<CollisionSystem>();
                     })
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
