@@ -1,11 +1,11 @@
-#include "MovementSystem.hpp"
+#include "SpaceShipSystem.hpp"
 
 #include "Components/RigidBodyComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 #include <Components/SpaceShipControlComponent.hpp>
 
-void MovementSystem::Update(float deltaTime)
+void SpaceShipSystem::Update(float deltaTime)
 {
     mScene->CreateQuery()->EachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
         [deltaTime = deltaTime](TransformComponent&        transform,

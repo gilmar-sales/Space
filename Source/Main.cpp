@@ -18,10 +18,10 @@
 #include "Systems/DecaySystem.hpp"
 #include "Systems/InputSystem.hpp"
 #include "Systems/LaserGunSystem.hpp"
-#include "Systems/MovementSystem.hpp"
 #include "Systems/PhysicsSystem.hpp"
 #include "Systems/PlayerControlSystem.hpp"
 #include "Systems/RenderSystem.hpp"
+#include "Systems/SpaceShipSystem.hpp"
 #include "Systems/SpawnSystem.hpp"
 
 #include "Random.hpp"
@@ -33,9 +33,7 @@ int main(int argc, char const* argv[])
             .AddExtension<fr::FreyrExtension>([](Ref<fr::FreyrExtension> freyr) {
                 freyr
                     ->WithOptions([](fr::FreyrOptionsBuilder& options) {
-                        options
-                            .WithArchetypeChunkCapacity(128)
-                            .WithThreadCount(std::thread::hardware_concurrency());
+                        options.WithArchetypeChunkCapacity(128).WithThreadCount(std::thread::hardware_concurrency());
                     })
                     .WithComponent<ModelComponent>()
                     .WithComponent<TransformComponent>()
@@ -57,14 +55,13 @@ int main(int argc, char const* argv[])
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
                         pipeline.WithName("Fixed")
                             .WithRate(60.0f)
-                            .WithSystem<OctreeSystem>()
-                            .WithSystem<MovementSystem>()
+                            .WithSystem<SpaceShipSystem>()
                             .WithSystem<PhysicsSystem>()
-                            .WithSystem<CollisionSystem>()
-                            .WithSystem<DecaySystem>();
+                            .WithSystem<OctreeSystem>()
+                            .WithSystem<CollisionSystem>();
                     })
                     .WithPipeline([](fr::PipelineBuilder& pipeline) {
-                        pipeline.WithName("AI").WithRate(5.0f).WithSystem<AIControlSystem>();
+                        pipeline.WithName("AI").WithRate(5.0f).WithSystem<AIControlSystem>().WithSystem<DecaySystem>();
                     });
             })
             .AddExtension<fra::FreyaExtension>([](Ref<fra::FreyaExtension> freya) {
