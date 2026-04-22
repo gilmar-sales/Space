@@ -46,27 +46,26 @@ int main(int argc, char const *argv[]) {
                         .WithComponent<SpaceShipControlComponent>()
                         .WithComponent<LaserGunComponent>()
                         .WithPipeline([](fr::PipelineBuilder &pipeline) {
-                            pipeline.WithName("Fixed")
-                                    .WithRate(60.0f)
-                                    .WithSystem<OctreeSystem>()
-                                    .WithSystem<SpaceShipSystem>()
-                                    .WithSystem<PhysicsSystem>()
-                                    .WithSystem<CollisionSystem>();
-                        })
-                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
-                            pipeline
-                                    .WithName("AI")
-                                    .WithRate(5.0f)
-                                    .WithSystem<AIControlSystem>()
-                                    .WithSystem<DecaySystem>();
-                        })
-                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
                             pipeline.WithName("Main")
                                     .WithSystem<SpawnSystem>()
                                     .WithSystem<InputSystem>()
                                     .WithSystem<PlayerControlSystem>()
                                     .WithSystem<LaserGunSystem>()
                                     .WithSystem<RenderSystem>();
+                        })
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline.WithName("Fixed")
+                                    .WithRate(60.0f)
+                                    .WithSystem<OctreeSystem>()
+                                    .WithSystem<SpaceShipSystem>()
+                                    .WithSystem<PhysicsSystem>()
+                                    .WithSystem<CollisionSystem>()
+                                    .WithSystem<DecaySystem>();
+                        })
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline.WithName("AI")
+                                    .WithRate(5.0f)
+                                    .WithSystem<AIControlSystem>();
                         });
             })
             .WithExtension<fra::FreyaExtension>([](fra::FreyaExtension &freya) {
