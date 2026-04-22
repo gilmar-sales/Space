@@ -179,7 +179,7 @@ void LaserGunSystem::Shoot(fr::Entity owner, glm::vec3 position, glm::vec3 veloc
             .meshes = &mAssetManager->GetBulletModel(),
             .material = mAssetManager->GetBulletMaterial()
         },
-        DecayComponent{.timeToLive = 3.0f},
+        DecayComponent{.timeToLive = 1.0f},
         RigidBodyComponent{
             .mass = 0.0001f,
             .velocity = velocity,

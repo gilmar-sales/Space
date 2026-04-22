@@ -46,6 +46,15 @@ int main(int argc, char const *argv[]) {
                         .WithComponent<SpaceShipControlComponent>()
                         .WithComponent<LaserGunComponent>()
                         .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline.WithName("Physics")
+                                    .WithRate(60.0f)
+                                    .WithSystem<OctreeSystem>()
+                                    .WithSystem<CollisionSystem>()
+                                    .WithSystem<SpaceShipSystem>()
+                                    .WithSystem<PhysicsSystem>()
+                                    .WithSystem<DecaySystem>();
+                        })
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
                             pipeline.WithName("Main")
                                     .WithSystem<SpawnSystem>()
                                     .WithSystem<InputSystem>()
@@ -54,16 +63,7 @@ int main(int argc, char const *argv[]) {
                                     .WithSystem<RenderSystem>();
                         })
                         .WithPipeline([](fr::PipelineBuilder &pipeline) {
-                            pipeline.WithName("Fixed")
-                                    .WithRate(60.0f)
-                                    .WithSystem<OctreeSystem>()
-                                    .WithSystem<SpaceShipSystem>()
-                                    .WithSystem<PhysicsSystem>()
-                                    .WithSystem<CollisionSystem>()
-                                    .WithSystem<DecaySystem>();
-                        })
-                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
-                            pipeline.WithName("AI")
+                            pipeline.WithName("AI::Think")
                                     .WithRate(5.0f)
                                     .WithSystem<AIControlSystem>();
                         });
