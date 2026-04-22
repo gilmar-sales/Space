@@ -26,53 +26,58 @@
 
 #include "Random.hpp"
 
-int main(int argc, char const* argv[])
-{
+int main(int argc, char const *argv[]) {
     auto builder =
-        skr::ApplicationBuilder()
-            .AddExtension<fr::FreyrExtension>([](Ref<fr::FreyrExtension> freyr) {
+            skr::ApplicationBuilder()
+            .WithExtension<fr::FreyrExtension>([](fr::FreyrExtension &freyr) {
                 freyr
-                    ->WithOptions([](fr::FreyrOptionsBuilder& options) {
-                        options.WithArchetypeChunkCapacity(128).WithThreadCount(std::thread::hardware_concurrency());
-                    })
-                    .WithComponent<ModelComponent>()
-                    .WithComponent<TransformComponent>()
-                    .WithComponent<SphereColliderComponent>()
-                    .WithComponent<RigidBodyComponent>()
-                    .WithComponent<HealthComponent>()
-                    .WithComponent<SquadComponent>()
-                    .WithComponent<PlayerComponent>()
-                    .WithComponent<SpaceShipControlComponent>()
-                    .WithComponent<LaserGunComponent>()
-                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
-                        pipeline.WithName("Main")
-                            .WithSystem<SpawnSystem>()
-                            .WithSystem<InputSystem>()
-                            .WithSystem<PlayerControlSystem>()
-                            .WithSystem<LaserGunSystem>()
-                            .WithSystem<RenderSystem>();
-                    })
-                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
-                        pipeline.WithName("Fixed")
-                            .WithRate(60.0f)
-                            .WithSystem<OctreeSystem>()
-                            .WithSystem<SpaceShipSystem>()
-                            .WithSystem<PhysicsSystem>()
-                            .WithSystem<CollisionSystem>();
-                    })
-                    .WithPipeline([](fr::PipelineBuilder& pipeline) {
-                        pipeline.WithName("AI").WithRate(5.0f).WithSystem<AIControlSystem>().WithSystem<DecaySystem>();
-                    });
+                        .WithOptions([](fr::FreyrOptionsBuilder &options) {
+                            options
+                                    .WithArchetypeChunkCapacity(128)
+                                    .WithThreadCount(std::thread::hardware_concurrency());
+                        })
+                        .WithComponent<ModelComponent>()
+                        .WithComponent<TransformComponent>()
+                        .WithComponent<SphereColliderComponent>()
+                        .WithComponent<RigidBodyComponent>()
+                        .WithComponent<HealthComponent>()
+                        .WithComponent<SquadComponent>()
+                        .WithComponent<PlayerComponent>()
+                        .WithComponent<SpaceShipControlComponent>()
+                        .WithComponent<LaserGunComponent>()
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline.WithName("Fixed")
+                                    .WithRate(60.0f)
+                                    .WithSystem<OctreeSystem>()
+                                    .WithSystem<SpaceShipSystem>()
+                                    .WithSystem<PhysicsSystem>()
+                                    .WithSystem<CollisionSystem>();
+                        })
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline
+                                    .WithName("AI")
+                                    .WithRate(5.0f)
+                                    .WithSystem<AIControlSystem>()
+                                    .WithSystem<DecaySystem>();
+                        })
+                        .WithPipeline([](fr::PipelineBuilder &pipeline) {
+                            pipeline.WithName("Main")
+                                    .WithSystem<SpawnSystem>()
+                                    .WithSystem<InputSystem>()
+                                    .WithSystem<PlayerControlSystem>()
+                                    .WithSystem<LaserGunSystem>()
+                                    .WithSystem<RenderSystem>();
+                        });
             })
-            .AddExtension<fra::FreyaExtension>([](Ref<fra::FreyaExtension> freya) {
-                freya->WithOptions([](fra::FreyaOptionsBuilder& freyaOptions) {
+            .WithExtension<fra::FreyaExtension>([](fra::FreyaExtension &freya) {
+                freya.WithOptions([](fra::FreyaOptionsBuilder &freyaOptions) {
                     freyaOptions.SetTitle("Space")
-                        .SetWidth(1920)
-                        .SetHeight(1080)
-                        .SetDrawDistance(1000'000.0f)
-                        .SetSampleCount(8)
-                        .SetVSync(false)
-                        .SetFullscreen(false);
+                            .SetWidth(1920)
+                            .SetHeight(1080)
+                            .SetDrawDistance(1'000'000.0f)
+                            .SetSampleCount(8)
+                            .SetVSync(false)
+                            .SetFullscreen(false);
                 });
             });
 
