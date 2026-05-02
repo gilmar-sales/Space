@@ -2,7 +2,7 @@
 
 #include "Components/SpaceShipControlComponent.hpp"
 
-constexpr auto CHASE_DISTANCE       = 350.0f;
+constexpr auto CHASE_DISTANCE       = 450.0f;
 constexpr auto SHOOT_DISTANCE       = 100.0f;
 const auto     SHOOT_ANGLE_TRESHOLD = glm::cos(glm::radians(20.0f));
 
@@ -27,7 +27,7 @@ void AIControlSystem::Update(float deltaTime)
                         Patrol(entity, aiControlled, squad, transform);
                         break;
                     case Behaviour::Chase:
-                        Chase(aiControlled, squad, deltaTime, transform, laserGun);
+                        Chase(aiControlled, spaceShipControl, squad, deltaTime, transform, laserGun);
                         break;
                     case Behaviour::Flee:
                         Flee(aiControlled, deltaTime);
@@ -41,18 +41,27 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
                              TransformComponent& transform)
 {
 
-    auto particle =
-        Particle { .entity = entity, .transform = transform, .sphereCollider = { .radius = CHASE_DISTANCE } };
+    std::optional<Particle> target = std::nullopt;
 
-    auto target = mOctree->FindFirst(particle, [&](const Particle& other) {
-        auto shouldTarget = false;
+    float percent = 0.1f;
 
-        mScene->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
-            shouldTarget = squad.squad != otherSquad.squad;
+    do
+    {
+        auto particle = Particle { .entity         = entity,
+                                   .transform      = transform,
+                                   .sphereCollider = { .radius = CHASE_DISTANCE * percent } };
+        target        = mOctree->FindFirst(particle, [&](const Particle& other) {
+            auto shouldTarget = false;
+
+            mScene->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
+                shouldTarget = squad.squad != otherSquad.squad;
+            });
+
+            return shouldTarget;
         });
 
-        return shouldTarget;
-    });
+        percent += 0.1f;
+    } while (percent < 1.0f);
 
     if (!target.has_value())
         return;
@@ -61,8 +70,9 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
     aiControlled.behaviour = Behaviour::Chase;
 }
 
-void AIControlSystem::Chase(AIControlledComponent& aiControlled, const SquadComponent& squad, const float deltaTime,
-                            TransformComponent& transform, LaserGunComponent& laserGun) const
+void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,
+                            const SquadComponent& squad, const float deltaTime, TransformComponent& transform,
+                            LaserGunComponent& laserGun) const
 {
     mScene->TryGetComponents<TransformComponent, SquadComponent>(
         aiControlled.target, [&](TransformComponent& playerTransform, const SquadComponent& targetSquad) {
@@ -98,6 +108,9 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, const SquadComp
 
             const glm::vec3 torque = glm::normalize(glm::cross(transform.GetForwardDirection(), toTarget));
 
-            transform.Rotate(-torque, 30.0f, deltaTime);
+            constexpr auto threshold     = 0.1f;
+            spaceShipControl.pitchTorque = std::abs(torque.x) > threshold ? torque.x : 0.0f;
+            spaceShipControl.yawTorque   = std::abs(torque.y) > threshold ? torque.y : 0.0f;
+            spaceShipControl.rollTorque  = std::abs(torque.z) > threshold ? torque.z * 0.4f : 0.0f;
         });
 }

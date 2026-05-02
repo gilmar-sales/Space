@@ -6,6 +6,7 @@
 
 #include "Components/AIControlledComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
+#include "Components/SpaceShipControlComponent.hpp"
 #include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
@@ -20,8 +21,9 @@ class AIControlSystem final : public fr::System
     void Patrol(fr::Entity entity, AIControlledComponent& aiControlled, SquadComponent& squad,
                 TransformComponent& transform);
 
-    void Chase(AIControlledComponent& aiControlled, const SquadComponent& squad, float deltaTime,
-               TransformComponent& transform, LaserGunComponent& laserGun) const;
+    void Chase(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,
+               const SquadComponent& squad, float deltaTime, TransformComponent& transform,
+               LaserGunComponent& laserGun) const;
 
     void Flee(AIControlledComponent& aiControlled, float deltaTime) {}
 

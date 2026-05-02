@@ -50,10 +50,10 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                     spaceShipControl.boost = Boost;
                     break;
                 case fra::KeyCode::A:
-                    spaceShipControl.rollTorque = -TurnTorque;
+                    spaceShipControl.rollTorque = -1.0f;
                     break;
                 case fra::KeyCode::D:
-                    spaceShipControl.rollTorque = TurnTorque;
+                    spaceShipControl.rollTorque = 1.0f;
                     break;
                 case fra::KeyCode::LShift:
                     spaceShipControl.boostFactor = BoostFactor;
@@ -136,13 +136,13 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                     spaceShipControl.boost = static_cast<float>(Boost * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftX:
-                    spaceShipControl.yawTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
+                    spaceShipControl.yawTorque = static_cast<float>(keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftY:
-                    spaceShipControl.pitchTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
+                    spaceShipControl.pitchTorque = -static_cast<float>(keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisRightX:
-                    spaceShipControl.rollTorque = static_cast<float>(TurnTorque * keyPressedEvent.value);
+                    spaceShipControl.rollTorque = static_cast<float>(keyPressedEvent.value);
                     break;
                 default:
                     break;
@@ -152,8 +152,8 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this, player](const fra::MouseMoveEvent& mouseMoveEvent) {
         mScene->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.yawTorque      = mouseMoveEvent.deltaX * 0.1f * TurnTorque;
-            spaceShipControl.pitchTorque    = mouseMoveEvent.deltaY * 0.1f * TurnTorque;
+            spaceShipControl.yawTorque      = mouseMoveEvent.deltaX * 0.1f;
+            spaceShipControl.pitchTorque    = -mouseMoveEvent.deltaY * 0.1f;
             spaceShipControl.volatileTorque = true;
         });
     });

@@ -12,9 +12,9 @@
 #include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
-constexpr auto SPAWN_RANGE = 1'000.0f;
+constexpr auto SPAWN_RANGE = 500.0f;
 
-constexpr auto SQUAD_SIZE = 500;
+constexpr auto SQUAD_SIZE = 1000;
 
 SpawnSystem::SpawnSystem(const Ref<fr::Scene> &scene, const Ref<AssetManager> &assetManager,
                          const Ref<Random> &random) : System(scene), mAssetManager(assetManager), mRandom(random) {

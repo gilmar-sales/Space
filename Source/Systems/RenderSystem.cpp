@@ -62,21 +62,12 @@ void RenderSystem::BeginFrame() const
     if (mPlayer.has_value())
         mScene->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent& transform) {
             const auto cameraPosition =
-                transform.position - transform.GetForwardDirection() * 15.0f - transform.GetUpDirection() * 5.0f;
+                transform.position - transform.GetForwardDirection() * 15.0f + transform.GetUpDirection() * 4.0f;
 
             const auto cameraForward =
                 glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);
 
-            auto projectionUniformBuffer = fra::ProjectionUniformBuffer {
-                .view = glm::lookAt(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection()),
-                .projection =
-                    glm::perspective(glm::radians(75.0f),
-                                     static_cast<float>(mWindow->GetWidth()) / static_cast<float>(mWindow->GetHeight()),
-                                     0.1f, mRenderer->GetDrawDistance()),
-                .ambientLight = glm::vec4(glm::normalize(glm::vec3(0.0f, 3.0f, 0.0f)), 0.5f)
-            };
-
-            mRenderer->UpdateProjection(projectionUniformBuffer);
+            mRenderer->UpdateCamera(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection());
         });
 }
 
@@ -93,10 +84,11 @@ void RenderSystem::DrawInstanced()
     matrices.clear();
     mScene->EndTrace();
 
-    auto& [view, projection, ambientLight] = mRenderer->GetCurrentProjection();
+    auto projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 1.0f, 20'000.0f);
+    auto view       = mRenderer->GetCurrentProjection().view;
 
     mScene->BeginTrace("Create Frustum");
-    const auto frustum = Frustum(mRenderer->CalculateProjectionMatrix(0.1f, 15000.0f) * view);
+    const auto frustum = Frustum(projection * view);
     mScene->EndTrace();
 
     mScene->BeginTrace("Query renderables");

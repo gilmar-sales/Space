@@ -36,7 +36,7 @@ void LaserGunSystem::Update(float deltaTime) {
 
                 const auto forwarOffset = transform.GetForwardDirection() * 9.5f;
                 const auto sideOffset = transform.GetRightDirection() * 3.5f;
-                const auto upOffset = transform.GetUpDirection() * 1.5f;
+                const auto upOffset = -transform.GetUpDirection() * 1.5f;
 
                 const auto leftOffset = forwarOffset - sideOffset + upOffset;
                 const auto rightOffset = forwarOffset + sideOffset + upOffset;

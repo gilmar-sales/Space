@@ -19,17 +19,17 @@ void SpaceShipSystem::Update(float deltaTime)
 
             if (spaceShipControl.pitchTorque != 0.0f)
             {
-                transform.Rotate(transform.GetRightDirection(), spaceShipControl.pitchTorque, deltaTime);
+                transform.Rotate(transform.GetRightDirection(), spaceShipControl.pitchTorque * TurnTorque, deltaTime);
             }
 
             if (spaceShipControl.yawTorque != 0.0f)
             {
-                transform.Rotate(transform.GetUpDirection(), spaceShipControl.yawTorque, deltaTime);
+                transform.Rotate(transform.GetUpDirection(), spaceShipControl.yawTorque * TurnTorque, deltaTime);
             }
 
             if (spaceShipControl.rollTorque != 0.0f)
             {
-                transform.Rotate(transform.GetForwardDirection(), spaceShipControl.rollTorque, deltaTime);
+                transform.Rotate(transform.GetForwardDirection(), spaceShipControl.rollTorque * TurnTorque, deltaTime);
             }
 
             if (spaceShipControl.volatileTorque)

@@ -3,15 +3,15 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
+static constexpr glm::vec3 FORWARD { 0.0f, 0.0f, 1.0f };
+static constexpr glm::vec3 RIGHT { 1.0f, 0.0f, 0.0f };
+static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
+
 struct TransformComponent : fr::Component
 {
     glm::vec3 position { glm::vec3(0.0f) };
     glm::quat rotation { glm::identity<glm::quat>() };
     glm::vec3 scale { glm::vec3(1.0f) };
-
-    static constexpr glm::vec3 FORWARD { 0.0f, 0.0f, 1.0f };
-    static constexpr glm::vec3 RIGHT { 1.0f, 0.0f, 0.0f };
-    static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
 
     [[nodiscard]] glm::vec3 GetForwardDirection() const { return FORWARD * rotation; }
     [[nodiscard]] glm::vec3 GetRightDirection() const { return RIGHT * rotation; }
