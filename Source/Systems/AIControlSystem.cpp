@@ -42,27 +42,18 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
                              TransformComponent& transform)
 {
 
-    std::optional<Particle> target = std::nullopt;
+    auto particle =
+        Particle { .entity = entity, .transform = transform, .sphereCollider = { .radius = CHASE_DISTANCE } };
 
-    float percent = 0.1f;
+    auto target = mOctree->FindFirst(particle, [&](const Particle& other) {
+        auto shouldTarget = false;
 
-    do
-    {
-        auto particle = Particle { .entity         = entity,
-                                   .transform      = transform,
-                                   .sphereCollider = { .radius = CHASE_DISTANCE * percent } };
-        target        = mOctree->FindFirst(particle, [&](const Particle& other) {
-            auto shouldTarget = false;
-
-            mScene->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
-                shouldTarget = squad.squad != otherSquad.squad;
-            });
-
-            return shouldTarget;
+        mScene->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
+            shouldTarget = squad.squad != otherSquad.squad;
         });
 
-        percent += 0.1f;
-    } while (percent < 1.0f);
+        return shouldTarget;
+    });
 
     if (!target.has_value())
         return;
