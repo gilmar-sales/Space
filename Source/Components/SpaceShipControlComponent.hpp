@@ -2,9 +2,9 @@
 
 #include <Freyr/Freyr.hpp>
 
-constexpr auto MaxThrust       = 5'000;
-constexpr auto BoostFactor = 2.f;
-constexpr auto TurnTorque  = 75.0f;
+constexpr auto MaxThrust       = 9'000;
+constexpr auto BoostFactor = 3.f;
+constexpr auto TurnTorque  = 90.0f;
 
 struct SpaceShipControlComponent : fr::Component
 {
