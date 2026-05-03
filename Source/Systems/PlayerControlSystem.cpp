@@ -47,7 +47,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost = Boost;
+                    spaceShipControl.throttle = 1.0f;
                     break;
                 case fra::KeyCode::A:
                     spaceShipControl.rollTorque = -1.0f;
@@ -69,7 +69,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyReleasedEvent.key)
             {
                 case fra::KeyCode::W:
-                    spaceShipControl.boost = 0;
+                    spaceShipControl.throttle = 0;
                     break;
                 case fra::KeyCode::A:
                 case fra::KeyCode::D:
@@ -133,7 +133,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
             switch (keyPressedEvent.axis)
             {
                 case fra::GamepadAxis::GamepadAxisRightTrigger:
-                    spaceShipControl.boost = static_cast<float>(Boost * keyPressedEvent.value);
+                    spaceShipControl.throttle = static_cast<float>(1.0f * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftX:
                     spaceShipControl.yawTorque = static_cast<float>(keyPressedEvent.value);

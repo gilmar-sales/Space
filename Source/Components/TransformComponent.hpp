@@ -3,9 +3,9 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
-static constexpr glm::vec3 FORWARD { 0.0f, 0.0f, 1.0f };
-static constexpr glm::vec3 RIGHT { 1.0f, 0.0f, 0.0f };
-static constexpr glm::vec3 UP { 0.0f, 1.0f, 0.0f };
+static constexpr glm::vec3 WORLD_FORWARD { 0.0f, 0.0f, 1.0f };
+static constexpr glm::vec3 WORLD_RIGHT { 1.0f, 0.0f, 0.0f };
+static constexpr glm::vec3 WORLD_UP { 0.0f, 1.0f, 0.0f };
 
 struct TransformComponent : fr::Component
 {
@@ -13,9 +13,9 @@ struct TransformComponent : fr::Component
     glm::quat rotation { glm::identity<glm::quat>() };
     glm::vec3 scale { glm::vec3(1.0f) };
 
-    [[nodiscard]] glm::vec3 GetForwardDirection() const { return FORWARD * rotation; }
-    [[nodiscard]] glm::vec3 GetRightDirection() const { return RIGHT * rotation; }
-    [[nodiscard]] glm::vec3 GetUpDirection() const { return UP * rotation; }
+    [[nodiscard]] glm::vec3 GetForwardDirection() const { return WORLD_FORWARD * rotation; }
+    [[nodiscard]] glm::vec3 GetRightDirection() const { return WORLD_RIGHT * rotation; }
+    [[nodiscard]] glm::vec3 GetUpDirection() const { return WORLD_UP * rotation; }
 
     [[nodiscard]] glm::mat4 GetModel() const
     {

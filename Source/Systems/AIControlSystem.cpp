@@ -2,9 +2,10 @@
 
 #include "Components/SpaceShipControlComponent.hpp"
 
-constexpr auto CHASE_DISTANCE       = 450.0f;
-constexpr auto SHOOT_DISTANCE       = 100.0f;
-const auto     SHOOT_ANGLE_TRESHOLD = glm::cos(glm::radians(20.0f));
+constexpr auto  CHASE_DISTANCE       = 450.0f;
+constexpr auto  SHOOT_DISTANCE       = 100.0f;
+const auto      SHOOT_ANGLE_TRESHOLD = glm::cos(glm::radians(20.0f));
+constexpr float BRAKING_DISTANCE     = 50.0f;
 
 AIControlSystem::AIControlSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem>& octreeSystem) :
     System(scene), mOctree(octreeSystem)
@@ -19,7 +20,7 @@ void AIControlSystem::Update(float deltaTime)
             [this, deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
                               SquadComponent& squad, LaserGunComponent& laserGun,
                               SpaceShipControlComponent& spaceShipControl) {
-                spaceShipControl.boost       = Boost;
+                spaceShipControl.throttle    = 1.0f;
                 spaceShipControl.boostFactor = 1.0f;
                 switch (aiControlled.behaviour)
                 {
@@ -75,7 +76,7 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
                             LaserGunComponent& laserGun) const
 {
     mScene->TryGetComponents<TransformComponent, SquadComponent>(
-        aiControlled.target, [&](TransformComponent& playerTransform, const SquadComponent& targetSquad) {
+        aiControlled.target, [&](TransformComponent& targetTransform, const SquadComponent& targetSquad) {
             if (targetSquad.squad == squad.squad)
             {
 
@@ -85,7 +86,7 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
                 return;
             }
 
-            const auto distanceVector = playerTransform.position - transform.position;
+            const auto distanceVector = targetTransform.position - transform.position;
 
             const auto distance = glm::length(distanceVector);
 
@@ -97,7 +98,7 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
                 return;
             }
 
-            const auto toTarget = glm::normalize(distanceVector);
+            const auto toTarget = distanceVector / distance;
 
             if (distance <= SHOOT_DISTANCE)
             {
@@ -106,11 +107,35 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
                 laserGun.triggered = dotProduct > SHOOT_ANGLE_TRESHOLD;
             }
 
-            const glm::vec3 torque = glm::normalize(glm::cross(transform.GetForwardDirection(), toTarget));
+            glm::vec3 worldTorque = glm::cross(toTarget, transform.GetForwardDirection());
 
-            constexpr auto threshold     = 0.1f;
-            spaceShipControl.pitchTorque = std::abs(torque.x) > threshold ? torque.x : 0.0f;
-            spaceShipControl.yawTorque   = std::abs(torque.y) > threshold ? torque.y : 0.0f;
-            spaceShipControl.rollTorque  = std::abs(torque.z) > threshold ? torque.z * 0.4f : 0.0f;
+            float forwardDot = glm::dot(transform.GetForwardDirection(), toTarget);
+
+            float alignment      = glm::max(0.0f, forwardDot);
+            float distanceFactor = glm::clamp(distance / BRAKING_DISTANCE, 0.0f, 1.0f);
+
+            spaceShipControl.throttle = alignment * distanceFactor;
+
+            if (glm::length(worldTorque) < 0.001f)
+            {
+                if (forwardDot < 0.0f)
+                {
+                    worldTorque = transform.GetUpDirection();
+                }
+                else
+                {
+                    worldTorque = glm::vec3(0.0f);
+                }
+            }
+
+            float pitchError = glm::dot(worldTorque, transform.GetRightDirection());
+            float yawError   = glm::dot(worldTorque, transform.GetUpDirection());
+
+            float rollError = glm::dot(transform.GetRightDirection(), WORLD_UP);
+
+            spaceShipControl.pitchTorque = pitchError;
+            spaceShipControl.yawTorque   = yawError;
+
+            spaceShipControl.rollTorque = rollError;
         });
 }
