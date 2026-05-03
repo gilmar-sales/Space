@@ -22,10 +22,9 @@ class AIControlSystem final : public fr::System
                 TransformComponent& transform);
 
     void Chase(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,
-               const SquadComponent& squad, float deltaTime, TransformComponent& transform,
-               LaserGunComponent& laserGun) const;
+               const SquadComponent& squad, TransformComponent& transform, LaserGunComponent& laserGun) const;
 
-    void Flee(AIControlledComponent& aiControlled, float deltaTime) {}
+    void Flee(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl, float deltaTime);
 
     Ref<OctreeSystem> mOctree;
 };

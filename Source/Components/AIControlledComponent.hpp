@@ -13,4 +13,5 @@ struct AIControlledComponent : fr::Component
 {
     Behaviour  behaviour;
     fr::Entity target;
+    float      fleeTime;
 };

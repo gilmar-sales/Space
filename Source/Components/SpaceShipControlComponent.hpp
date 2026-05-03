@@ -4,7 +4,7 @@
 
 constexpr auto MaxThrust       = 5'000;
 constexpr auto BoostFactor = 2.f;
-constexpr auto TurnTorque  = 60.0f;
+constexpr auto TurnTorque  = 75.0f;
 
 struct SpaceShipControlComponent : fr::Component
 {

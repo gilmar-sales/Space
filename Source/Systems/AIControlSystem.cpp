@@ -28,11 +28,10 @@ void AIControlSystem::Update(float deltaTime)
                         Patrol(entity, aiControlled, squad, transform);
                         break;
                     case Behaviour::Chase:
-                        Chase(aiControlled, spaceShipControl, squad, deltaTime, transform, laserGun);
+                        Chase(aiControlled, spaceShipControl, squad, transform, laserGun);
                         break;
                     case Behaviour::Flee:
-                        Flee(aiControlled, deltaTime);
-                        spaceShipControl.boostFactor = BoostFactor;
+                        Flee(aiControlled, spaceShipControl, deltaTime);
                         break;
                 }
             });
@@ -63,7 +62,7 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
 }
 
 void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,
-                            const SquadComponent& squad, const float deltaTime, TransformComponent& transform,
+                            const SquadComponent& squad, TransformComponent& transform,
                             LaserGunComponent& laserGun) const
 {
     mScene->TryGetComponents<TransformComponent, SquadComponent>(
@@ -129,4 +128,18 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
 
             spaceShipControl.rollTorque = rollError;
         });
+}
+
+void AIControlSystem::Flee(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,
+                           float deltaTime)
+{
+    aiControlled.fleeTime -= deltaTime;
+
+    if (aiControlled.fleeTime <= 0.0f)
+    {
+        aiControlled.behaviour = Behaviour::Patrol;
+        return;
+    }
+
+    spaceShipControl.boostFactor = BoostFactor;
 }
