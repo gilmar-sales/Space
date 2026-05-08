@@ -27,7 +27,7 @@ public:
 
     void OnCollision(const CollisionEvent &event) const;
 
-    void Shoot(fr::Entity owner, glm::vec3 position, glm::vec3 velocity);
+    void Shoot(fr::Entity owner, std::uint32_t material, glm::vec3 position, glm::quat rotation, glm::vec3 velocity);
 
 private:
     std::optional<fr::Entity> mPlayer;

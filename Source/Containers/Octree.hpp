@@ -59,7 +59,6 @@ public:
     bool IsInsideFrustum(const Frustum &frustum) const;
 
     void Draw(const Ref<fra::Renderer> &renderer,
-              const Ref<fra::MeshPool> &meshPool,
               const std::vector<std::uint32_t> &meshIds) const;
 
     void PushInstanceData(std::vector<glm::mat4> &instanceData) const;

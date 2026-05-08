@@ -73,7 +73,8 @@ int main(int argc, char const *argv[]) {
                             .SetSampleCount(8)
                             .SetVSync(false)
                             .SetFullscreen(false)
-                            .WithReverseZ();
+                            .WithReverseZ()
+                            .SetRenderingStrategy(fra::RenderingStrategy::Deferred);
                 });
             });
 

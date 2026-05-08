@@ -13,10 +13,14 @@ fetchcontent_declare(
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.14.0"
+        GIT_TAG "v0.15.0"
 )
 
 fetchcontent_makeavailable(freyr freya)
+
+list(APPEND CMAKE_MODULE_PATH "${freya_SOURCE_DIR}/cmake")
+
+include(CompileShaders)
 
 project(
         Space
@@ -40,12 +44,14 @@ target_precompile_headers(Space PUBLIC
         <memory>
 )
 if (WIN32)
-  if (MSVC)
-    target_compile_options(Space PUBLIC "/bigobj")
-  else ()
-    target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
-    target_compile_options(Space PRIVATE "-Os")
-  endif ()
+    if (MSVC)
+        target_compile_options(Space PUBLIC "/bigobj")
+    else ()
+        target_compile_options(Space PUBLIC "-Wa,-mbig-obj")
+        target_compile_options(Space PRIVATE "-Os")
+    endif ()
 endif (WIN32)
 
 file(COPY Resources DESTINATION ${CMAKE_BINARY_DIR})
+
+add_dependencies(Space Shaders)
