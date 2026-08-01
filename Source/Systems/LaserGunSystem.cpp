@@ -73,19 +73,21 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
         mRegistry->TryGetComponents<SquadComponent>(bullet.owner, [&](const SquadComponent &onwerSquad) {
             mRegistry->TryGetComponents<AIControlledComponent, LaserGunComponent>(
                 bullet.owner,
-                [](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
+                [&](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
                     aiControlled.behaviour = Behaviour::Flee;
-                    aiControlled.fleeTime = 3.0f;
-                    aiControlled.target = 0;
+                    aiControlled.fleeTime = 1.5f;
+                    aiControlled.target = event.target;
+                    aiControlled.frustration = 0.0f;
                     laserGun.triggered = false;
                 });
 
             mRegistry->TryGetComponents<AIControlledComponent, LaserGunComponent>(
                 event.target,
-                [](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
+                [&](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
                     aiControlled.behaviour = Behaviour::Flee;
                     aiControlled.fleeTime = 3.0f;
-                    aiControlled.target = 0;
+                    aiControlled.target = bullet.owner;
+                    aiControlled.frustration = 0.0f;
                     laserGun.triggered = false;
                 });
 

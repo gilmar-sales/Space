@@ -22,6 +22,8 @@ class OctreeSystem final : public fr::System
 
     void Query(Particle& particle, std::vector<Particle>& found) const;
 
+    void QueryKinematic(Particle& particle, std::vector<Particle>& found) const;
+
     void Query(const Frustum& frustum, std::vector<Particle>& found) const
     {
         if (mKinematicOctree != nullptr)

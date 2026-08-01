@@ -3,6 +3,7 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
+#include "Components/AIControlledComponent.hpp"
 #include "Components/HealthComponent.hpp"
 #include "Components/LaserGunComponent.hpp"
 #include "Components/ModelComponent.hpp"
@@ -43,6 +44,7 @@ int main(int argc, char const *argv[]) {
                         .WithComponent<PlayerComponent>()
                         .WithComponent<SpaceShipControlComponent>()
                         .WithComponent<LaserGunComponent>()
+                        .WithComponent<AIControlledComponent>()
                         .WithPipeline([](fr::PipelineBuilder &pipeline) {
                             pipeline.WithName("Physics")
                                     .WithRate(60.0f)
