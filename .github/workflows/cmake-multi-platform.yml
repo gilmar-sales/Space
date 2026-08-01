@@ -52,6 +52,33 @@ jobs:
         sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
         sudo apt-get update
 
+    - name: Install SDL3 build dependencies
+      if: ${{ matrix.os == 'ubuntu-latest' }}
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          libx11-dev libxext-dev libxrandr-dev libxcursor-dev \
+          libxi-dev libxinerama-dev libxxf86vm-dev libxss-dev \
+          libxkbcommon-dev libxkbcommon-x11-dev \
+          libwayland-dev wayland-protocols \
+          libdrm-dev libgbm-dev \
+          libudev-dev libdbus-1-dev \
+          libpulse-dev libasound2-dev
+
+    - name: Set reusable strings
+      # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
+      id: strings
+      shell: bash
+      run: |
+        echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        
+    - name: Prepare Vulkan SDK
+      uses: humbletim/setup-vulkan-sdk@v1.2.1
+      with:
+        vulkan-query-version: 1.4.328.1
+        vulkan-components: Vulkan-Headers, Vulkan-Loader
+        vulkan-use-cache: true
+
     - name: Cache and install gcc-16 on Linux
       if: matrix.os == 'ubuntu-latest'
       uses: awalsh128/cache-apt-pkgs-action@v1
