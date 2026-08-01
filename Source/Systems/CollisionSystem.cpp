@@ -8,7 +8,7 @@
 
 void CollisionSystem::Update(float deltaTime)
 {
-    mScene->CreateQuery()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+    mRegistry->CreateMutation()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         [this, deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
                                       SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
             if (rigidBody.isKinematic)
@@ -22,7 +22,7 @@ void CollisionSystem::Update(float deltaTime)
 
             for (const auto collision : collisions)
             {
-                mScene->SendEvent<CollisionEvent>(
+                mRegistry->SendEvent<CollisionEvent>(
                     CollisionEvent { .target = collision.entity, .collisor = entity, .deltaTime = deltaTime });
             }
         });

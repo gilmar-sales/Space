@@ -8,11 +8,11 @@
 
 #include <ranges>
 
-RenderSystem::RenderSystem(const Ref<fr::Scene> &scene, const Ref<fra::Renderer> &renderer,
-                           const Ref<fra::Window> &window, const Ref<fra::MeshPool> &meshPool,
-                           const Ref<fra::MaterialPool> &materialPool, const Ref<OctreeSystem> &octreeSystem,
-                           const Ref<fr::ThreadPool> &taskManager,
-                           const Ref<fra::EventManager> &eventManager) : System(scene), mRenderables({}), mMatrices({}),
+RenderSystem::RenderSystem(const skr::Arc<fr::Registry> &registry, const skr::Arc<fra::Renderer> &renderer,
+                           const skr::Arc<fra::Window> &window, const skr::Arc<fra::MeshPool> &meshPool,
+                           const skr::Arc<fra::MaterialPool> &materialPool, const skr::Arc<OctreeSystem> &octreeSystem,
+                           const skr::Arc<fr::ThreadPool> &taskManager,
+                           const skr::Arc<fra::EventManager> &eventManager) : System(registry), mRenderables({}), mMatrices({}),
                                                                          mInstanceMatrixBuffers({}),
                                                                          mRenderer(renderer), mWindow(window),
                                                                          mMaterialPool(materialPool),
@@ -20,7 +20,7 @@ RenderSystem::RenderSystem(const Ref<fr::Scene> &scene, const Ref<fra::Renderer>
                                                                          mOctreeSystem(octreeSystem),
                                                                          mThreadPool(taskManager),
                                                                          mEnabled(true) {
-    mPlayer = mScene->CreateQuery()->FindUnique<PlayerComponent>();
+    mPlayer = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
 
     mRenderables.resize(mRenderer->GetFrameCount());
     mMatrices.resize(mRenderer->GetFrameCount());
@@ -61,7 +61,7 @@ void RenderSystem::BeginFrame() const {
     mRenderer->BeginFrame();
 
     if (mPlayer.has_value())
-        mScene->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent &transform) {
+        mRegistry->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent &transform) {
             const auto cameraPosition =
                     transform.position - transform.GetForwardDirection() * 15.0f + transform.GetUpDirection() * 4.0f;
 
@@ -79,28 +79,28 @@ void RenderSystem::DrawInstanced() {
     auto &matrices = mMatrices[currentFrameIndex];
     auto &instaceMatrixBuffer = mInstanceMatrixBuffers[currentFrameIndex];
 
-    mScene->BeginTrace("Clear Buffers");
+    mRegistry->BeginTrace("Clear Buffers");
     renderables.clear();
     matrices.clear();
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 
     auto projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 1.0f, 20'000.0f);
     auto view = mRenderer->GetCurrentProjection().view;
 
-    mScene->BeginTrace("Create Frustum");
+    mRegistry->BeginTrace("Create Frustum");
     const auto frustum = Frustum(projection * view);
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 
-    mScene->BeginTrace("Query renderables");
+    mRegistry->BeginTrace("Query renderables");
     mOctreeSystem->Query(frustum, renderables);
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 
-    mScene->BeginTrace("Sort Renderables");
+    mRegistry->BeginTrace("Sort Renderables");
 
     std::ranges::sort(renderables, [this](const Particle &a, const Particle &b) {
         auto greater = false;
-        mScene->TryGetComponents<ModelComponent>(a.entity, [&](const ModelComponent &aModel) {
-            mScene->TryGetComponents<ModelComponent>(b.entity, [&](const ModelComponent &bModel) {
+        mRegistry->TryGetComponents<ModelComponent>(a.entity, [&](const ModelComponent &aModel) {
+            mRegistry->TryGetComponents<ModelComponent>(b.entity, [&](const ModelComponent &bModel) {
                 if (aModel.meshes != bModel.meshes) {
                     greater = aModel.meshes < bModel.meshes;
                 } else {
@@ -110,17 +110,17 @@ void RenderSystem::DrawInstanced() {
         });
         return greater;
     });
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 
     if (renderables.size() > matrices.capacity())
         matrices.reserve(renderables.size());
 
     auto instanceDraws = std::vector<InstanceDraw>();
 
-    mScene->BeginTrace("Calculate instance sequence");
+    mRegistry->BeginTrace("Calculate instance sequence");
 
     auto result = std::ranges::remove_if(renderables, [&](auto &particle) {
-        return !mScene->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent &transform) {
+        return !mRegistry->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent &transform) {
             matrices.emplace_back(transform.GetModel());
         });
     });
@@ -129,7 +129,7 @@ void RenderSystem::DrawInstanced() {
 
     auto i = 0;
     for (auto &renderable: renderables) {
-        mScene->TryGetComponents<ModelComponent>(renderable.entity, [&](const ModelComponent &model) {
+        mRegistry->TryGetComponents<ModelComponent>(renderable.entity, [&](const ModelComponent &model) {
             if (currentInstance.meshes &&
                 (currentInstance.meshes != model.meshes || currentInstance.material != model.material)) {
                 instanceDraws.push_back(currentInstance);
@@ -156,7 +156,7 @@ void RenderSystem::DrawInstanced() {
             i++;
         });
     }
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 
     if (matrices.empty()) {
         return;
@@ -174,18 +174,18 @@ void RenderSystem::DrawInstanced() {
 
     mRenderer->BindBuffer(instaceMatrixBuffer);
 
-    mScene->BeginTrace("Draw instance sequences");
+    mRegistry->BeginTrace("Draw instance sequences");
     for (const auto &instanceDraw: instanceDraws) {
         if (instanceDraw.meshes != nullptr)
             for (const auto &meshId: *instanceDraw.meshes) {
                 mRenderer->DrawInstanced(meshId, instanceDraw.material, instanceDraw.instanceCount, instanceDraw.index);
             }
     }
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 }
 
 void RenderSystem::EndFrame() const {
-    mScene->BeginTrace("Render");
+    mRegistry->BeginTrace("Render");
     mRenderer->EndFrame();
-    mScene->EndTrace();
+    mRegistry->EndTrace();
 }

@@ -8,11 +8,11 @@
 class CollisionSystem final : public fr::System
 {
   public:
-    CollisionSystem(const Ref<fr::Scene>&     scene,
-                    const Ref<fra::Renderer>& renderer,
-                    const Ref<fra::MeshPool>& meshPool,
-                    const Ref<OctreeSystem>&  octreeSystem) :
-        System(scene), mRenderer(renderer), mMeshPool(meshPool), mOctreeSystem(octreeSystem)
+    CollisionSystem(const skr::Arc<fr::Registry>& registry,
+                    const skr::Arc<fra::Renderer>& renderer,
+                    const skr::Arc<fra::MeshPool>& meshPool,
+                    const skr::Arc<OctreeSystem>&  octreeSystem) :
+        System(registry), mRenderer(renderer), mMeshPool(meshPool), mOctreeSystem(octreeSystem)
     {
     }
 
@@ -26,7 +26,7 @@ class CollisionSystem final : public fr::System
     std::vector<std::uint32_t> mSphereModel;
     std::vector<std::uint32_t> mCubeModel;
 
-    Ref<fra::Renderer> mRenderer;
-    Ref<fra::MeshPool> mMeshPool;
-    Ref<OctreeSystem>  mOctreeSystem;
+    skr::Arc<fra::Renderer> mRenderer;
+    skr::Arc<fra::MeshPool> mMeshPool;
+    skr::Arc<OctreeSystem>  mOctreeSystem;
 };

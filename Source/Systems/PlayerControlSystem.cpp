@@ -4,10 +4,10 @@
 #include <Components/PlayerComponent.hpp>
 #include <Components/SpaceShipControlComponent.hpp>
 
-PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger) :
-    System(scene)
+PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::EventManager>& eventManger) :
+    System(registry)
 {
-    const auto playerOpt = mScene->CreateQuery()->FindUnique<PlayerComponent>();
+    const auto playerOpt = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
 
     if (!playerOpt.has_value())
         return;
@@ -18,7 +18,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
         switch (event.button)
         {
             case fra::MouseButton::Left: {
-                mScene->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
+                mRegistry->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
                     laserGun.triggered = true;
                 });
                 break;
@@ -32,7 +32,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
         switch (event.button)
         {
             case fra::MouseButton::Left: {
-                mScene->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
+                mRegistry->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
                     laserGun.triggered = false;
                 });
                 break;
@@ -43,7 +43,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
     });
 
     eventManger->Subscribe<fra::KeyPressedEvent>([this, player](const fra::KeyPressedEvent& keyPressedEvent) {
-        mScene->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
+        mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
             switch (keyPressedEvent.key)
             {
                 case fra::KeyCode::W:
@@ -65,7 +65,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
     });
 
     eventManger->Subscribe<fra::KeyReleasedEvent>([this, player](const fra::KeyReleasedEvent& keyReleasedEvent) {
-        mScene->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
+        mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
             switch (keyReleasedEvent.key)
             {
                 case fra::KeyCode::W:
@@ -86,7 +86,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::GamepadButtonPressedEvent>(
         [this, player](const fra::GamepadButtonPressedEvent& gamepadButtonPressedEvent) {
-            mScene->TryGetComponents<SpaceShipControlComponent>(
+            mRegistry->TryGetComponents<SpaceShipControlComponent>(
                 player, [&](SpaceShipControlComponent& spaceShipControl) {
                     switch (gamepadButtonPressedEvent.button)
                     {
@@ -94,7 +94,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                             spaceShipControl.boostFactor = BoostFactor;
                             break;
                         case fra::GamepadButton::GamepadButtonLeftShoulder:
-                            mScene->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
+                            mRegistry->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
                                 laserGun.triggered = true;
                             });
                             break;
@@ -107,7 +107,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::GamepadButtonReleasedEvent>(
         [this, player](const fra::GamepadButtonReleasedEvent& gamepadButtonReleasedEvent) {
-            mScene->TryGetComponents<SpaceShipControlComponent>(
+            mRegistry->TryGetComponents<SpaceShipControlComponent>(
                 player, [&](SpaceShipControlComponent& spaceShipControl) {
                     switch (gamepadButtonReleasedEvent.button)
                     {
@@ -115,7 +115,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
                             spaceShipControl.boostFactor = 1.0f;
                             break;
                         case fra::GamepadButton::GamepadButtonLeftShoulder:
-                            mScene->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
+                            mRegistry->TryGetComponents<LaserGunComponent>(player, [](LaserGunComponent& laserGun) {
                                 laserGun.triggered = false;
                             });
                             break;
@@ -128,7 +128,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
 
     eventManger->Subscribe<fra::GamepadAxisMotionEvent>([this,
                                                          player](const fra::GamepadAxisMotionEvent& keyPressedEvent) {
-        mScene->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
+        mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
             spaceShipControl.volatileTorque = false;
             switch (keyPressedEvent.axis)
             {
@@ -151,7 +151,7 @@ PlayerControlSystem::PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<
     });
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this, player](const fra::MouseMoveEvent& mouseMoveEvent) {
-        mScene->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
+        mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
             spaceShipControl.yawTorque      = mouseMoveEvent.deltaX * 0.1f;
             spaceShipControl.pitchTorque    = -mouseMoveEvent.deltaY * 0.1f;
             spaceShipControl.volatileTorque = true;

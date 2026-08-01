@@ -7,14 +7,14 @@ constexpr auto  SHOOT_DISTANCE       = 100.0f;
 const auto      SHOOT_ANGLE_TRESHOLD = glm::cos(glm::radians(20.0f));
 constexpr float BRAKING_DISTANCE     = 50.0f;
 
-AIControlSystem::AIControlSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem>& octreeSystem) :
-    System(scene), mOctree(octreeSystem)
+AIControlSystem::AIControlSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<OctreeSystem>& octreeSystem) :
+    System(registry), mOctree(octreeSystem)
 {
 }
 
 void AIControlSystem::Update(float deltaTime)
 {
-    mScene->CreateQuery()
+    mRegistry->CreateMutation()
         ->EachAsync<AIControlledComponent, TransformComponent, SquadComponent, LaserGunComponent,
                     SpaceShipControlComponent>(
             [this, deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
@@ -47,7 +47,7 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
     auto target = mOctree->FindFirst(particle, [&](const Particle& other) {
         auto shouldTarget = false;
 
-        mScene->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
+        mRegistry->TryGetComponents<SquadComponent>(other.entity, [&](SquadComponent& otherSquad) {
             shouldTarget = squad.squad != otherSquad.squad;
         });
 
@@ -65,7 +65,7 @@ void AIControlSystem::Chase(AIControlledComponent& aiControlled, SpaceShipContro
                             const SquadComponent& squad, TransformComponent& transform,
                             LaserGunComponent& laserGun) const
 {
-    mScene->TryGetComponents<TransformComponent, SquadComponent>(
+    mRegistry->TryGetComponents<TransformComponent, SquadComponent>(
         aiControlled.target, [&](TransformComponent& targetTransform, const SquadComponent& targetSquad) {
             if (targetSquad.squad == squad.squad)
             {

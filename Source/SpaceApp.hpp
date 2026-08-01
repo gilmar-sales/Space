@@ -8,10 +8,10 @@
 class SpaceApp final : public fra::AbstractApplication
 {
   public:
-    SpaceApp(const Ref<skr::ServiceProvider>& serviceProvider,
-             const Ref<fr::Scene>&            scene,
-             const Ref<AssetManager>&         assetManager) :
-        AbstractApplication(serviceProvider), mScene(scene), mAssetManager(assetManager)
+    SpaceApp(const skr::Arc<skr::ServiceProvider>& serviceProvider,
+             const skr::Arc<fr::Registry>& registry,
+             const skr::Arc<AssetManager>&         assetManager) :
+        AbstractApplication(serviceProvider), mRegistry(registry), mAssetManager(assetManager)
     {
     }
 
@@ -20,6 +20,6 @@ class SpaceApp final : public fra::AbstractApplication
     void ShutDown() override;
 
   private:
-    Ref<fr::Scene>    mScene;
-    Ref<AssetManager> mAssetManager;
+    skr::Arc<fr::Registry>    mRegistry;
+    skr::Arc<AssetManager> mAssetManager;
 };

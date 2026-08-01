@@ -274,7 +274,7 @@ void Octree::PushInstanceData(std::vector<glm::mat4> &instanceData) const {
     }
 }
 
-void Octree::Draw(const Ref<fra::Renderer> &renderer,
+void Octree::Draw(const skr::Arc<fra::Renderer> &renderer,
                   const std::vector<std::uint32_t> &meshIds) const {
     auto instanceData = std::vector<glm::mat4>();
 

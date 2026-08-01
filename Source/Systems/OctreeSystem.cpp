@@ -12,7 +12,7 @@ void OctreeSystem::BuildOctree()
         mKinematicAllocator->reset();
         mKinematicOctree = mKinematicAllocator->construct<Octree>(glm::vec3(0), 200'000.0f, mKinematicAllocator);
 
-        mScene->CreateQuery()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+        mRegistry->CreateMutation()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
             [this](const fr::Entity         entity,
                    TransformComponent&      transform,
                    SphereColliderComponent& sphereCollider,
@@ -32,7 +32,7 @@ void OctreeSystem::BuildOctree()
     mAllocator->reset();
     mOctree = mAllocator->construct<Octree>(glm::vec3(0), 200'000.0f, mAllocator);
 
-    mScene->CreateQuery()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+    mRegistry->CreateMutation()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
         [this](const fr::Entity         entity,
                TransformComponent&      transform,
                SphereColliderComponent& sphereCollider,

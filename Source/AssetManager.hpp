@@ -4,9 +4,9 @@
 
 class AssetManager final {
 public:
-    AssetManager(const Ref<fra::MeshPool> &meshPool,
-                 const Ref<fra::TexturePool> &texturePool,
-                 const Ref<fra::MaterialPool> &materialPool);
+    AssetManager(const skr::Arc<fra::MeshPool> &meshPool,
+                 const skr::Arc<fra::TexturePool> &texturePool,
+                 const skr::Arc<fra::MaterialPool> &materialPool);
 
     ~AssetManager() = default;
 
@@ -30,9 +30,9 @@ public:
     std::uint32_t GetEnemyBulletMaterial() { return mEnemyBulletMaterial; }
 
 private:
-    Ref<fra::MeshPool> mMeshPool;
-    Ref<fra::TexturePool> mTexturePool;
-    Ref<fra::MaterialPool> mMaterialPool;
+    skr::Arc<fra::MeshPool> mMeshPool;
+    skr::Arc<fra::TexturePool> mTexturePool;
+    skr::Arc<fra::MaterialPool> mMaterialPool;
 
     std::uint32_t mBlankTexture;
     std::uint32_t mBlankMaterial;

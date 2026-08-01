@@ -16,10 +16,10 @@ constexpr auto SPAWN_RANGE = 1000.0f;
 
 constexpr auto SQUAD_SIZE = 500;
 
-SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& assetManager,
-                         const Ref<Random>& random) : System(scene), mAssetManager(assetManager), mRandom(random)
+SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<AssetManager>& assetManager,
+                         const skr::Arc<Random>& random) : System(registry), mAssetManager(assetManager), mRandom(random)
 {
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetMoonModel(), .material = mAssetManager->GetMoonMaterial() })
@@ -40,7 +40,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithEntities(30'000)
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetJupiterModel(),
                                         .material = mAssetManager->GetJupiterMaterial() })
@@ -62,7 +62,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithEntities(15'000)
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetRock1Model(), .material = mAssetManager->GetRock1Material() })
@@ -84,7 +84,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithEntities(15'000)
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(HealthComponent { .hitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetRock2Model(), .material = mAssetManager->GetRock2Material() })
@@ -107,7 +107,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithEntities(10'000)
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(PlayerComponent {})
         .WithComponent(SquadComponent { .squad = Squad::Ally })
         .WithComponent(HealthComponent { .hitPoints = 1000 })
@@ -124,7 +124,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         .WithEntities(1)
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(SquadComponent { .squad = Squad::Enemy })
         .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
         .WithComponent(HealthComponent { .hitPoints = 1000 })
@@ -143,7 +143,7 @@ SpawnSystem::SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& a
         })
         .Build();
 
-    mScene->CreateArchetypeBuilder()
+    mRegistry->CreateArchetypeBuilder()
         .WithComponent(SquadComponent { .squad = Squad::Ally })
         .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
         .WithComponent(HealthComponent { .hitPoints = 1000 })

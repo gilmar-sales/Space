@@ -9,8 +9,8 @@
 class OctreeSystem final : public fr::System
 {
   public:
-    explicit OctreeSystem(const Ref<fr::Scene>& scene) :
-        System(scene), mAllocator(new ArenaAllocator()), mKinematicAllocator(new ArenaAllocator()), mOctree(nullptr),
+    explicit OctreeSystem(const skr::Arc<fr::Registry>& registry) :
+        System(registry), mAllocator(new ArenaAllocator()), mKinematicAllocator(new ArenaAllocator()), mOctree(nullptr),
         mKinematicOctree(nullptr), mEntries()
     {
         BuildOctree();

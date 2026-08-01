@@ -18,7 +18,7 @@ void SpaceApp::StartUp()
 
 void SpaceApp::Update()
 {
-    mScene->Update(mWindow->GetDeltaTime());
+    mRegistry->Update(mWindow->GetDeltaTime());
 }
 
 void SpaceApp::ShutDown()

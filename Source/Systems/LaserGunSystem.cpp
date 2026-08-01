@@ -10,7 +10,7 @@
 #include "Components/TransformComponent.hpp"
 
 void LaserGunSystem::Update(float deltaTime) {
-    mScene->CreateQuery()->EachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent, SquadComponent>(
+    mRegistry->CreateMutation()->EachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent, SquadComponent>(
         [this, deltaTime](auto entity,
                           LaserGunComponent &laserGun,
                           TransformComponent &transform,
@@ -57,21 +57,21 @@ void LaserGunSystem::Update(float deltaTime) {
 }
 
 void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
-    mScene->TryGetComponents<BulletComponent>(event.collisor, [&](const BulletComponent &bullet) {
-        mScene->DestroyEntity(event.collisor);
+    mRegistry->TryGetComponents<BulletComponent>(event.collisor, [&](const BulletComponent &bullet) {
+        mRegistry->DestroyEntity(event.collisor);
         const auto targetIsBullet =
-                mScene->TryGetComponents<BulletComponent>(event.target, [&](const BulletComponent &otherBullet) {
+                mRegistry->TryGetComponents<BulletComponent>(event.target, [&](const BulletComponent &otherBullet) {
                     if (otherBullet.owner == bullet.owner)
                         return;
 
-                    mScene->DestroyEntity(event.target);
+                    mRegistry->DestroyEntity(event.target);
                 });
 
         if (targetIsBullet)
             return;
 
-        mScene->TryGetComponents<SquadComponent>(bullet.owner, [&](const SquadComponent &onwerSquad) {
-            mScene->TryGetComponents<AIControlledComponent, LaserGunComponent>(
+        mRegistry->TryGetComponents<SquadComponent>(bullet.owner, [&](const SquadComponent &onwerSquad) {
+            mRegistry->TryGetComponents<AIControlledComponent, LaserGunComponent>(
                 bullet.owner,
                 [](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
                     aiControlled.behaviour = Behaviour::Flee;
@@ -80,7 +80,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
                     laserGun.triggered = false;
                 });
 
-            mScene->TryGetComponents<AIControlledComponent, LaserGunComponent>(
+            mRegistry->TryGetComponents<AIControlledComponent, LaserGunComponent>(
                 event.target,
                 [](AIControlledComponent &aiControlled, LaserGunComponent &laserGun) {
                     aiControlled.behaviour = Behaviour::Flee;
@@ -89,7 +89,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
                     laserGun.triggered = false;
                 });
 
-            mScene->TryGetComponents<ModelComponent, SquadComponent>(
+            mRegistry->TryGetComponents<ModelComponent, SquadComponent>(
                 event.target,
                 [&](ModelComponent &model, SquadComponent &targetSquad) {
                     if (onwerSquad.squad == Squad::Ally) {
@@ -107,15 +107,15 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
         if (event.target == mPlayer)
             return;
 
-        mScene->TryGetComponents<HealthComponent>(event.target, [&](HealthComponent &targetHealth) {
+        mRegistry->TryGetComponents<HealthComponent>(event.target, [&](HealthComponent &targetHealth) {
             targetHealth.hitPoints -= 50.0f;
 
-            if (mScene->HasComponent<SquadComponent>(bullet.owner))
+            if (mRegistry->HasComponent<SquadComponent>(bullet.owner))
                 return;
 
             if (targetHealth.hitPoints <= 0.0f) {
-                if (!mScene->HasComponent<SquadComponent>(event.target))
-                    mScene->TryGetComponents<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+                if (!mRegistry->HasComponent<SquadComponent>(event.target))
+                    mRegistry->TryGetComponents<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
                         event.target,
                         [&](const TransformComponent &transform,
                             const RigidBodyComponent &rigidBody,
@@ -123,7 +123,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
                             const auto count = sphereCollider.radius;
                             const auto maxSize = sphereCollider.radius / 10.0f;
 
-                            mScene->CreateArchetypeBuilder()
+                            mRegistry->CreateArchetypeBuilder()
                                     .WithComponent(ModelComponent{
                                         .meshes = &mAssetManager->GetRock1Model(),
                                         .material = mAssetManager->GetRock1Material()
@@ -164,7 +164,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
                         });
 
                 mOctreeSystem->Remove(event.target);
-                mScene->DestroyEntity(event.target);
+                mRegistry->DestroyEntity(event.target);
             }
         });
     });
@@ -172,7 +172,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent &event) const {
 
 void LaserGunSystem::Shoot(fr::Entity owner, std::uint32_t material, glm::vec3 position, glm::quat rotation,
                            glm::vec3 velocity) {
-    mScene->CreateEntity(
+    mRegistry->CreateEntity(
         BulletComponent{.owner = owner},
         TransformComponent{.position = position, .rotation = rotation, .scale = glm::vec3(1.0)},
         SphereColliderComponent{.radius = 1.0f},

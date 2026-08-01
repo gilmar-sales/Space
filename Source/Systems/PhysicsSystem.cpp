@@ -5,16 +5,16 @@
 #include "Components/TransformComponent.hpp"
 #include "Events/CollisionEvent.hpp"
 
-PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem>& octreeSystem) :
-    System(scene), mOctreeSystem(octreeSystem)
+PhysicsSystem::PhysicsSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<OctreeSystem>& octreeSystem) :
+    System(registry), mOctreeSystem(octreeSystem)
 {
     mCollisionListener =
-        mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent collisionEvent) {
-            mScene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+        mRegistry->AddEventListener<CollisionEvent>([this](const CollisionEvent collisionEvent) {
+            mRegistry->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
                 collisionEvent.target,
                 [&](TransformComponent& targetTransform, const SphereColliderComponent& targetCollider,
                     RigidBodyComponent& targetRigidBody) {
-                    mScene->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
+                    mRegistry->TryGetComponents<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
                         collisionEvent.collisor,
                         [&](TransformComponent& collisorTransform, const SphereColliderComponent& collisorCollider,
                             RigidBodyComponent& collisorRigidBody) {
@@ -43,7 +43,7 @@ PhysicsSystem::PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem
 
 void PhysicsSystem::Update(float deltaTime)
 {
-    mScene->CreateQuery()->EachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+    mRegistry->CreateMutation()->EachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
         [this, deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
                           SphereColliderComponent& sphereCollider) {
             if (rigidBody.isKinematic)

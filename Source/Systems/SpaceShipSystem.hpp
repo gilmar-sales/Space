@@ -5,7 +5,7 @@
 class SpaceShipSystem final : public fr::System
 {
   public:
-    explicit SpaceShipSystem(const Ref<fr::Scene>& scene) : System(scene) {}
+    explicit SpaceShipSystem(const skr::Arc<fr::Registry>& registry) : System(registry) {}
 
     ~SpaceShipSystem() override = default;
 

@@ -13,14 +13,14 @@
 
 class LaserGunSystem : public fr::System {
 public:
-    LaserGunSystem(const Ref<fr::Scene> &scene,
-                   const Ref<OctreeSystem> &octreeSystem,
-                   const Ref<AssetManager> &assetManager,
-                   const Ref<Random> &random) : System(scene), mOctreeSystem(octreeSystem), mAssetManager(assetManager),
+    LaserGunSystem(const skr::Arc<fr::Registry> &registry,
+                   const skr::Arc<OctreeSystem> &octreeSystem,
+                   const skr::Arc<AssetManager> &assetManager,
+                   const skr::Arc<Random> &random) : System(registry), mOctreeSystem(octreeSystem), mAssetManager(assetManager),
                                                 mRandom(random) {
-        mPlayer = mScene->CreateQuery()->FindUnique<PlayerComponent>();
+        mPlayer = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
         mCollisionListener =
-                mScene->AddEventListener<CollisionEvent>([this](const CollisionEvent event) { OnCollision(event); });
+                mRegistry->AddEventListener<CollisionEvent>([this](const CollisionEvent event) { OnCollision(event); });
     }
 
     void Update(float deltaTime) override;
@@ -31,8 +31,8 @@ public:
 
 private:
     std::optional<fr::Entity> mPlayer;
-    Ref<fr::ListenerHandle> mCollisionListener;
-    Ref<OctreeSystem> mOctreeSystem;
-    Ref<AssetManager> mAssetManager;
-    Ref<Random> mRandom;
+    skr::Arc<fr::ListenerHandle> mCollisionListener;
+    skr::Arc<OctreeSystem> mOctreeSystem;
+    skr::Arc<AssetManager> mAssetManager;
+    skr::Arc<Random> mRandom;
 };

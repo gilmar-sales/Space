@@ -6,10 +6,10 @@
 class InputSystem final : public fr::System
 {
   public:
-    InputSystem(const Ref<fr::Scene>&         scene,
-                const Ref<fra::Renderer>&     renderer,
-                const Ref<fra::Window>&       window,
-                const Ref<fra::EventManager>& eventManager) : System(scene), mRenderer(renderer), mWindow(window)
+    InputSystem(const skr::Arc<fr::Registry>& registry,
+                const skr::Arc<fra::Renderer>&     renderer,
+                const skr::Arc<fra::Window>&       window,
+                const skr::Arc<fra::EventManager>& eventManager) : System(registry), mRenderer(renderer), mWindow(window)
     {
         eventManager->Subscribe<fra::KeyPressedEvent>([this](const fra::KeyPressedEvent& event) {
             if (event.key == fra::KeyCode::M)
@@ -38,12 +38,12 @@ class InputSystem final : public fr::System
             {
                 if (!mProfilingStarted)
                 {
-                    mScene->BeginProfiling();
+                    mRegistry->BeginProfiling();
                     mProfilingStarted = true;
                 }
                 else
                 {
-                    mScene->EndProfiling();
+                    mRegistry->EndProfiling();
                     mProfilingStarted = false;
                 }
             }
@@ -58,6 +58,6 @@ class InputSystem final : public fr::System
     bool mMouseGrab        = false;
     bool mProfilingStarted = false;
 
-    Ref<fra::Renderer> mRenderer;
-    Ref<fra::Window>   mWindow;
+    skr::Arc<fra::Renderer> mRenderer;
+    skr::Arc<fra::Window>   mWindow;
 };

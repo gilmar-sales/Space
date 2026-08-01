@@ -6,5 +6,5 @@
 class PlayerControlSystem final : public fr::System
 {
   public:
-    PlayerControlSystem(const Ref<fr::Scene>& scene, const Ref<fra::EventManager>& eventManger);
+    PlayerControlSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::EventManager>& eventManger);
 };

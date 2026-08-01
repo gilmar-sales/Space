@@ -5,5 +5,5 @@
 
 struct OctreeFinishedEvent : fr::Event
 {
-    Ref<Octree> octree;
+    skr::Arc<Octree> octree;
 };

@@ -7,13 +7,13 @@
 class PhysicsSystem final : public fr::System
 {
   public:
-    explicit PhysicsSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem>& octreeSystem);
+    explicit PhysicsSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<OctreeSystem>& octreeSystem);
 
     ~PhysicsSystem() override = default;
 
     void Update(float deltaTime) override;
 
   private:
-    Ref<OctreeSystem>       mOctreeSystem;
-    Ref<fr::ListenerHandle> mCollisionListener;
+    skr::Arc<OctreeSystem>       mOctreeSystem;
+    skr::Arc<fr::ListenerHandle> mCollisionListener;
 };

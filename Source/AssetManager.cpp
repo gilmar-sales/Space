@@ -1,7 +1,7 @@
 #include "AssetManager.hpp"
 
-AssetManager::AssetManager(const Ref<fra::MeshPool> &meshPool, const Ref<fra::TexturePool> &texturePool,
-                           const Ref<fra::MaterialPool> &materialPool) : mMeshPool(meshPool), mTexturePool(texturePool),
+AssetManager::AssetManager(const skr::Arc<fra::MeshPool> &meshPool, const skr::Arc<fra::TexturePool> &texturePool,
+                           const skr::Arc<fra::MaterialPool> &materialPool) : mMeshPool(meshPool), mTexturePool(texturePool),
                                                                          mMaterialPool(materialPool) {
     mBlankTexture = mTexturePool->CreateTextureFromFile("./Resources/Textures/blank_texture.png");
     mBlankMaterial = mMaterialPool->Create({mBlankTexture, mBlankTexture, mBlankTexture});

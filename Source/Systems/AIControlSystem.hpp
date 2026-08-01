@@ -13,7 +13,7 @@
 class AIControlSystem final : public fr::System
 {
   public:
-    explicit AIControlSystem(const Ref<fr::Scene>& scene, const Ref<OctreeSystem>& octreeSystem);
+    explicit AIControlSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<OctreeSystem>& octreeSystem);
 
     void Update(float deltaTime) override;
 
@@ -26,5 +26,5 @@ class AIControlSystem final : public fr::System
 
     void Flee(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl, float deltaTime);
 
-    Ref<OctreeSystem> mOctree;
+    skr::Arc<OctreeSystem> mOctree;
 };

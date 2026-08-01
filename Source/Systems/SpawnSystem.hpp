@@ -8,9 +8,9 @@
 class SpawnSystem final : public fr::System
 {
   public:
-    explicit SpawnSystem(const Ref<fr::Scene>& scene, const Ref<AssetManager>& assetManager, const Ref<Random>& random);
+    explicit SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<AssetManager>& assetManager, const skr::Arc<Random>& random);
 
   private:
-    Ref<AssetManager> mAssetManager;
-    Ref<Random>       mRandom;
+    skr::Arc<AssetManager> mAssetManager;
+    skr::Arc<Random>       mRandom;
 };

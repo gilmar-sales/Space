@@ -16,10 +16,10 @@ struct InstanceDraw
 class RenderSystem final : public fr::System
 {
   public:
-    RenderSystem(const Ref<fr::Scene>& scene, const Ref<fra::Renderer>& renderer, const Ref<fra::Window>& window,
-                 const Ref<fra::MeshPool>& meshPool, const Ref<fra::MaterialPool>& materialPool,
-                 const Ref<OctreeSystem>& octreeSystem, const Ref<fr::ThreadPool>& threadPool,
-                 const Ref<fra::EventManager>& eventManager);
+    RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::Renderer>& renderer, const skr::Arc<fra::Window>& window,
+                 const skr::Arc<fra::MeshPool>& meshPool, const skr::Arc<fra::MaterialPool>& materialPool,
+                 const skr::Arc<OctreeSystem>& octreeSystem, const skr::Arc<fr::ThreadPool>& threadPool,
+                 const skr::Arc<fra::EventManager>& eventManager);
 
     void PostUpdate(float dt) override;
 
@@ -34,13 +34,13 @@ class RenderSystem final : public fr::System
 
     std::vector<std::vector<Particle>>  mRenderables;
     std::vector<std::vector<glm::mat4>> mMatrices;
-    std::vector<Ref<fra::Buffer>>       mInstanceMatrixBuffers;
+    std::vector<skr::Arc<fra::Buffer>>       mInstanceMatrixBuffers;
 
-    Ref<fra::Renderer>     mRenderer;
-    Ref<fra::Window>       mWindow;
-    Ref<fra::MaterialPool> mMaterialPool;
-    Ref<fra::MeshPool>     mMeshPool;
-    Ref<OctreeSystem>      mOctreeSystem;
-    Ref<fr::ThreadPool>    mThreadPool;
+    skr::Arc<fra::Renderer>     mRenderer;
+    skr::Arc<fra::Window>       mWindow;
+    skr::Arc<fra::MaterialPool> mMaterialPool;
+    skr::Arc<fra::MeshPool>     mMeshPool;
+    skr::Arc<OctreeSystem>      mOctreeSystem;
+    skr::Arc<fr::ThreadPool>    mThreadPool;
     bool                   mEnabled;
 };
