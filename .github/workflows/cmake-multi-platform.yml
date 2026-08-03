@@ -185,12 +185,40 @@ jobs:
         export PATH="/c/mingw64-gcc16/bin:$PATH"
         ctest --rerun-failed --output-on-failure --build-config ${{ matrix.build_type }}
 
+    # Layout matches the build tree: executable at root, Resources/ beside it.
+    - name: Stage publish
+      shell: bash
+      run: |
+        set -euo pipefail
+        BUILD="${{ steps.strings.outputs.build-output-dir }}"
+        STAGE="${{ github.workspace }}/publish"
+        rm -rf "$STAGE"
+        mkdir -p "$STAGE"
+
+        if [[ -f "$BUILD/Space" ]]; then
+          cp "$BUILD/Space" "$STAGE/"
+        elif [[ -f "$BUILD/Space.exe" ]]; then
+          cp "$BUILD/Space.exe" "$STAGE/"
+        elif [[ -f "$BUILD/Release/Space.exe" ]]; then
+          cp "$BUILD/Release/Space.exe" "$STAGE/"
+        else
+          echo "Space executable not found under $BUILD"
+          find "$BUILD" -maxdepth 2 -name 'Space*' -print || true
+          exit 1
+        fi
+
+        if [[ ! -d "$BUILD/Resources" ]]; then
+          echo "Resources directory not found at $BUILD/Resources"
+          exit 1
+        fi
+        cp -a "$BUILD/Resources" "$STAGE/"
+
+        echo "Publish layout:"
+        find "$STAGE" -maxdepth 2 -print | sort
+
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: build-${{ matrix.os }}-${{ matrix.c_compiler }}
-        path: |
-          ${{ steps.strings.outputs.build-output-dir }}/Space
-          ${{ steps.strings.outputs.build-output-dir }}/Release/Space.exe
-          ${{ steps.strings.outputs.build-output-dir }}/Resources/*
-          ${{ github.workspace }}/VULKAN_SDK/lib/*
+        name: Space-${{ matrix.os }}-${{ matrix.build_type }}
+        path: publish/*
+        if-no-files-found: error
