@@ -77,12 +77,39 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
         
-    - name: Prepare Vulkan SDK
+    # Headers/loader only — glslc comes from apt on Linux (below). Without
+    # glslc Freya falls back to copying GLSL sources into
+    # Resources/Shaders/Shaders (nested) instead of compiling .spv.
+    - name: Prepare Vulkan SDK (Linux)
+      if: matrix.os == 'ubuntu-latest'
       uses: humbletim/setup-vulkan-sdk@v1.2.1
       with:
         vulkan-query-version: 1.4.328.1
         vulkan-components: Vulkan-Headers, Vulkan-Loader
         vulkan-use-cache: true
+
+    - name: Install glslc on Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y glslc
+        command -v glslc
+        glslc --version
+
+    # Full SDK on Windows so glslc is available for Freya's shader target.
+    - name: Install Vulkan SDK (Windows)
+      if: matrix.os == 'windows-latest'
+      uses: humbletim/install-vulkan-sdk@v1.2
+      with:
+        version: 1.4.328.1
+        cache: true
+
+    - name: Verify glslc on Windows
+      if: matrix.os == 'windows-latest'
+      shell: bash
+      run: |
+        command -v glslc
+        glslc --version
 
     - name: Cache and install gcc-16 on Linux
       if: matrix.os == 'ubuntu-latest'
@@ -162,9 +189,11 @@ jobs:
       uses: actions/cache@v4
       with:
         path: build
-        key: ${{ runner.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-Ninja-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', 'src/Baldr/**', 'test/**.cpp') }}
+        # Bump cache when shader tooling changes — stale configures without
+        # glslc leave Resources/Shaders/Shaders (GLSL sources, not .spv).
+        key: ${{ runner.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-Ninja-glslc1-${{ hashFiles('CMakeLists.txt', '**/CMakeLists.txt', 'src/Baldr/**', 'test/**.cpp') }}
         restore-keys: |
-          ${{ runner.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-Ninja-
+          ${{ runner.os }}-${{ matrix.c_compiler }}-${{ matrix.build_type }}-Ninja-glslc1-
 
     - name: Configure CMake
       shell: bash
@@ -218,8 +247,24 @@ jobs:
         fi
         cp -a "$BUILD/Resources" "$STAGE/"
 
+        SHADERS="$STAGE/Resources/Shaders"
+        if [[ -d "$SHADERS/Shaders" ]]; then
+          echo "Nested Resources/Shaders/Shaders detected — glslc was missing at configure time."
+          find "$SHADERS" -maxdepth 3 -print | sort
+          exit 1
+        fi
+
+        mapfile -t SPVS < <(find "$SHADERS" -type f -name '*.spv' | sort)
+        if [[ ${#SPVS[@]} -eq 0 ]]; then
+          echo "No compiled .spv shaders under $SHADERS"
+          find "$SHADERS" -maxdepth 3 -print | sort || true
+          exit 1
+        fi
+
         echo "Publish layout:"
         find "$STAGE" -maxdepth 2 -print | sort
+        echo "Compiled shaders (${#SPVS[@]}):"
+        printf '  %s\n' "${SPVS[@]}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v4
