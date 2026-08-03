@@ -15,10 +15,15 @@ on:
       - mkdocs.yml
   pull_request:
     branches: [ "main" ]
+  # Publishing a GitHub Release builds the tagged commit and attaches zips.
+  release:
+    types: [published]
 
 jobs:
   build:
     runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
 
     strategy:
       # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
@@ -222,3 +227,28 @@ jobs:
         name: Space-${{ matrix.os }}-${{ matrix.build_type }}
         path: publish/*
         if-no-files-found: error
+
+    # Actions artifacts (above) expire and live only on the workflow run.
+    # Release assets below are permanent attachments on the GitHub Release.
+    - name: Pack release zip
+      if: github.event_name == 'release'
+      id: pack
+      shell: bash
+      run: |
+        set -euo pipefail
+        case "${{ matrix.os }}" in
+          ubuntu-latest) PLATFORM=linux ;;
+          windows-latest) PLATFORM=windows ;;
+          *) PLATFORM="${{ matrix.os }}" ;;
+        esac
+        ASSET="Space-${PLATFORM}-${{ matrix.build_type }}"
+        python -c "import shutil; shutil.make_archive('${ASSET}', 'zip', 'publish')"
+        echo "asset=${ASSET}.zip" >> "$GITHUB_OUTPUT"
+        ls -lh "${ASSET}.zip"
+
+    - name: Attach zip to GitHub Release
+      if: github.event_name == 'release'
+      uses: softprops/action-gh-release@v2
+      with:
+        files: ${{ steps.pack.outputs.asset }}
+        fail_on_unmatched_files: true
