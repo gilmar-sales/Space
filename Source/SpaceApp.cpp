@@ -8,12 +8,13 @@ void SpaceApp::StartUp()
     auto gamepads     = SDL_GetGamepads(&gamepadCount);
     if (gamepadCount > 0)
     {
-        auto gamepad = SDL_OpenGamepad(gamepads[1]);
+        auto gamepad = SDL_OpenGamepad(gamepads[0]);
         if (gamepad)
         {
             std::printf("Found gamepad %s\n", SDL_GetGamepadName(gamepad));
         }
     }
+    SDL_free(gamepads);
 }
 
 void SpaceApp::Update()

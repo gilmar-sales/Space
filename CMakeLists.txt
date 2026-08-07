@@ -2,18 +2,23 @@ cmake_minimum_required(VERSION 3.20)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+project(
+        Space
+        LANGUAGES C CXX
+)
+
 include(FetchContent)
 
 fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.28.0"
+        GIT_TAG "v0.29.0"
 )
 
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.16.0"
+        GIT_TAG "v0.29.0"
 )
 
 fetchcontent_makeavailable(freyr freya)
@@ -21,11 +26,6 @@ fetchcontent_makeavailable(freyr freya)
 list(APPEND CMAKE_MODULE_PATH "${freya_SOURCE_DIR}/cmake")
 
 include(CompileShaders)
-
-project(
-        Space
-        LANGUAGES C CXX
-)
 
 cmake_policy(SET CMP0002 NEW)
 
