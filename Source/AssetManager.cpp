@@ -8,19 +8,21 @@ AssetManager::AssetManager(const skr::Arc<fra::MeshPool> &meshPool, const skr::A
 
     mPlayerShipModel = mMeshPool->CreateMeshFromFile("./Resources/Models/ally_ship.glb");
     mPlayerShipMaterial = mMaterialPool->Create(
-        {
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship.png"),
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_normal.png"),
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_roughness.png")
-        });
+        { .albedo = mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship.png"),
+          .normal = mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_normal.png"),
+          .roughness =
+                  mTexturePool->CreateTextureFromFile("./Resources/Textures/player_ship_roughness.png"),
+          .roughnessFactor = 4.0f,
+          .metalnessFactor = 0.0f });
 
     mEnemyShipModel = mMeshPool->CreateMeshFromFile("./Resources/Models/enemy_ship.glb");
     mEnemyShipMaterial = mMaterialPool->Create(
-        {
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship.png"),
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_normal.png"),
-            mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_roughness.png")
-        });
+        { .albedo = mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship.png"),
+          .normal = mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_normal.png"),
+          .roughness =
+                  mTexturePool->CreateTextureFromFile("./Resources/Textures/enemy_ship_roughness.png"),
+          .roughnessFactor = 2.0f,
+          .metalnessFactor = 0.0f });
 
     mMoonModel = mMeshPool->CreateMeshFromFile("./Resources/Models/quad_sphere.glb");
     mMoonMaterial = mMaterialPool->Create(
