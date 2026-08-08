@@ -72,7 +72,8 @@ int main(int argc, char const *argv[]) {
                             .SetWidth(1920)
                             .SetHeight(1080)
                             .SetDrawDistance(20'000.0f)
-                            .SetSampleCount(8)
+                            .SetEnableSsao(false)
+                            .SetEnableTaa(false)
                             .SetVSync(false)
                             .SetFullscreen(false)
                             .WithReverseZ();

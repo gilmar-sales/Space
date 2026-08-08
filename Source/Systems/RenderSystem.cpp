@@ -12,8 +12,8 @@ RenderSystem::RenderSystem(const skr::Arc<fr::Registry> &registry, const skr::Ar
                            const skr::Arc<fra::Window> &window, const skr::Arc<fra::MeshPool> &meshPool,
                            const skr::Arc<fra::MaterialPool> &materialPool, const skr::Arc<OctreeSystem> &octreeSystem,
                            const skr::Arc<fr::ThreadPool> &taskManager,
-                           const skr::Arc<fra::EventManager> &eventManager) : System(registry), mRenderables({}), mMatrices({}),
-                                                                         mInstanceMatrixBuffers({}),
+                           const skr::Arc<fra::EventManager> &eventManager) : System(registry), mRenderables({}),
+                                                                         mMatrices({}),
                                                                          mRenderer(renderer), mWindow(window),
                                                                          mMaterialPool(materialPool),
                                                                          mMeshPool(meshPool),
@@ -22,20 +22,8 @@ RenderSystem::RenderSystem(const skr::Arc<fr::Registry> &registry, const skr::Ar
                                                                          mEnabled(true) {
     mPlayer = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
 
-    mRenderables.resize(mRenderer->GetFrameCount());
-    mMatrices.resize(mRenderer->GetFrameCount());
-    mInstanceMatrixBuffers.resize(mRenderer->GetFrameCount());
-
-    for (int frameIndex = 0; frameIndex < mRenderer->GetFrameCount(); ++frameIndex) {
-        mRenderables[frameIndex].reserve(30000);
-        mMatrices[frameIndex].reserve(30000);
-        mInstanceMatrixBuffers[frameIndex] =
-                mRenderer->GetBufferBuilder()
-                .SetData(mMatrices[frameIndex].data())
-                .SetSize(sizeof(glm::mat4) * 30000)
-                .SetUsage(fra::BufferUsage::Instance)
-                .Build();
-    }
+    mRenderables.reserve(30000);
+    mMatrices.reserve(30000);
 
     eventManager->Subscribe<fra::KeyPressedEvent>([this](const fra::KeyPressedEvent &event) {
         if (event.key != fra::KeyCode::F2)
@@ -73,15 +61,9 @@ void RenderSystem::BeginFrame() const {
 }
 
 void RenderSystem::DrawInstanced() {
-    const auto currentFrameIndex = mRenderer->GetCurrentFrameIndex();
-
-    auto &renderables = mRenderables[currentFrameIndex];
-    auto &matrices = mMatrices[currentFrameIndex];
-    auto &instaceMatrixBuffer = mInstanceMatrixBuffers[currentFrameIndex];
-
     mRegistry->BeginTrace("Clear Buffers");
-    renderables.clear();
-    matrices.clear();
+    mRenderables.clear();
+    mMatrices.clear();
     mRegistry->EndTrace();
 
     auto projection = glm::perspective(glm::radians(45.0f), 1920.0f / 1080.0f, 1.0f, 20'000.0f);
@@ -92,12 +74,12 @@ void RenderSystem::DrawInstanced() {
     mRegistry->EndTrace();
 
     mRegistry->BeginTrace("Query renderables");
-    mOctreeSystem->Query(frustum, renderables);
+    mOctreeSystem->Query(frustum, mRenderables);
     mRegistry->EndTrace();
 
     mRegistry->BeginTrace("Sort Renderables");
 
-    std::ranges::sort(renderables, [this](const Particle &a, const Particle &b) {
+    std::ranges::sort(mRenderables, [this](const Particle &a, const Particle &b) {
         auto greater = false;
         mRegistry->TryGetComponents<ModelComponent>(a.entity, [&](const ModelComponent &aModel) {
             mRegistry->TryGetComponents<ModelComponent>(b.entity, [&](const ModelComponent &bModel) {
@@ -112,23 +94,23 @@ void RenderSystem::DrawInstanced() {
     });
     mRegistry->EndTrace();
 
-    if (renderables.size() > matrices.capacity())
-        matrices.reserve(renderables.size());
+    if (mRenderables.size() > mMatrices.capacity())
+        mMatrices.reserve(mRenderables.size());
 
     auto instanceDraws = std::vector<InstanceDraw>();
 
     mRegistry->BeginTrace("Calculate instance sequence");
 
-    auto result = std::ranges::remove_if(renderables, [&](auto &particle) {
+    auto result = std::ranges::remove_if(mRenderables, [&](auto &particle) {
         return !mRegistry->TryGetComponents<TransformComponent>(particle.entity, [&](const TransformComponent &transform) {
-            matrices.emplace_back(transform.GetModel());
+            mMatrices.emplace_back(transform.GetModel());
         });
     });
-    renderables.erase(result.begin(), result.end());
+    mRenderables.erase(result.begin(), result.end());
     auto currentInstance = InstanceDraw{.index = 0, .instanceCount = 0, .meshes = nullptr, .material = 9};
 
     auto i = 0;
-    for (auto &renderable: renderables) {
+    for (auto &renderable: mRenderables) {
         mRegistry->TryGetComponents<ModelComponent>(renderable.entity, [&](const ModelComponent &model) {
             if (currentInstance.meshes &&
                 (currentInstance.meshes != model.meshes || currentInstance.material != model.material)) {
@@ -139,7 +121,7 @@ void RenderSystem::DrawInstanced() {
                 currentInstance.index = i;
             }
 
-            if (i == renderables.size() - 1) {
+            if (i == static_cast<int>(mRenderables.size()) - 1) {
                 if (!currentInstance.meshes) {
                     currentInstance.meshes = model.meshes;
                     currentInstance.material = model.material;
@@ -158,21 +140,11 @@ void RenderSystem::DrawInstanced() {
     }
     mRegistry->EndTrace();
 
-    if (matrices.empty()) {
+    if (mMatrices.empty()) {
         return;
     }
 
-    if (instaceMatrixBuffer->GetSize() < matrices.capacity())
-        instaceMatrixBuffer =
-                mRenderer->GetBufferBuilder()
-                .SetData(matrices.data())
-                .SetSize(sizeof(glm::mat4) * matrices.size())
-                .SetUsage(fra::BufferUsage::Instance)
-                .Build();
-
-    instaceMatrixBuffer->Copy(matrices.data(), sizeof(glm::mat4) * matrices.size());
-
-    mRenderer->BindBuffer(instaceMatrixBuffer);
+    mRenderer->SetInstanceModels(mMatrices.data(), mMatrices.size());
 
     mRegistry->BeginTrace("Draw instance sequences");
     for (const auto &instanceDraw: instanceDraws) {

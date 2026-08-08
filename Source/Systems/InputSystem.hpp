@@ -47,6 +47,26 @@ class InputSystem final : public fr::System
                     mProfilingStarted = false;
                 }
             }
+
+            if (event.key == fra::KeyCode::F5)
+            {
+                CycleShadowQuality();
+            }
+
+            if (event.key == fra::KeyCode::F6)
+            {
+                CycleSsaoQuality();
+            }
+
+            if (event.key == fra::KeyCode::F7)
+            {
+                CycleTaaQuality();
+            }
+
+            if (event.key == fra::KeyCode::F8)
+            {
+                CycleBloomQuality();
+            }
         });
     }
 
@@ -54,6 +74,11 @@ class InputSystem final : public fr::System
 
   private:
     friend class SpaceApp;
+
+    void CycleShadowQuality();
+    void CycleSsaoQuality();
+    void CycleTaaQuality();
+    void CycleBloomQuality();
 
     bool mMouseGrab        = false;
     bool mProfilingStarted = false;

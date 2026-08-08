@@ -32,9 +32,8 @@ class RenderSystem final : public fr::System
 
     std::optional<fr::Entity> mPlayer;
 
-    std::vector<std::vector<Particle>>  mRenderables;
-    std::vector<std::vector<glm::mat4>> mMatrices;
-    std::vector<skr::Arc<fra::Buffer>>       mInstanceMatrixBuffers;
+    std::vector<Particle>  mRenderables;
+    std::vector<glm::mat4> mMatrices;
 
     skr::Arc<fra::Renderer>     mRenderer;
     skr::Arc<fra::Window>       mWindow;
@@ -42,5 +41,5 @@ class RenderSystem final : public fr::System
     skr::Arc<fra::MeshPool>     mMeshPool;
     skr::Arc<OctreeSystem>      mOctreeSystem;
     skr::Arc<fr::ThreadPool>    mThreadPool;
-    bool                   mEnabled;
+    bool                        mEnabled;
 };
