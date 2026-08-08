@@ -14,7 +14,7 @@
 
 constexpr auto SPAWN_RANGE = 1000.0f;
 
-constexpr auto SQUAD_SIZE = 500;
+constexpr auto SQUAD_SIZE = 1000;
 
 SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<AssetManager>& assetManager,
                          const skr::Arc<Random>& random) : System(registry), mAssetManager(assetManager), mRandom(random)

@@ -277,19 +277,25 @@ void Octree::PushInstanceData(std::vector<glm::mat4> &instanceData) const {
 void Octree::Draw(const skr::Arc<fra::Renderer> &renderer,
                   const std::vector<std::uint32_t> &meshIds) const {
     auto instanceData = std::vector<glm::mat4>();
-
     PushInstanceData(instanceData);
 
-    auto instanceBuffer =
-            renderer->GetBufferBuilder()
-            .SetData(instanceData.data())
-            .SetSize(sizeof(glm::mat4) * instanceData.size())
-            .SetUsage(fra::BufferUsage::Instance)
-            .Build();
+    if (instanceData.empty() || meshIds.empty())
+        return;
 
-    renderer->BindBuffer(instanceBuffer);
+    auto uploads = std::vector<fra::SceneInstanceUpload>();
+    uploads.reserve(instanceData.size() * meshIds.size());
 
-    for (auto meshId: meshIds) {
-        renderer->DrawInstanced(meshId, 0, 1, instanceData.size());
+    for (std::size_t i = 0; i < instanceData.size(); ++i) {
+        for (const auto meshId : meshIds) {
+            uploads.push_back(fra::SceneInstanceUpload {
+                .model       = instanceData[i],
+                .meshId      = meshId,
+                .materialId  = 0,
+                .entityId    = static_cast<std::uint32_t>(i),
+                .castShadows = false,
+            });
+        }
     }
+
+    renderer->UploadSceneInstances(uploads);
 }

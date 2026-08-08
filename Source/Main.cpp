@@ -73,7 +73,6 @@ int main(int argc, char const *argv[]) {
                             .SetHeight(1080)
                             .SetDrawDistance(20'000.0f)
                             .SetEnableSsao(false)
-                            .SetEnableTaa(false)
                             .SetVSync(false)
                             .SetFullscreen(false)
                             .WithReverseZ();
