@@ -18,7 +18,7 @@ fetchcontent_declare(
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "V0.36.3"
+        GIT_TAG "v0.36.3"
 )
 
 fetchcontent_makeavailable(freyr freya)
