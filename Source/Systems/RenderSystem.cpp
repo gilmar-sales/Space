@@ -39,8 +39,13 @@ void RenderSystem::PostUpdate(float /*dt*/)
 
 void RenderSystem::BeginFrame() const
 {
+    mRegistry->BeginTrace("WaitForAllTasks");
     mThreadPool->WaitForAllTasks();
+    mRegistry->EndTrace();
+
+    mRegistry->BeginTrace("Freya BeginFrame");
     mRenderer->BeginFrame();
+    mRegistry->EndTrace();
 
     if (mPlayer.has_value())
         mRegistry->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent& transform) {
@@ -61,9 +66,6 @@ void RenderSystem::SubmitScene()
     mUploads.clear();
     mRegistry->EndTrace();
 
-    // Pre-filter on CPU: Freya's UploadSceneInstances (sort/history/buffer copy)
-    // and bindless MDI stay fast when the upload count is the frustum set, not
-    // the whole world (~60k).
     const auto& projectionUniforms = mRenderer->GetCurrentProjection();
     const auto  viewProj           = projectionUniforms.projection * projectionUniforms.view;
 
@@ -98,17 +100,8 @@ void RenderSystem::SubmitScene()
     if (mUploads.empty())
         return;
 
-    // Match Freya's batch key so it can skip its internal sort.
     mRegistry->BeginTrace("Sort scene instances");
-    std::ranges::sort(mUploads, [this](const fra::SceneInstanceUpload& a, const fra::SceneInstanceUpload& b) {
-        const auto& meshA = mMeshPool->GetMesh(a.meshId);
-        const auto& meshB = mMeshPool->GetMesh(b.meshId);
-        if (meshA.vertexBufferIndex != meshB.vertexBufferIndex)
-            return meshA.vertexBufferIndex < meshB.vertexBufferIndex;
-        if (meshA.indexBufferIndex != meshB.indexBufferIndex)
-            return meshA.indexBufferIndex < meshB.indexBufferIndex;
-        if (a.meshId != b.meshId)
-            return a.meshId < b.meshId;
+    std::ranges::sort(mUploads, [](const fra::SceneInstanceUpload& a, const fra::SceneInstanceUpload& b) {
         return a.entityId < b.entityId;
     });
     mRegistry->EndTrace();
