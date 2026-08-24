@@ -90,9 +90,7 @@ AIControlSystem::AIControlSystem(const skr::Arc<fr::Registry>& registry, const s
 
 void AIControlSystem::Update(float deltaTime)
 {
-    mRegistry->CreateMutation()
-        ->EachAsync<AIControlledComponent, TransformComponent, SquadComponent, LaserGunComponent,
-                    SpaceShipControlComponent>(
+    mRegistry->CreateMutation()->EachAsync(
             [this, deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
                               SquadComponent& squad, LaserGunComponent& laserGun,
                               SpaceShipControlComponent& spaceShipControl) {

@@ -43,7 +43,7 @@ PhysicsSystem::PhysicsSystem(const skr::Arc<fr::Registry>& registry, const skr::
 
 void PhysicsSystem::Update(float deltaTime)
 {
-    mRegistry->CreateMutation()->EachAsync<TransformComponent, RigidBodyComponent, SphereColliderComponent>(
+    mRegistry->CreateMutation()->EachAsync(
         [this, deltaTime](fr::Entity entity, TransformComponent& transform, RigidBodyComponent& rigidBody,
                           SphereColliderComponent& sphereCollider) {
             if (rigidBody.isKinematic)

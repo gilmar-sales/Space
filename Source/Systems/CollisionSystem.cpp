@@ -8,8 +8,8 @@
 
 void CollisionSystem::Update(float deltaTime)
 {
-    mRegistry->CreateMutation()->EachAsync<TransformComponent, SphereColliderComponent, RigidBodyComponent>(
-        [this, deltaTime = deltaTime](const fr::Entity entity, TransformComponent& transform,
+    mRegistry->CreateMutation()->EachAsync(
+        [this, deltaTime = deltaTime](fr::Entity entity, TransformComponent& transform,
                                       SphereColliderComponent& sphereCollider, RigidBodyComponent& rigidBody) {
             if (rigidBody.isKinematic)
                 return;

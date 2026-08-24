@@ -8,7 +8,7 @@
 
 void SpaceShipSystem::Update(float deltaTime)
 {
-    mRegistry->CreateMutation()->EachAsync<TransformComponent, RigidBodyComponent, SpaceShipControlComponent>(
+    mRegistry->CreateMutation()->EachAsync(
         [deltaTime = deltaTime](TransformComponent&        transform,
                                 RigidBodyComponent&        rigidBody,
                                 SpaceShipControlComponent& spaceShipControl) {

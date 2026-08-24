@@ -12,7 +12,7 @@ include(FetchContent)
 fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.29.0"
+        GIT_TAG "v0.36.0"
 )
 
 fetchcontent_declare(
@@ -34,7 +34,7 @@ file(GLOB_RECURSE SPACE_SRC Source/**.cpp Source/**.hpp)
 add_executable(Space ${SPACE_SRC}
         Source/Containers/ArenaAllocator.hpp)
 
-target_compile_features(Space PUBLIC cxx_std_23)
+target_compile_features(Space PUBLIC cxx_std_26)
 
 target_link_libraries(Space freyr::freyr Freya::Freya)
 

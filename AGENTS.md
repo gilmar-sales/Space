@@ -13,9 +13,9 @@ ctest --build-config Release
 - External libs fetched via CMake FetchContent: `freyr` (ECS), `freya` (graphics), `skirnir` (DI)
 
 ## Compiler Requirements
-- C++23 required
+- C++26 required (Freyr reflection)
 - MSVC/Windows: `/bigobj` flag (already in CMakeLists.txt)
-- GCC 14 recommended on Linux (CI installs it explicitly)
+- GCC 16+ / Clang 22+ recommended (reflection support)
 
 ## Build Artifacts
 - `Resources/` directory copied to `${CMAKE_BINARY_DIR}/` during build

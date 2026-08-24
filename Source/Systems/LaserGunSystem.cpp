@@ -10,8 +10,8 @@
 #include "Components/TransformComponent.hpp"
 
 void LaserGunSystem::Update(float deltaTime) {
-    mRegistry->CreateMutation()->EachAsync<LaserGunComponent, TransformComponent, RigidBodyComponent, SquadComponent>(
-        [this, deltaTime](auto entity,
+    mRegistry->CreateMutation()->EachAsync(
+        [this, deltaTime](fr::Entity entity,
                           LaserGunComponent &laserGun,
                           TransformComponent &transform,
                           RigidBodyComponent &rigidBody,
