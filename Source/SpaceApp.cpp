@@ -1,5 +1,9 @@
 #include "SpaceApp.hpp"
 
+#include <SDL3/SDL.h>
+
+#include <cstdio>
+
 void SpaceApp::StartUp()
 {
     SDL_AddGamepadMappingsFromFile("./Resources/gamecontrollerdb.txt");

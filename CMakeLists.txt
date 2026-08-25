@@ -18,7 +18,7 @@ fetchcontent_declare(
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.36.3"
+        GIT_TAG "v0.42.4"
 )
 
 fetchcontent_makeavailable(freyr freya)
@@ -36,7 +36,7 @@ add_executable(Space ${SPACE_SRC}
 
 target_compile_features(Space PUBLIC cxx_std_26)
 
-target_link_libraries(Space freyr::freyr Freya::Freya)
+target_link_libraries(Space freyr::freyr Freya::Freya SDL3::SDL3)
 
 target_include_directories(Space PUBLIC Source)
 

@@ -7,6 +7,8 @@
 #include <algorithm>
 #include <ranges>
 
+#include <glm/gtc/matrix_transform.hpp>
+
 RenderSystem::RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::Renderer>& renderer,
                            const skr::Arc<fra::Window>& window, const skr::Arc<fra::MeshPool>& meshPool,
                            const skr::Arc<fra::MaterialPool>& materialPool,
@@ -37,7 +39,7 @@ void RenderSystem::PostUpdate(float /*dt*/)
     EndFrame();
 }
 
-void RenderSystem::BeginFrame() const
+void RenderSystem::BeginFrame()
 {
     mRegistry->BeginTrace("WaitForAllTasks");
     mThreadPool->WaitForAllTasks();
@@ -52,10 +54,21 @@ void RenderSystem::BeginFrame() const
             const auto cameraPosition =
                 transform.position - transform.GetForwardDirection() * 15.0f + transform.GetUpDirection() * 4.0f;
 
-            const auto cameraForward =
-                glm::normalize(transform.position + transform.GetForwardDirection() * 1500.0f - cameraPosition);
+            const auto cameraTarget =
+                transform.position + transform.GetForwardDirection() * 1500.0f;
+            const auto cameraUp = transform.GetUpDirection();
 
-            mRenderer->UpdateCamera(cameraPosition, cameraPosition + cameraForward, transform.GetUpDirection());
+            constexpr float fovRadians = glm::radians(45.0f);
+            constexpr float nearPlane  = 1.0f;
+            const float     farPlane   = mRenderer->GetDrawDistance();
+            const float     aspect =
+                static_cast<float>(mWindow->GetWidth()) / static_cast<float>(std::max(mWindow->GetHeight(), 1u));
+
+            mRenderer->UpdateCamera(cameraPosition, cameraTarget, cameraUp, fovRadians, nearPlane, farPlane);
+
+            const auto view       = glm::lookAt(cameraPosition, cameraTarget, cameraUp);
+            const auto projection = mRenderer->MakeProjection(fovRadians, aspect, nearPlane, farPlane);
+            mViewProj             = projection * view;
         });
 }
 
@@ -66,11 +79,8 @@ void RenderSystem::SubmitScene()
     mUploads.clear();
     mRegistry->EndTrace();
 
-    const auto& projectionUniforms = mRenderer->GetCurrentProjection();
-    const auto  viewProj           = projectionUniforms.projection * projectionUniforms.view;
-
     mRegistry->BeginTrace("Query renderables");
-    mOctreeSystem->Query(Frustum(viewProj), mRenderables);
+    mOctreeSystem->Query(Frustum(mViewProj), mRenderables);
     mRegistry->EndTrace();
 
     mRegistry->BeginTrace("Collect scene instances");

@@ -18,7 +18,7 @@ class RenderSystem final : public fr::System
     void PostUpdate(float dt) override;
 
   private:
-    void BeginFrame() const;
+    void BeginFrame();
     void SubmitScene();
     void EndFrame() const;
 
@@ -28,6 +28,7 @@ class RenderSystem final : public fr::System
 
     std::vector<Particle>                 mRenderables;
     std::vector<fra::SceneInstanceUpload> mUploads;
+    glm::mat4                             mViewProj { 1.0f };
 
     skr::Arc<fra::Renderer>     mRenderer;
     skr::Arc<fra::Window>       mWindow;
