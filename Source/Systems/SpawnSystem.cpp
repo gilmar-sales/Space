@@ -20,7 +20,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
                          const skr::Arc<Random>& random) : System(registry), mAssetManager(assetManager), mRandom(random)
 {
     mRegistry->CreateArchetypeBuilder()
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetMoonModel(), .material = mAssetManager->GetMoonMaterial() })
         .WithComponent(TransformComponent {})
@@ -41,7 +41,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
         .Build();
 
     mRegistry->CreateArchetypeBuilder()
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetJupiterModel(),
                                         .material = mAssetManager->GetJupiterMaterial() })
         .WithComponent(
@@ -63,7 +63,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
         .Build();
 
     mRegistry->CreateArchetypeBuilder()
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetRock1Model(), .material = mAssetManager->GetRock1Material() })
         .WithComponent(
@@ -85,7 +85,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
         .Build();
 
     mRegistry->CreateArchetypeBuilder()
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(
             ModelComponent { .meshes = &mAssetManager->GetRock2Model(), .material = mAssetManager->GetRock2Material() })
         .WithComponent(TransformComponent { .position = glm::vec3(0),
@@ -110,7 +110,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
     mRegistry->CreateArchetypeBuilder()
         .WithComponent(PlayerComponent {})
         .WithComponent(SquadComponent { .squad = Squad::Ally })
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetPlayerShipModel(),
                                         .material = mAssetManager->GetPlayerShipMaterial() })
         .WithComponent(TransformComponent { .position = mRandom->Position(-SPAWN_RANGE, SPAWN_RANGE),
@@ -127,7 +127,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
     mRegistry->CreateArchetypeBuilder()
         .WithComponent(SquadComponent { .squad = Squad::Enemy })
         .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetEnemyShipModel(),
                                         .material = mAssetManager->GetEnemyShipMaterial() })
         .WithComponent(
@@ -146,7 +146,7 @@ SpawnSystem::SpawnSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<
     mRegistry->CreateArchetypeBuilder()
         .WithComponent(SquadComponent { .squad = Squad::Ally })
         .WithComponent(AIControlledComponent { .behaviour = Behaviour::Patrol })
-        .WithComponent(HealthComponent { .hitPoints = 1000 })
+        .WithComponent(HealthComponent { .hitPoints = 1000, .maxHitPoints = 1000 })
         .WithComponent(ModelComponent { .meshes   = &mAssetManager->GetPlayerShipModel(),
                                         .material = mAssetManager->GetPlayerShipMaterial() })
         .WithComponent(

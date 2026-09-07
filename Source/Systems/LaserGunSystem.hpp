@@ -6,7 +6,9 @@
 #include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
 
+#include <Components/HealthComponent.hpp>
 #include <Components/PlayerComponent.hpp>
+#include <Components/SquadComponent.hpp>
 
 #include <AssetManager.hpp>
 #include <Random.hpp>
@@ -25,14 +27,17 @@ public:
 
     void Update(float deltaTime) override;
 
-    void OnCollision(const CollisionEvent &event) const;
+    void OnCollision(const CollisionEvent& event) const;
 
     void Shoot(fr::Entity owner, std::uint32_t material, glm::vec3 position, glm::quat rotation, glm::vec3 velocity);
 
-private:
-    std::optional<fr::Entity> mPlayer;
+  private:
+    void ConvertShip(fr::Entity target, Squad newSquad) const;
+    void ShatterRock(fr::Entity target, const HealthComponent& targetHealth) const;
+
+    std::optional<fr::Entity>    mPlayer;
     skr::Arc<fr::ListenerHandle> mCollisionListener;
-    skr::Arc<OctreeSystem> mOctreeSystem;
-    skr::Arc<AssetManager> mAssetManager;
-    skr::Arc<Random> mRandom;
+    skr::Arc<OctreeSystem>       mOctreeSystem;
+    skr::Arc<AssetManager>       mAssetManager;
+    skr::Arc<Random>             mRandom;
 };

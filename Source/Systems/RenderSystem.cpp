@@ -1,13 +1,25 @@
 #include "RenderSystem.hpp"
 
+#include "Components/HealthComponent.hpp"
 #include "Components/ModelComponent.hpp"
 #include "Components/PlayerComponent.hpp"
+#include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
 #include <algorithm>
 #include <ranges>
 
 #include <glm/gtc/matrix_transform.hpp>
+
+namespace
+{
+constexpr glm::vec4 HealthBarBackground { 0.08f, 0.08f, 0.08f, 0.85f };
+constexpr glm::vec4 AllyHealthForeground { 0.25f, 0.85f, 0.35f, 1.0f };
+constexpr glm::vec4 EnemyHealthForeground { 0.90f, 0.25f, 0.20f, 1.0f };
+constexpr float     HealthBarWidth   = 6.0f;
+constexpr float     HealthBarHeight  = 0.55f;
+constexpr float     HealthBarYOffset = 4.0f;
+} // namespace
 
 RenderSystem::RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::Renderer>& renderer,
                            const skr::Arc<fra::Window>& window, const skr::Arc<fra::MeshPool>& meshPool,
@@ -36,6 +48,7 @@ void RenderSystem::PostUpdate(float /*dt*/)
 
     BeginFrame();
     SubmitScene();
+    SubmitHealthBars();
     EndFrame();
 }
 
@@ -57,9 +70,8 @@ void RenderSystem::BeginFrame()
             const auto cameraPosition =
                 transform.position - transform.GetForwardDirection() * 15.0f + transform.GetUpDirection() * 4.0f;
 
-            const auto cameraTarget =
-                transform.position + transform.GetForwardDirection() * 1500.0f;
-            const auto cameraUp = transform.GetUpDirection();
+            const auto cameraTarget = transform.position + transform.GetForwardDirection() * 1500.0f;
+            const auto cameraUp     = transform.GetUpDirection();
 
             constexpr float fovRadians = glm::radians(45.0f);
             constexpr float nearPlane  = 1.0f;
@@ -121,6 +133,33 @@ void RenderSystem::SubmitScene()
 
     mRegistry->BeginTrace("UploadSceneInstances");
     mRenderer->UploadSceneInstances(mUploads);
+    mRegistry->EndTrace();
+}
+
+void RenderSystem::SubmitHealthBars()
+{
+    mRegistry->BeginTrace("HealthBars");
+    auto& draw = mRenderer->GetBillboardDraw();
+
+    for (const auto& renderable : mRenderables)
+    {
+        if (mPlayer.has_value() && renderable.entity == mPlayer.value())
+            continue;
+
+        mRegistry->TryGetComponents<TransformComponent, HealthComponent, SquadComponent>(
+            renderable.entity,
+            [&](const TransformComponent& transform, const HealthComponent& health, const SquadComponent& squad) {
+                if (health.maxHitPoints <= 0.0f)
+                    return;
+
+                const float fill = std::clamp(health.hitPoints / health.maxHitPoints, 0.0f, 1.0f);
+                const auto  fg   = squad.squad == Squad::Ally ? AllyHealthForeground : EnemyHealthForeground;
+                const auto  head = transform.position + transform.GetUpDirection() * HealthBarYOffset;
+
+                draw.HealthBar(head, HealthBarWidth, HealthBarHeight, fill, HealthBarBackground, fg,
+                               fra::BillboardAlign::Screen);
+            });
+    }
     mRegistry->EndTrace();
 }
 

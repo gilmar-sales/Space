@@ -4,6 +4,6 @@
 
 struct HealthComponent : fr::Component
 {
-    float hitPoints;
-    float regenerationRate;
+    float hitPoints    = 1000.0f;
+    float maxHitPoints = 1000.0f;
 };

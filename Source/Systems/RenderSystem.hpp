@@ -20,6 +20,7 @@ class RenderSystem final : public fr::System
   private:
     void BeginFrame();
     void SubmitScene();
+    void SubmitHealthBars();
     void EndFrame() const;
 
     friend class SpaceApp;
