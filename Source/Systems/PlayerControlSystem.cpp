@@ -3,7 +3,6 @@
 #include "Components/LaserGunComponent.hpp"
 #include <Components/PlayerComponent.hpp>
 #include <Components/SpaceShipControlComponent.hpp>
-#include <glm/common.hpp>
 
 namespace
 {
@@ -160,23 +159,12 @@ PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry,
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this, player](const fra::MouseMoveEvent& mouseMoveEvent) {
         mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
-            const glm::vec2 mouseDelta(static_cast<float>(mouseMoveEvent.deltaX),
-                                       -static_cast<float>(mouseMoveEvent.deltaY));
-            const float mouseLength = glm::length(mouseDelta);
-
-            if (mouseLength > 0.001f)
-            {
-                const glm::vec2 mouseDirection = mouseDelta / mouseLength;
-                spaceShipControl.yawInput   = mouseDirection.x;
-                spaceShipControl.pitchInput = mouseDirection.y;
-            }
-            else
-            {
-                spaceShipControl.yawInput   = 0.0f;
-                spaceShipControl.pitchInput = 0.0f;
-            }
-
-            spaceShipControl.volatileInput = true;
+            // Accumulate degrees; SpaceShipSystem consumes them once per sim step
+            // as an angular impulse so net turn matches mouse travel across dt.
+            spaceShipControl.yawImpulse +=
+                static_cast<float>(mouseMoveEvent.deltaX) * MouseDegreesPerPixel;
+            spaceShipControl.pitchImpulse +=
+                -static_cast<float>(mouseMoveEvent.deltaY) * MouseDegreesPerPixel;
         });
     });
 }

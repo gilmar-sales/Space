@@ -94,12 +94,13 @@ void AIControlSystem::Update(float deltaTime)
             [this, deltaTime](fr::Entity entity, AIControlledComponent& aiControlled, TransformComponent& transform,
                               SquadComponent& squad, LaserGunComponent& laserGun,
                               SpaceShipControlComponent& spaceShipControl) {
-                spaceShipControl.throttle       = 1.0f;
-                spaceShipControl.boostFactor    = 1.0f;
-                spaceShipControl.pitchInput    = 0.0f;
-                spaceShipControl.yawInput      = 0.0f;
-                spaceShipControl.rollInput     = 0.0f;
-                spaceShipControl.volatileInput = false;
+                spaceShipControl.throttle    = 1.0f;
+                spaceShipControl.boostFactor = 1.0f;
+                spaceShipControl.pitchInput  = 0.0f;
+                spaceShipControl.yawInput    = 0.0f;
+                spaceShipControl.rollInput   = 0.0f;
+                spaceShipControl.pitchImpulse = 0.0f;
+                spaceShipControl.yawImpulse   = 0.0f;
 
                 if (aiControlled.retargetCooldown > 0.0f)
                     aiControlled.retargetCooldown -= deltaTime;
