@@ -12,6 +12,7 @@ struct RigidBodyComponent : fr::Component
     bool      kinematicIfStop = false;
     float     mass            = 1.0f;
     glm::vec3 velocity        = glm::vec3(0.0f);
+    glm::vec3 angularVelocity = glm::vec3(0.0f); // local-space degrees per second
 
     void ApplyForce(const glm::vec3& direction, float magnitude, float dt)
     {

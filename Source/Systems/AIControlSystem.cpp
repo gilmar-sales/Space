@@ -96,10 +96,10 @@ void AIControlSystem::Update(float deltaTime)
                               SpaceShipControlComponent& spaceShipControl) {
                 spaceShipControl.throttle       = 1.0f;
                 spaceShipControl.boostFactor    = 1.0f;
-                spaceShipControl.pitchTorque    = 0.0f;
-                spaceShipControl.yawTorque      = 0.0f;
-                spaceShipControl.rollTorque     = 0.0f;
-                spaceShipControl.volatileTorque = false;
+                spaceShipControl.pitchInput    = 0.0f;
+                spaceShipControl.yawInput      = 0.0f;
+                spaceShipControl.rollInput     = 0.0f;
+                spaceShipControl.volatileInput = false;
 
                 if (aiControlled.retargetCooldown > 0.0f)
                     aiControlled.retargetCooldown -= deltaTime;
@@ -126,9 +126,9 @@ void AIControlSystem::Patrol(fr::Entity entity, AIControlledComponent& aiControl
 
     const float wanderPhase = EntityNoise(entity, 7) * glm::two_pi<float>();
     const float wanderAmp   = 0.25f + EntityNoise(entity, 13) * 0.35f;
-    spaceShipControl.yawTorque   = std::sin(wanderPhase) * wanderAmp;
-    spaceShipControl.pitchTorque = std::cos(wanderPhase * 0.7f) * wanderAmp * 0.5f;
-    spaceShipControl.rollTorque  = glm::dot(transform.GetRightDirection(), WORLD_UP) * 0.5f;
+    spaceShipControl.yawInput   = std::sin(wanderPhase) * wanderAmp;
+    spaceShipControl.pitchInput = std::cos(wanderPhase * 0.7f) * wanderAmp * 0.5f;
+    spaceShipControl.rollInput  = glm::dot(transform.GetRightDirection(), WORLD_UP) * 0.5f;
 
     const auto obstacle = ComputeObstacleAvoidance(entity, transform);
     if (glm::dot(obstacle, obstacle) > 0.001f)
@@ -335,7 +335,7 @@ void AIControlSystem::Flee(fr::Entity entity, AIControlledComponent& aiControlle
     ApplySteering(spaceShipControl, transform, desired, desired);
 
     if (!steered)
-        spaceShipControl.rollTorque = glm::dot(transform.GetRightDirection(), WORLD_UP);
+        spaceShipControl.rollInput = glm::dot(transform.GetRightDirection(), WORLD_UP);
 }
 
 std::optional<fr::Entity> AIControlSystem::FindBestTarget(fr::Entity entity, const AIControlledComponent& ai,
@@ -662,9 +662,9 @@ void AIControlSystem::ApplySteering(SpaceShipControlComponent& spaceShipControl,
             worldTorque = glm::vec3(0.0f);
     }
 
-    spaceShipControl.pitchTorque = glm::dot(worldTorque, transform.GetRightDirection());
-    spaceShipControl.yawTorque   = glm::dot(worldTorque, transform.GetUpDirection());
-    spaceShipControl.rollTorque  = glm::dot(transform.GetRightDirection(), WORLD_UP);
+    spaceShipControl.pitchInput = glm::dot(worldTorque, transform.GetRightDirection());
+    spaceShipControl.yawInput   = glm::dot(worldTorque, transform.GetUpDirection());
+    spaceShipControl.rollInput  = glm::dot(transform.GetRightDirection(), WORLD_UP);
 }
 
 void AIControlSystem::UpdateBoost(AIControlledComponent& aiControlled, SpaceShipControlComponent& spaceShipControl,

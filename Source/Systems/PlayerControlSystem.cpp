@@ -3,6 +3,12 @@
 #include "Components/LaserGunComponent.hpp"
 #include <Components/PlayerComponent.hpp>
 #include <Components/SpaceShipControlComponent.hpp>
+#include <glm/common.hpp>
+
+namespace
+{
+constexpr float GAMEPAD_ROTATION_SCALE = 0.5f;
+} // namespace
 
 PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::EventManager>& eventManger) :
     System(registry)
@@ -50,10 +56,10 @@ PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry,
                     spaceShipControl.throttle = 1.0f;
                     break;
                 case fra::KeyCode::A:
-                    spaceShipControl.rollTorque = -1.0f;
+                    spaceShipControl.rollInput = -1.0f;
                     break;
                 case fra::KeyCode::D:
-                    spaceShipControl.rollTorque = 1.0f;
+                    spaceShipControl.rollInput = 1.0f;
                     break;
                 case fra::KeyCode::LShift:
                     spaceShipControl.boostFactor = BoostFactor;
@@ -73,7 +79,7 @@ PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry,
                     break;
                 case fra::KeyCode::A:
                 case fra::KeyCode::D:
-                    spaceShipControl.rollTorque = 0;
+                    spaceShipControl.rollInput = 0;
                     break;
                 case fra::KeyCode::LShift:
                     spaceShipControl.boostFactor = 1.0f;
@@ -129,20 +135,22 @@ PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry,
     eventManger->Subscribe<fra::GamepadAxisMotionEvent>([this,
                                                          player](const fra::GamepadAxisMotionEvent& keyPressedEvent) {
         mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.volatileTorque = false;
             switch (keyPressedEvent.axis)
             {
                 case fra::GamepadAxis::GamepadAxisRightTrigger:
                     spaceShipControl.throttle = static_cast<float>(1.0f * keyPressedEvent.value);
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftX:
-                    spaceShipControl.yawTorque = static_cast<float>(keyPressedEvent.value);
+                    spaceShipControl.yawInput =
+                        static_cast<float>(keyPressedEvent.value) * GAMEPAD_ROTATION_SCALE;
                     break;
                 case fra::GamepadAxis::GamepadAxisLeftY:
-                    spaceShipControl.pitchTorque = -static_cast<float>(keyPressedEvent.value);
+                    spaceShipControl.pitchInput =
+                        -static_cast<float>(keyPressedEvent.value) * GAMEPAD_ROTATION_SCALE;
                     break;
                 case fra::GamepadAxis::GamepadAxisRightX:
-                    spaceShipControl.rollTorque = static_cast<float>(keyPressedEvent.value);
+                    spaceShipControl.rollInput =
+                        static_cast<float>(keyPressedEvent.value) * GAMEPAD_ROTATION_SCALE;
                     break;
                 default:
                     break;
@@ -152,9 +160,23 @@ PlayerControlSystem::PlayerControlSystem(const skr::Arc<fr::Registry>& registry,
 
     eventManger->Subscribe<fra::MouseMoveEvent>([this, player](const fra::MouseMoveEvent& mouseMoveEvent) {
         mRegistry->TryGetComponents<SpaceShipControlComponent>(player, [&](SpaceShipControlComponent& spaceShipControl) {
-            spaceShipControl.yawTorque      = mouseMoveEvent.deltaX * 0.1f;
-            spaceShipControl.pitchTorque    = -mouseMoveEvent.deltaY * 0.1f;
-            spaceShipControl.volatileTorque = true;
+            const glm::vec2 mouseDelta(static_cast<float>(mouseMoveEvent.deltaX),
+                                       -static_cast<float>(mouseMoveEvent.deltaY));
+            const float mouseLength = glm::length(mouseDelta);
+
+            if (mouseLength > 0.001f)
+            {
+                const glm::vec2 mouseDirection = mouseDelta / mouseLength;
+                spaceShipControl.yawInput   = mouseDirection.x;
+                spaceShipControl.pitchInput = mouseDirection.y;
+            }
+            else
+            {
+                spaceShipControl.yawInput   = 0.0f;
+                spaceShipControl.pitchInput = 0.0f;
+            }
+
+            spaceShipControl.volatileInput = true;
         });
     });
 }

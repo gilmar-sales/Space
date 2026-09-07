@@ -12,13 +12,13 @@ include(FetchContent)
 fetchcontent_declare(
         freyr
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freyr.git"
-        GIT_TAG "v0.37.0"
+        GIT_TAG "v0.37.1"
 )
 
 fetchcontent_declare(
         freya
         GIT_REPOSITORY "https://github.com/gilmar-sales/Freya.git"
-        GIT_TAG "v0.42.4"
+        GIT_TAG "v0.44.1"
 )
 
 fetchcontent_makeavailable(freyr freya)

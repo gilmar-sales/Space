@@ -4,6 +4,8 @@
 #include "Components/TransformComponent.hpp"
 #include "glm/gtx/norm.hpp"
 
+#include <cmath>
+
 #include <Components/SpaceShipControlComponent.hpp>
 
 void SpaceShipSystem::Update(float deltaTime)
@@ -15,33 +17,52 @@ void SpaceShipSystem::Update(float deltaTime)
             if (spaceShipControl.throttle != 0)
             {
                 rigidBody.ApplyForce(transform.GetForwardDirection(),
-                                     spaceShipControl.throttle * MaxThrust * spaceShipControl.boostFactor, deltaTime);
+                                      glm::clamp(spaceShipControl.throttle, 0.0f, 1.0f) * MaxThrust *
+                                          spaceShipControl.boostFactor,
+                                      deltaTime);
             }
 
-            glm::vec3 localAngularVelocity(spaceShipControl.pitchTorque,
-                                           spaceShipControl.yawTorque,
-                                           spaceShipControl.rollTorque);
+            const glm::vec3 input = glm::clamp(
+                glm::vec3(spaceShipControl.pitchInput, spaceShipControl.yawInput, spaceShipControl.rollInput),
+                glm::vec3(-1.0f),
+                glm::vec3(1.0f));
+            const glm::vec3 targetAngularVelocity = input * MaxAngularSpeed;
+            const glm::vec3 angularDelta = targetAngularVelocity - rigidBody.angularVelocity;
+            const float     maxAngularChange = AngularAcceleration * deltaTime;
 
-            // 2. Only rotate if we actually need to
-            if (glm::length2(localAngularVelocity) > 0.0001f)
+            if (glm::length2(angularDelta) > 0.0001f)
             {
-                // 3. Convert local angular velocity to world space
-                glm::vec3 worldAngularVelocity =
-                    (transform.GetRightDirection() * localAngularVelocity.x) +
-                    (transform.GetUpDirection() * localAngularVelocity.y) +
-                    (transform.GetForwardDirection() * localAngularVelocity.z);
-
-                // 4. Apply a single rotation
-                float     angle = glm::length(worldAngularVelocity) * TurnTorque;
-                glm::vec3 axis  = glm::normalize(worldAngularVelocity);
-
-                transform.Rotate(axis, angle, deltaTime);
+                const float deltaLength = glm::length(angularDelta);
+                rigidBody.angularVelocity +=
+                    angularDelta * glm::min(1.0f, maxAngularChange / deltaLength);
             }
 
-            if (spaceShipControl.volatileTorque)
+            if (glm::length2(input) < 0.0001f)
             {
-                spaceShipControl.yawTorque   = 0.0f;
-                spaceShipControl.pitchTorque = 0.0f;
+                rigidBody.angularVelocity *= std::exp(-AngularDamping * deltaTime);
+            }
+
+            const float angularSpeed = glm::length(rigidBody.angularVelocity);
+            if (angularSpeed > MaxAngularSpeed)
+            {
+                rigidBody.angularVelocity *= MaxAngularSpeed / angularSpeed;
+            }
+
+            if (angularSpeed > 0.0001f)
+            {
+                const glm::vec3 worldAngularVelocity =
+                    transform.GetRightDirection() * rigidBody.angularVelocity.x +
+                    transform.GetUpDirection() * rigidBody.angularVelocity.y +
+                    transform.GetForwardDirection() * rigidBody.angularVelocity.z;
+
+                transform.Rotate(glm::normalize(worldAngularVelocity), glm::length(worldAngularVelocity), deltaTime);
+            }
+
+            if (spaceShipControl.volatileInput)
+            {
+                spaceShipControl.yawInput   = 0.0f;
+                spaceShipControl.pitchInput = 0.0f;
+                spaceShipControl.volatileInput = false;
             }
         });
 }

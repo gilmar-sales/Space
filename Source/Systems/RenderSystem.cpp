@@ -49,6 +49,9 @@ void RenderSystem::BeginFrame()
     mRenderer->BeginFrame();
     mRegistry->EndTrace();
 
+    if (!mPlayer.has_value())
+        mPlayer = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
+
     if (mPlayer.has_value())
         mRegistry->TryGetComponents<TransformComponent>(mPlayer.value(), [this](const TransformComponent& transform) {
             const auto cameraPosition =

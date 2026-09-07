@@ -30,6 +30,9 @@
 int main(int argc, char const *argv[]) {
     auto builder =
             skr::ApplicationBuilder()
+            .WithExtension<skr::LoggingExtension>([](skr::LoggingExtension &logging) {
+                logging.AddConsoleSink().AddFileSink("Space.log");
+            })
             .WithExtension<fr::FreyrExtension>([](fr::FreyrExtension &freyr) {
                 freyr
                         .WithOptions([](fr::FreyrOptionsBuilder &options) {
