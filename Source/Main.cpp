@@ -78,6 +78,8 @@ int main(int argc, char const *argv[]) {
                             .SetEnableSsao(false)
                             .SetVSync(false)
                             .SetFullscreen(false)
+                            .SetMeshLodPixelRef(96.0f)
+                            .SetMeshLodStep(1.6f)
                             .WithReverseZ();
                 });
             });

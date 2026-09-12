@@ -1,9 +1,12 @@
 #pragma once
 
+#include <Freya/Freya.hpp>
 #include <Freyr/Freyr.hpp>
+
+#include <vector>
 
 struct ModelComponent : fr::Component
 {
-    std::vector<std::uint32_t>* meshes;
-    std::uint32_t               material;
+    std::vector<fra::MeshHandle>* meshes;
+    fra::MaterialHandle           material;
 };

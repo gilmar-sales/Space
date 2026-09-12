@@ -42,7 +42,7 @@ void LaserGunSystem::Update(float deltaTime)
             laserGun.energySpent += laserGun.energyCost;
 
             const auto forwardOffset = transform.GetForwardDirection() * 9.5f;
-            const auto sideOffset    = transform.GetRightDirection() * 3.5f;
+            const auto sideOffset    = transform.GetRightDirection() * 2.5f;
             const auto upOffset      = -transform.GetUpDirection() * 1.5f;
 
             const auto leftOffset  = forwardOffset - sideOffset + upOffset;
@@ -210,7 +210,7 @@ void LaserGunSystem::OnCollision(const CollisionEvent& event) const
     });
 }
 
-void LaserGunSystem::Shoot(fr::Entity owner, std::uint32_t material, glm::vec3 position, glm::quat rotation,
+void LaserGunSystem::Shoot(fr::Entity owner, fra::MaterialHandle material, glm::vec3 position, glm::quat rotation,
                            glm::vec3 velocity)
 {
     mRegistry->CreateEntity(

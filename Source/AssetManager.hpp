@@ -2,62 +2,64 @@
 
 #include <Freya/Freya.hpp>
 
-class AssetManager final {
-public:
-    AssetManager(const skr::Arc<fra::MeshPool> &meshPool,
-                 const skr::Arc<fra::TexturePool> &texturePool,
-                 const skr::Arc<fra::MaterialPool> &materialPool);
+#include <vector>
+
+class AssetManager final
+{
+  public:
+    AssetManager(const skr::Arc<fra::MeshPool>& meshPool, const skr::Arc<fra::TexturePool>& texturePool,
+                 const skr::Arc<fra::MaterialPool>& materialPool);
 
     ~AssetManager() = default;
 
-    std::uint32_t GetBlankTexture() { return mBlankTexture; }
-    std::uint32_t GetBlankMaterial() { return mBlankMaterial; }
-    std::vector<std::uint32_t> &GetCheckpointModel() { return mCheckpointModel; }
-    std::vector<std::uint32_t> &GetPlayerShipModel() { return mPlayerShipModel; }
-    std::uint32_t GetPlayerShipMaterial() { return mPlayerShipMaterial; }
-    std::vector<std::uint32_t> &GetEnemyShipModel() { return mEnemyShipModel; }
-    std::uint32_t GetEnemyShipMaterial() { return mEnemyShipMaterial; }
-    std::vector<std::uint32_t> &GetMoonModel() { return mMoonModel; }
-    std::uint32_t GetMoonMaterial() { return mMoonMaterial; }
-    std::vector<std::uint32_t> &GetJupiterModel() { return mJupiter; }
-    std::uint32_t GetJupiterMaterial() { return mJupiterMaterial; }
-    std::vector<std::uint32_t> &GetRock1Model() { return mRock1Model; }
-    std::uint32_t GetRock1Material() { return mRock1Material; }
-    std::vector<std::uint32_t> &GetRock2Model() { return mRock2Model; }
-    std::uint32_t GetRock2Material() { return mRock2Material; }
-    std::vector<std::uint32_t> &GetBulletModel() { return mBulletModel; }
-    std::uint32_t GetBulletMaterial() { return mBulletMaterial; }
-    std::uint32_t GetEnemyBulletMaterial() { return mEnemyBulletMaterial; }
+    fra::TextureHandle             GetBlankTexture() { return mBlankTexture; }
+    fra::MaterialHandle            GetBlankMaterial() { return mBlankMaterial; }
+    std::vector<fra::MeshHandle>&  GetCheckpointModel() { return mCheckpointModel; }
+    std::vector<fra::MeshHandle>&  GetPlayerShipModel() { return mPlayerShipModel; }
+    fra::MaterialHandle            GetPlayerShipMaterial() { return mPlayerShipMaterial; }
+    std::vector<fra::MeshHandle>&  GetEnemyShipModel() { return mEnemyShipModel; }
+    fra::MaterialHandle            GetEnemyShipMaterial() { return mEnemyShipMaterial; }
+    std::vector<fra::MeshHandle>&  GetMoonModel() { return mMoonModel; }
+    fra::MaterialHandle            GetMoonMaterial() { return mMoonMaterial; }
+    std::vector<fra::MeshHandle>&  GetJupiterModel() { return mJupiter; }
+    fra::MaterialHandle            GetJupiterMaterial() { return mJupiterMaterial; }
+    std::vector<fra::MeshHandle>&  GetRock1Model() { return mRock1Model; }
+    fra::MaterialHandle            GetRock1Material() { return mRock1Material; }
+    std::vector<fra::MeshHandle>&  GetRock2Model() { return mRock2Model; }
+    fra::MaterialHandle            GetRock2Material() { return mRock2Material; }
+    std::vector<fra::MeshHandle>&  GetBulletModel() { return mBulletModel; }
+    fra::MaterialHandle            GetBulletMaterial() { return mBulletMaterial; }
+    fra::MaterialHandle            GetEnemyBulletMaterial() { return mEnemyBulletMaterial; }
 
-private:
-    skr::Arc<fra::MeshPool> mMeshPool;
-    skr::Arc<fra::TexturePool> mTexturePool;
+  private:
+    skr::Arc<fra::MeshPool>     mMeshPool;
+    skr::Arc<fra::TexturePool>  mTexturePool;
     skr::Arc<fra::MaterialPool> mMaterialPool;
 
-    std::uint32_t mBlankTexture;
-    std::uint32_t mBlankMaterial;
+    fra::TextureHandle  mBlankTexture;
+    fra::MaterialHandle mBlankMaterial;
 
-    std::vector<std::uint32_t> mCheckpointModel;
+    std::vector<fra::MeshHandle> mCheckpointModel;
 
-    std::vector<std::uint32_t> mEnemyShipModel;
-    std::uint32_t mEnemyShipMaterial;
+    std::vector<fra::MeshHandle> mEnemyShipModel;
+    fra::MaterialHandle          mEnemyShipMaterial;
 
-    std::vector<std::uint32_t> mJupiter;
-    std::uint32_t mJupiterMaterial;
+    std::vector<fra::MeshHandle> mJupiter;
+    fra::MaterialHandle          mJupiterMaterial;
 
-    std::vector<std::uint32_t> mRock1Model;
-    std::uint32_t mRock1Material;
+    std::vector<fra::MeshHandle> mRock1Model;
+    fra::MaterialHandle          mRock1Material;
 
-    std::vector<std::uint32_t> mRock2Model;
-    std::uint32_t mRock2Material;
+    std::vector<fra::MeshHandle> mRock2Model;
+    fra::MaterialHandle          mRock2Material;
 
-    std::vector<std::uint32_t> mMoonModel;
-    std::uint32_t mMoonMaterial;
+    std::vector<fra::MeshHandle> mMoonModel;
+    fra::MaterialHandle          mMoonMaterial;
 
-    std::vector<std::uint32_t> mPlayerShipModel;
-    std::uint32_t mPlayerShipMaterial;
+    std::vector<fra::MeshHandle> mPlayerShipModel;
+    fra::MaterialHandle          mPlayerShipMaterial;
 
-    std::vector<uint32_t> mBulletModel;
-    uint32_t mBulletMaterial;
-    uint32_t mEnemyBulletMaterial;
+    std::vector<fra::MeshHandle> mBulletModel;
+    fra::MaterialHandle          mBulletMaterial;
+    fra::MaterialHandle          mEnemyBulletMaterial;
 };

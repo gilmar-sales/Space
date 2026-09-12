@@ -6,8 +6,10 @@
 #include "Components/SquadComponent.hpp"
 #include "Components/TransformComponent.hpp"
 
+#include <Freya/Asset/SceneInstanceUpload.hpp>
+
 #include <algorithm>
-#include <ranges>
+#include <vector>
 
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -19,6 +21,18 @@ constexpr glm::vec4 EnemyHealthForeground { 0.90f, 0.25f, 0.20f, 1.0f };
 constexpr float     HealthBarWidth   = 6.0f;
 constexpr float     HealthBarHeight  = 0.55f;
 constexpr float     HealthBarYOffset = 4.0f;
+
+constexpr std::size_t UploadChunkSize = 2'048;
+
+/// Match TransformComponent::GetModel (T * inverse(R) * S) with Freya SceneTransform expand.
+fra::SceneTransform ToSceneTransform(const TransformComponent& transform)
+{
+    return fra::SceneTransform {
+        .position = transform.position,
+        .scale    = transform.scale,
+        .rotation = glm::inverse(transform.rotation),
+    };
+}
 } // namespace
 
 RenderSystem::RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Arc<fra::Renderer>& renderer,
@@ -31,7 +45,6 @@ RenderSystem::RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Ar
 {
     mPlayer = mRegistry->CreateQuery()->FindUnique<PlayerComponent>();
     mRenderables.reserve(30'000);
-    mUploads.reserve(30'000);
 
     eventManager->Subscribe<fra::KeyPressedEvent>([this](const fra::KeyPressedEvent& event) {
         if (event.key != fra::KeyCode::F2)
@@ -41,7 +54,7 @@ RenderSystem::RenderSystem(const skr::Arc<fr::Registry>& registry, const skr::Ar
     });
 }
 
-void RenderSystem::PostUpdate(float /*dt*/)
+void RenderSystem::PostUpdate(float dt)
 {
     if (!mEnabled)
         return;
@@ -54,8 +67,8 @@ void RenderSystem::PostUpdate(float /*dt*/)
 
 void RenderSystem::BeginFrame()
 {
-    mRegistry->BeginTrace("WaitForAllTasks");
-    mThreadPool->WaitForAllTasks();
+    mRegistry->BeginTrace("ExecuteTasks");
+    mRegistry->ExecuteTasks();
     mRegistry->EndTrace();
 
     mRegistry->BeginTrace("Freya BeginFrame");
@@ -89,51 +102,70 @@ void RenderSystem::BeginFrame()
 
 void RenderSystem::SubmitScene()
 {
-    mRegistry->BeginTrace("Clear buffers");
+    mRegistry->BeginTrace("Octree frustum query");
     mRenderables.clear();
-    mUploads.clear();
-    mRegistry->EndTrace();
-
-    mRegistry->BeginTrace("Query renderables");
     mOctreeSystem->Query(Frustum(mViewProj), mRenderables);
     mRegistry->EndTrace();
 
-    mRegistry->BeginTrace("Collect scene instances");
-    mUploads.reserve(mRenderables.size());
-    for (const auto& renderable : mRenderables)
-    {
-        mRegistry->TryGetComponents<ModelComponent, TransformComponent>(
-            renderable.entity, [&](const ModelComponent& model, const TransformComponent& transform) {
-                if (model.meshes == nullptr || model.meshes->empty())
-                    return;
+    mRegistry->BeginTrace("BeginSceneInstances");
+    mRenderer->BeginSceneInstances();
+    mRegistry->EndTrace();
 
-                const auto modelMatrix = transform.GetModel();
-                for (const auto meshId : *model.meshes)
-                {
-                    mUploads.push_back(fra::SceneInstanceUpload {
-                        .model       = modelMatrix,
-                        .meshId      = meshId,
-                        .materialId  = model.material,
-                        .entityId    = renderable.entity,
-                        .castShadows = true,
-                    });
-                }
-            });
+    mRegistry->BeginTrace("ReserveSceneInstances");
+    mRenderer->ReserveSceneInstances(std::max(mInstanceReserve, static_cast<std::uint32_t>(mRenderables.size())));
+    mRegistry->EndTrace();
+
+    std::uint32_t uploaded = 0;
+
+    mRegistry->BeginTrace("UploadSceneInstances");
+    std::vector<fra::SceneInstanceUpload> uploads;
+    uploads.reserve(UploadChunkSize);
+
+    for (std::size_t start = 0; start < mRenderables.size(); start += UploadChunkSize)
+    {
+        uploads.clear();
+        const auto end = std::min(start + UploadChunkSize, mRenderables.size());
+
+        for (std::size_t i = start; i < end; ++i)
+        {
+            const auto& renderable = mRenderables[i];
+            // Live transform (not octree snapshot): camera already uses the
+            // current pose; drawing from PreUpdate particles made the chase
+            // cam feel one physics step behind the ship.
+            mRegistry->TryGetComponents<ModelComponent, TransformComponent>(
+                renderable.entity,
+                [&](const ModelComponent& model, const TransformComponent& transform) {
+                    if (model.meshes == nullptr || model.meshes->empty())
+                        return;
+
+                    const auto sceneTransform = ToSceneTransform(transform);
+                    for (const auto mesh : *model.meshes)
+                    {
+                        uploads.push_back(fra::SceneInstanceUpload {
+                            .transform = sceneTransform,
+                            .mesh      = mesh,
+                            .material  = model.material,
+                            .entityId  = static_cast<std::uint32_t>(renderable.entity),
+                            .flags     = fra::MakeSceneInstanceFlags(true),
+                        });
+                    }
+                });
+        }
+
+        if (uploads.empty())
+            continue;
+
+        uploaded += static_cast<std::uint32_t>(uploads.size());
+        mRenderer->UploadSceneInstances(uploads);
     }
     mRegistry->EndTrace();
 
-    if (mUploads.empty())
-        return;
-
-    mRegistry->BeginTrace("Sort scene instances");
-    std::ranges::sort(mUploads, [](const fra::SceneInstanceUpload& a, const fra::SceneInstanceUpload& b) {
-        return a.entityId < b.entityId;
-    });
+    mRegistry->BeginTrace("EndSceneInstances");
+    mRenderer->EndSceneInstances();
     mRegistry->EndTrace();
 
-    mRegistry->BeginTrace("UploadSceneInstances");
-    mRenderer->UploadSceneInstances(mUploads);
-    mRegistry->EndTrace();
+    if (uploaded > mInstanceReserve)
+        mInstanceReserve = uploaded;
 }
 
 void RenderSystem::SubmitHealthBars()
@@ -163,7 +195,7 @@ void RenderSystem::SubmitHealthBars()
     mRegistry->EndTrace();
 }
 
-void RenderSystem::EndFrame() const
+void RenderSystem::EndFrame()
 {
     mRegistry->BeginTrace("Render");
     mRenderer->EndFrame();

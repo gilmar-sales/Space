@@ -1,5 +1,7 @@
 #include "Octree.hpp"
 
+#include <Freya/Asset/SceneInstanceUpload.hpp>
+
 #include <glm/ext/matrix_transform.hpp>
 
 void Octree::Remove(fr::Entity entity) {
@@ -10,7 +12,7 @@ void Octree::Remove(fr::Entity entity) {
 }
 
 Octree::Octree(const glm::vec3 position, const float halfRange, ArenaAllocator *allocator,
-               Octree *root) : mAllocator(allocator), mPosition(position), mHalfRange(halfRange), mRoot(root) {
+               Octree *root) : mRoot(root), mAllocator(allocator), mPosition(position), mHalfRange(halfRange) {
     if (mRoot == nullptr)
         mRoot = this;
 
@@ -275,7 +277,7 @@ void Octree::PushInstanceData(std::vector<glm::mat4> &instanceData) const {
 }
 
 void Octree::Draw(const skr::Arc<fra::Renderer> &renderer,
-                  const std::vector<std::uint32_t> &meshIds) const {
+                  const std::vector<fra::MeshHandle> &meshIds) const {
     auto instanceData = std::vector<glm::mat4>();
     PushInstanceData(instanceData);
 
@@ -286,16 +288,20 @@ void Octree::Draw(const skr::Arc<fra::Renderer> &renderer,
     uploads.reserve(instanceData.size() * meshIds.size());
 
     for (std::size_t i = 0; i < instanceData.size(); ++i) {
-        for (const auto meshId : meshIds) {
+        const auto transform = fra::SceneTransform::FromMatrix(instanceData[i]);
+        for (const auto mesh : meshIds) {
             uploads.push_back(fra::SceneInstanceUpload {
-                .model       = instanceData[i],
-                .meshId      = meshId,
-                .materialId  = 0,
+                .transform   = transform,
+                .mesh        = mesh,
+                .material    = fra::MaterialHandle {},
                 .entityId    = static_cast<std::uint32_t>(i),
-                .castShadows = false,
+                .flags = fra::MakeSceneInstanceFlags(true),
             });
         }
     }
 
+    renderer->BeginSceneInstances();
+    renderer->ReserveSceneInstances(static_cast<std::uint32_t>(uploads.size()));
     renderer->UploadSceneInstances(uploads);
+    renderer->EndSceneInstances();
 }

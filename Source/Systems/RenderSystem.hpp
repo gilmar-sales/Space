@@ -21,15 +21,15 @@ class RenderSystem final : public fr::System
     void BeginFrame();
     void SubmitScene();
     void SubmitHealthBars();
-    void EndFrame() const;
+    void EndFrame();
 
     friend class SpaceApp;
 
     std::optional<fr::Entity> mPlayer;
 
-    std::vector<Particle>                 mRenderables;
-    std::vector<fra::SceneInstanceUpload> mUploads;
-    glm::mat4                             mViewProj { 1.0f };
+    std::vector<Particle> mRenderables;
+    std::uint32_t         mInstanceReserve { 30'000 };
+    glm::mat4             mViewProj { 1.0f };
 
     skr::Arc<fra::Renderer>     mRenderer;
     skr::Arc<fra::Window>       mWindow;
