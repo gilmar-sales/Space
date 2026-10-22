@@ -295,7 +295,7 @@ void Octree::Draw(const skr::Arc<fra::Renderer> &renderer,
                 .mesh        = mesh,
                 .material    = fra::MaterialHandle {},
                 .entityId    = static_cast<std::uint32_t>(i),
-                .flags = fra::MakeSceneInstanceFlags(true),
+                .flags = fra::SceneInstanceFlags::CastShadows,
             });
         }
     }

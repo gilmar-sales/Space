@@ -1,14 +1,12 @@
 #pragma once
 
-#include <Freyr/Freyr.hpp>
-
 enum class Squad
 {
     Ally,
     Enemy
 };
 
-struct SquadComponent : fr::Component
+struct SquadComponent
 {
     Squad squad;
 };

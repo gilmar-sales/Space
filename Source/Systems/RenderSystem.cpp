@@ -146,7 +146,7 @@ void RenderSystem::SubmitScene()
                             .mesh      = mesh,
                             .material  = model.material,
                             .entityId  = static_cast<std::uint32_t>(renderable.entity),
-                            .flags     = fra::MakeSceneInstanceFlags(true),
+                            .flags     = fra::SceneInstanceFlags::CastShadows,
                         });
                     }
                 });

@@ -1,8 +1,6 @@
 #pragma once
 
-#include <Freyr/Freyr.hpp>
-
-struct LaserGunComponent : fr::Component {
+struct LaserGunComponent  {
     bool triggered;
     float fireRate;
     float fireTime;
@@ -12,6 +10,6 @@ struct LaserGunComponent : fr::Component {
     std::uint32_t materialId;
 };
 
-struct BulletComponent : fr::Component {
+struct BulletComponent  {
     fr::Entity owner;
 };

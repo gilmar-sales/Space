@@ -17,7 +17,7 @@ enum class CombatManeuver : uint8_t
     Reposition
 };
 
-struct AIControlledComponent : fr::Component
+struct AIControlledComponent
 {
     Behaviour      behaviour        = Behaviour::Patrol;
     CombatManeuver maneuver         = CombatManeuver::Pursue;

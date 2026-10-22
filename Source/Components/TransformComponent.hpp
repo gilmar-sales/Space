@@ -1,13 +1,12 @@
 #pragma once
 
 #include <Freya/Freya.hpp>
-#include <Freyr/Freyr.hpp>
 
 static constexpr glm::vec3 WORLD_FORWARD { 0.0f, 0.0f, 1.0f };
 static constexpr glm::vec3 WORLD_RIGHT { 1.0f, 0.0f, 0.0f };
 static constexpr glm::vec3 WORLD_UP { 0.0f, 1.0f, 0.0f };
 
-struct TransformComponent : fr::Component
+struct TransformComponent
 {
     glm::vec3 position { glm::vec3(0.0f) };
     glm::quat rotation { glm::identity<glm::quat>() };

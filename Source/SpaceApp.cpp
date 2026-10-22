@@ -46,11 +46,9 @@ void SpaceApp::StartUp()
     }
     SDL_free(gamepads);
 
-    // LightService is window-scoped; seed a key light so deferred isn't unlit.
     auto lights = GetMainServiceProvider()->GetService<fra::LightService>();
     auto key    = fra::MakeDirectionalLight(glm::vec3(-0.35f, -1.0f, -0.25f),
                                             glm::vec3(1.0f, 0.97f, 0.92f), 2.5f);
-    key.castShadows = false;
     lights->AddLight(key);
 }
 

@@ -2,11 +2,9 @@
 
 #include "Containers/Octree.hpp"
 
-#include <Freyr/Freyr.hpp>
-
 #include <glm/glm.hpp>
 
-struct RigidBodyComponent : fr::Component
+struct RigidBodyComponent
 {
     bool      isKinematic     = false;
     bool      kinematicIfStop = false;
